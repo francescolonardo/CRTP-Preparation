@@ -10,9 +10,7 @@
 
 ## Solution
 
-1. **Try to get command execution on the domain controller by creating silver ticket for:**
-	- **HTTP**
-	- **WMI**
+1. **Try to get command execution on the domain controller by creating silver ticket for HTTP service and WMI service**
 
 From the information gathered in the previous steps (see *Learning Objective 07*) we have the hash for the machine account of the domain controller (`dcorp-dc$`).
 
