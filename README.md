@@ -85,6 +85,7 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 - [x] **Use domain admin privileges obtained earlier to execute the diamond ticket attack**
 
+[...]
 
 ---
 ---
