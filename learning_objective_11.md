@@ -298,7 +298,7 @@ Now, run the commands below to access the DC.
 ```
 🚩
 
-![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
 `$env:username`:
 ```
