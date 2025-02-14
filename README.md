@@ -85,6 +85,10 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 - [x] **Use domain admin privileges obtained earlier to execute the diamond ticket attack**
 
+#### 11 [Learning Objective](./learning_objective_11.md)
+
+= [ ] **Use domain admin privileges obtained earlier to abuse the DSRM credential for persistence**
+
 [...]
 
 ---
