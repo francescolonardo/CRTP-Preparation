@@ -170,7 +170,7 @@ Microsoft Windows [Version 10.0.20348.2762]
 
 C:\Users\Administrator>
 ```
-🚩
+🚀
 
 ![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
@@ -183,6 +183,7 @@ dcorp\administrator
 ```
 dcorp-dc
 ```
+🚩
 
 **WMI Service**
 
