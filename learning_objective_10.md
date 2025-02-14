@@ -138,7 +138,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--std422-administrator-64b5f6?logo=windows11&logoColor=white)
+![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -149,6 +149,7 @@ dcorp\administrator
 ```
 dcorp-dc
 ```
+🚩
 
 ---
 ---
