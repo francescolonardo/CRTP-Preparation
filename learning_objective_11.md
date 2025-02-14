@@ -296,7 +296,7 @@ Now, run the commands below to access the DC.
 ```
 [172.16.2.1]: PS C:\Users\Administrator.DCORP-DC\Documents>
 ```
-🚩
+🚀
 
 ![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
@@ -319,6 +319,7 @@ dcorp-dc\administrator
 ```
 dcorp-dc
 ```
+🚩
 
 ---
 ---
