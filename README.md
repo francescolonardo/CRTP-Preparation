@@ -87,13 +87,18 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 11 [Learning Objective](./learning_objective_11.md)
 
-= [x] **Use domain admin privileges obtained earlier to abuse the DSRM credential for persistence**
+- [x] **Use domain admin privileges obtained earlier to abuse the DSRM credential for persistence**
 
 #### 12 [Learning Objective](./learning_objective_12.md)
 
 - [x] **Check if `student422` has Replication (DCSync) rights**
 - [x] **If yes, execute the DCSync attack to pull hashes of the `krbtgt` user**
 - [x] **If no, add the replication rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
+
+#### 13 [Learning Objective](./learning_objective_13.md)
+
+- [x] **Modify security descriptors on `dcorp-dc` to get access using PowerShell remoting and WMI without requiring administrator access**
+- [x] **Retrieve machine account hash from `dcorp-dc` without using administrator access and use that to execute a Silver Ticket attack to get code execution with WMI**
 
 [...]
 
