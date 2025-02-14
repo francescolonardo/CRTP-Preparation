@@ -87,7 +87,13 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 11 [Learning Objective](./learning_objective_11.md)
 
-= [ ] **Use domain admin privileges obtained earlier to abuse the DSRM credential for persistence**
+= [x] **Use domain admin privileges obtained earlier to abuse the DSRM credential for persistence**
+
+#### 12 [Learning Objective](./learning_objective_12.md)
+
+- [x] **Check if `student422` has Replication (DCSync) rights**
+- [x] **If yes, execute the DCSync attack to pull hashes of the `krbtgt` user**
+- [x] **If no, add the replication rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
 
 [...]
 
