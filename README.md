@@ -100,6 +100,10 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 - [x] **Modify security descriptors on `dcorp-dc` to get access using PowerShell remoting and WMI without requiring administrator access**
 - [x] **Retrieve machine account hash from `dcorp-dc` without using administrator access and use that to execute a Silver Ticket attack to get code execution with WMI**
 
+#### 14 [Learning Objective](./learning_objective_14.md)
+
+- [x] **Using the kerberoasting attack, crack password of a SQL server service account**
+
 [...]
 
 ---
