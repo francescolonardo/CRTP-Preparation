@@ -122,8 +122,12 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 17 [Learning Objective](./learning_objective_17.md)
 
-- [ ] **Find a computer object in `dcorp` domain where we have Write permissions**
-- [ ] **Abuse the Write permissions to access that computer as Domain Admin**
+- [x] **Find a computer object in `dcorp` domain where we have Write permissions**
+- [x] **Abuse the Write permissions to access that computer as Domain Admin**
+
+#### 18 [Learning Objective](./learning_objective_18.md)
+
+- [ ] **Using Domain Admin access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using the domain trust key**
 
 [...]
 
