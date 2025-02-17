@@ -129,9 +129,9 @@ Domain: MONEYCORP.LOCAL📌 (mcorp / S-1-5-21-335606122-960912869-3279953914)
 [SNIP]
 ```
 
-**Froge ticket**
+**Forge the ticket**
 
-Let’s Forge a ticket with SID History of Enterprise Admins. Run the below command.
+Let’s forge a ticket with SID History of Enterprise Admins. Run the below command.
 
 ![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
