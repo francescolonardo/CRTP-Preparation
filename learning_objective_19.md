@@ -2,13 +2,13 @@
 
 ## Tasks
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using` dollarcorp`'s `krbtgt` hash**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using `dollarcorp`'s `krbtgt` hash**
 
 ---
 
 ## Solution
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using` dollarcorp`'s `krbtgt` hash**
+2. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using` dollarcorp`'s `krbtgt` hash**
 
 We already have the `krbtgt` hash from `dcorp-dc`. Let's create the inter-realm TGT and inject it. Run the below command.
 
