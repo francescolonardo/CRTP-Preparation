@@ -108,9 +108,24 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 15 [Learning Objective](./learning_objective_15.md)
 
-- [x] **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
-- [x] **Compromise the server and escalate to Domain Admin privileges**
-- [x] **Escalate to Enterprise Admins privileges by abusing Printer Bug**
+- [ ] **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
+- [ ] **Compromise the server and escalate to Domain Admin privileges**
+- [ ] **Escalate to Enterprise Admins privileges by abusing Printer Bug**
+
+#### 16 [Learning Objective](./learning_objective_16.md)
+
+- [ ] **Enumerate users in the domain for whom Constrained Delegation is enabled**
+	- [ ] **For such a user, request a TGT from the DC and obtain a TGS for the service to which delegation is configured**
+	- [ ] **Pass the ticket and access the service**
+- [ ] **Enumerate computer accounts in the domain for which Constrained Delegation is enabled**
+	- [ ] **For such a user, request a TGT from the DC**
+	- [ ] **Obtain an alternate TGS for LDAP service on the target machine**
+	- [ ] **Use the TGS for executing DCSync attack**
+
+#### 17 [Learning Objective](./learning_objective_17.md)
+
+- [ ] **Find a computer object in `dcorp` domain where we have Write permissions**
+- [ ] **Abuse the Write permissions to access that computer as Domain Admin**
 
 [...]
 
