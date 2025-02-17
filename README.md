@@ -127,7 +127,11 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 18 [Learning Objective](./learning_objective_18.md)
 
-- [ ] **Using Domain Admin access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using the domain trust key**
+- [x] **Using Domain Admin access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using the domain trust key**
+
+#### 19 [Learning Objective](./learning_objective_19.md)
+
+- [x] **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using` dollarcorp`'s `krbtgt` hash**
 
 [...]
 
