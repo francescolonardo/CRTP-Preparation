@@ -133,6 +133,15 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 - [x] **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to Enterprise Admins using` dollarcorp`'s `krbtgt` hash**
 
+#### 20 [Learning Objective](./learning_objective_20.md)
+
+- [x] **With DA privileges on `dollarcorp.moneycorp.local`, get access to `SharedwithDCorp` share on the DC of `eurocorp.local` forest**
+
+#### 21 [Learning Objective](./learning_objective_21.md)
+
+- [x] **Check if AD CS is used by the target forest and find any vulnerable/abusable templates**
+- [x] **Abuse any such template(s) to escalate to Domain Admin and Enterprise Admin**
+
 [...]
 
 ---
