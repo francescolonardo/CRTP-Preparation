@@ -139,8 +139,8 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 21 [Learning Objective](./learning_objective_21.md)
 
-- [x] **Check if AD CS is used by the target forest and find any vulnerable/abusable templates**
-- [x] **Abuse any such template(s) to escalate to Domain Admin and Enterprise Admin**
+- [ ] **Check if AD CS is used by the target forest and find any vulnerable/abusable templates**
+- [ ] **Abuse any such template(s) to escalate to Domain Admin and Enterprise Admin**
 
 [...]
 
