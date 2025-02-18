@@ -148,7 +148,7 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 23 [Learning Objective](./learning_objective_23.md)
 
-- [ ] **Compromise `eu-sql422` again. Use opsec friendly alternatives to bypass MDE and MDI**
+- [ ] **Compromise `eu-sql26` again. Use opsec friendly alternatives to bypass MDE and MDI**
 
 ---
 ---
