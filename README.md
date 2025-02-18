@@ -144,11 +144,11 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 22 [Learning Objective](./learning_objective_22.md)
 
-- [ ] **Get a reverse shell on a SQL server in `eurocorp` forest by abusing database links from `dcorp-mssql`**
+- [x] **Get a reverse shell on a SQL server in `eurocorp` forest by abusing database links from `dcorp-mssql`**
 
 #### 23 [Learning Objective](./learning_objective_23.md)
 
-- [ ] **Compromise `eu-sql26` again. Use opsec friendly alternatives to bypass MDE and MDI**
+- [x] **Compromise `eu-sql26` again. Use opsec friendly alternatives to bypass MDE and MDI**
 
 ---
 ---
