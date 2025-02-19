@@ -112,13 +112,13 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 16 [Learning Objective](./learning_objective_16.md)
 
-- [ ] **Enumerate users in the domain for whom Constrained Delegation is enabled**
-	- [ ] **For such a user, request a TGT from the DC and obtain a TGS for the service to which delegation is configured**
-	- [ ] **Pass the ticket and access the service**
-- [ ] **Enumerate computer accounts in the domain for which Constrained Delegation is enabled**
-	- [ ] **For such a user, request a TGT from the DC**
-	- [ ] **Obtain an alternate TGS for LDAP service on the target machine**
-	- [ ] **Use the TGS for executing DCSync attack**
+- [x] **Enumerate users in the domain for whom Constrained Delegation is enabled**
+	- [x] **For such a user, request a TGT from the DC and obtain a TGS for the service to which delegation is configured**
+	- [x] **Pass the ticket and access the service**
+- [x] **Enumerate computer accounts in the domain for which Constrained Delegation is enabled**
+	- [x] **For such a user, request a TGT from the DC**
+	- [x] **Obtain an alternate TGS for LDAP service on the target machine**
+	- [x] **Use the TGS for executing DCSync attack**
 
 #### 17 [Learning Objective](./learning_objective_17.md)
 
