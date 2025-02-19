@@ -26,14 +26,14 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 	- [x] **Domain Administrators**
 	- [x] **Enterprise Administrators**
 - [x] **Use BloodHound to identify the shortest path to Domain Admins in the `dollarcorp` domain**
-- [ ] **Find a file share where `studentx` has Write permissions**
+- [ ] **Find a file share where `student422` has Write permissions**
 
 #### 02 [Learning Objective](./learning_objective_02.md)
 
 - [x] **Enumerate following for the dollarcorp domain:**
 	- [x] **ACL for the Domain Admins group**
-	- [x] **ACLs where studentx has interesting permissions**
-- [x] **Analyze the permissions for studentx in BloodHound UI**
+	- [x] **ACLs where `student422` has interesting permissions**
+- [x] **Analyze the permissions for `student422	 in BloodHound UI**
 
 #### 03 [Learning Objective](./learning_objective_03.md)
 
@@ -53,8 +53,8 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 05 [Learning Objective](./learning_objective_05.md)
 
-- [x] **Exploit a service on `dcorp-studentx` and elevate privileges to local administrator**
-- [x] **Identify a machine in the domain where `studentx` has local administrative access**
+- [x] **Exploit a service on `dcorp-student422` and elevate privileges to local administrator**
+- [x] **Identify a machine in the domain where `student422` has local administrative access**
 - [x] **Using privileges of a user on Jenkins on `172.16.3.11:8080`, get admin privileges on `172.16.3.11`, the `dcorp-ci` server**
 
 #### 06 [Learning Objective](./learning_objective_06.md)
