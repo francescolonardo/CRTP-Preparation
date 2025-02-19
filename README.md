@@ -30,10 +30,10 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 02 [Learning Objective](./learning_objective_02.md)
 
-- [x] **Enumerate following for the dollarcorp domain:**
+- [x] **Enumerate following for the `dollarcorp` domain:**
 	- [x] **ACL for the Domain Admins group**
 	- [x] **ACLs where `student422` has interesting permissions**
-- [x] **Analyze the permissions for `student422	 in BloodHound UI**
+- [x] **Analyze the permissions for `student422` in BloodHound UI**
 
 #### 03 [Learning Objective](./learning_objective_03.md)
 
