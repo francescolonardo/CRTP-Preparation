@@ -59,7 +59,7 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 06 [Learning Objective](./learning_objective_06.md)
 
-- [ ] **Abuse an overly permissive Group Policy to get admin access on `dcorp-ci`**
+- [x] **Abuse an overly permissive Group Policy to get admin access on `dcorp-ci`**
 
 #### 07 [Learning Objective](./learning_objective_07.md)
 
