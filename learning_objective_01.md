@@ -192,6 +192,12 @@ dcorp-mgmt.dollarcorp.moneycorp.local
 dcorp-mssql.dollarcorp.moneycorp.local
 dcorp-sql1.dollarcorp.moneycorp.local
 dcorp-stdadmin.dollarcorp.moneycorp.local
+dcorp-std416.dollarcorp.moneycorp.local
+dcorp-std417.dollarcorp.moneycorp.local
+dcorp-std418.dollarcorp.moneycorp.local
+
+[SNIP]
+
 dcorp-std422.dollarcorp.moneycorp.local
 
 [SNIP]
@@ -210,23 +216,6 @@ dcorp-stdadmin.dollarcorp.moneycorp.local
 dcorp-std416.dollarcorp.moneycorp.local
 dcorp-std417.dollarcorp.moneycorp.local
 dcorp-std418.dollarcorp.moneycorp.local
-dcorp-std419.dollarcorp.moneycorp.local
-dcorp-std420.dollarcorp.moneycorp.local
-dcorp-std421.dollarcorp.moneycorp.local
-dcorp-std422.dollarcorp.moneycorp.local
-dcorp-std423.dollarcorp.moneycorp.local
-dcorp-std424.dollarcorp.moneycorp.local
-dcorp-std425.dollarcorp.moneycorp.local
-dcorp-std426.dollarcorp.moneycorp.local
-dcorp-std427.dollarcorp.moneycorp.local
-dcorp-std428.dollarcorp.moneycorp.local
-dcorp-std429.dollarcorp.moneycorp.local
-dcorp-std430.dollarcorp.moneycorp.local
-dcorp-std431.dollarcorp.moneycorp.local
-dcorp-std432.dollarcorp.moneycorp.local
-dcorp-std433.dollarcorp.moneycorp.local
-dcorp-std434.dollarcorp.moneycorp.local
-dcorp-std435.dollarcorp.moneycorp.local
 ```
 
 To see details of the "Domain Admins" group.
@@ -655,9 +644,10 @@ In `Node Info`, scroll down to `LOCAL ADMIN RIGHTS` and expand `Derivative Local
 3. **Find a file share where `student422` has write permissions**
 
 We will use PowerHuntShares to search for file shares where `student422` has write permissions.
-We will not scan the domain controller for writable shares for a better OPSEC.
 
 Run the following commands from a PowerShell session started using Invisi-Shell.
+
+`cd \AD\Tools`
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -665,6 +655,8 @@ Run the following commands from a PowerShell session started using Invisi-Shell.
 ```
 
 `Import-Module C:\AD\Tools\PowerHuntShares.psm1`
+
+We will not scan the domain controller for writable shares for a better OPSEC.
 
 `type C:\AD\Tools\servers.txt`:
 ```
@@ -693,167 +685,107 @@ dcorp-stdadmin.dollarcorp.moneycorp.local
 
 `Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt`:
 ```
- ===============================================================                                                                                                        INVOKE-HUNTSMBSHARES                                                                                                                                                   ===============================================================                                                                                                         This function automates the following tasks:                                                                                                                                                                                                                                                                                                  o Determine current computer's domain
-  o Enumerate domain computers
-  o Check if computers respond to ping requests
-  o Filter for computers that have TCP 445 open and accessible
-  o Enumerate SMB shares
-  o Enumerate SMB share permissions
-  o Identify shares with potentially excessive privielges
-  o Identify shares that provide read or write access
-  o Identify shares thare are high risk
-  o Identify common share owners, names, & directory listings
-  o Generate last written & last accessed timelines
-  o Generate html summary report and detailed csv files
+[SNIP]
 
-  Note: This can take hours to run in large environments.
- ---------------------------------------------------------------
- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
  ---------------------------------------------------------------
  SHARE DISCOVERY
  ---------------------------------------------------------------
- [*][02/12/2025 05:24] Scan Start
- [*][02/12/2025 05:24] Output Directory: C:\AD\Tools\\SmbShareHunt-02122025052419
- [*][02/12/2025 05:24] Importing computer targets from C:\AD\Tools\servers.txt
- [*][02/12/2025 05:24] 28 systems will be targeted
- [*][02/12/2025 05:24] - Skipping ping scan.
- [*][02/12/2025 05:24] Checking if TCP Port 445 is open on 28 computers
- [*][02/12/2025 05:24] - 28 computers have TCP port 445 open.
- [*][02/12/2025 05:24] Getting a list of SMB shares from 28 computers
- [*][02/12/2025 05:24] - 112 SMB shares were found.
- [*][02/12/2025 05:24] Getting share permissions from 112 SMB shares
- [*][02/12/2025 05:24] - 0 share permissions were enumerated.📌
- [*][02/12/2025 05:24] - Aborting.
-```
-❌
+ [*][02/20/2025 06:31] Scan Start
+ [*][02/20/2025 06:31] Output Directory: C:\AD\Tools\\SmbShareHunt-02202025063120
+ [*][02/20/2025 06:31] Importing computer targets from C:\AD\Tools\servers.txt
+ [*][02/20/2025 06:31] 7 systems will be targeted
+ [*][02/20/2025 06:31] - Skipping ping scan.
+ [*][02/20/2025 06:31] Checking if TCP Port 445 is open on 7 computers
+ [*][02/20/2025 06:31] - 7 computers have TCP port 445 open.
+ [*][02/20/2025 06:31] Getting a list of SMB shares from 7 computers
+ [*][02/20/2025 06:31] - 23 SMB shares were found.
+ [*][02/20/2025 06:31] Getting share permissions from 23 SMB shares
+ [*][02/20/2025 06:31] - 30 share permissions were enumerated.
+ [*][02/20/2025 06:31] Identifying potentially excessive share permissions
+ [*][02/20/2025 06:31] - 10 potentially excessive privileges were found on 4 shares across 3 systems.
+ [*][02/20/2025 06:31] Getting directory listings from 4 SMB shares
+ [*][02/20/2025 06:31] - Targeting up to 3 nested directory levels
+ [*][02/20/2025 06:31] - 6 files and folders were enumerated.
+ [*][02/20/2025 06:31] Scan Complete
 
-**We need admin privileges**, see Learning Objective 05.
-
-`Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt`:
-```
- ===============================================================                                                                                                        INVOKE-HUNTSMBSHARES                                                                                                                                                   ===============================================================                                                                                                         This function automates the following tasks:                                                                                                                                                                                                                                                                                                  o Determine current computer's domain                                                                                                                                  o Enumerate domain computers                                                                                                                                           o Check if computers respond to ping requests                                                                                                                          o Filter for computers that have TCP 445 open and accessible                                                                                                           o Enumerate SMB shares                                                                                                                                                 o Enumerate SMB share permissions
-  o Identify shares with potentially excessive privielges
-  o Identify shares that provide read or write access
-  o Identify shares thare are high risk
-  o Identify common share owners, names, & directory listings
-  o Generate last written & last accessed timelines
-  o Generate html summary report and detailed csv files
-
-  Note: This can take hours to run in large environments.
+[SNIP]
+ 
+ [*][02/20/2025 06:31] Creating ShareGraph nodes and edges...
+ [*][02/20/2025 06:31] Analysis Complete
  ---------------------------------------------------------------
- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ SHARE REPORT SUMMARY📌
  ---------------------------------------------------------------
- SHARE DISCOVERY
- ---------------------------------------------------------------
- [*][02/12/2025 05:51] Scan Start
- [*][02/12/2025 05:51] Output Directory: C:\AD\Tools\\SmbShareHunt-02122025055111
- [*][02/12/2025 05:51] Importing computer targets from C:\AD\Tools\servers.txt
- [*][02/12/2025 05:51] 7 systems will be targeted
- [*][02/12/2025 05:51] - Skipping ping scan.
- [*][02/12/2025 05:51] Checking if TCP Port 445 is open on 7 computers
- [*][02/12/2025 05:51] - 7 computers have TCP port 445 open.
- [*][02/12/2025 05:51] Getting a list of SMB shares from 7 computers
- [*][02/12/2025 05:51] - 19 SMB shares were found.
- [*][02/12/2025 05:51] Getting share permissions from 19 SMB shares
- [*][02/12/2025 05:51] - 23 share permissions were enumerated.
- [*][02/12/2025 05:51] Identifying potentially excessive share permissions
- [*][02/12/2025 05:51] - 6 potentially excessive privileges were found on 3 shares across 2 systems.
- [*][02/12/2025 05:51] Getting directory listings from 3 SMB shares
- [*][02/12/2025 05:51] - Targeting up to 3 nested directory levels
- [*][02/12/2025 05:52] - 5 files and folders were enumerated.
- [*][02/12/2025 05:52] Scan Complete
- ---------------------------------------------------------------
- SHARE ANALYSIS
- ---------------------------------------------------------------
- [*][02/12/2025 05:52] Analysis Start
- [*][02/12/2025 05:52] - 3 shares can be read across 2 systems.
- [*][02/12/2025 05:52] - 1 shares can be written to across 1 systems.
- [*][02/12/2025 05:52] - 3 shares are considered non-default across 2 systems.
- [*][02/12/2025 05:52] - 2 shares are considered high risk across 1 systems.
- [*][02/12/2025 05:52] - Identified top 200 owners of excessive shares.
- [*][02/12/2025 05:52] - Identified top 200 share groups.
- [*][02/12/2025 05:52] - Identified top 200 share names.
- [*][02/12/2025 05:52] - Identified shares created in last 90 days.
- [*][02/12/2025 05:52] - Identified shares accessed in last 90 days.
- [*][02/12/2025 05:52] - Identified shares modified in last 90 days.
- [*][02/12/2025 05:52] - Identified 2 subnets hosting shares configured with excessive privileges.
- [*][02/12/2025 05:52] Finding interesting files...
- [*][02/12/2025 05:52] Grabbing secrets for parsing...
- [*][02/12/2025 05:52] Creating ShareGraph nodes and edges...
- [*][02/12/2025 05:52] Analysis Complete
- ---------------------------------------------------------------
- SHARE REPORT SUMMARY
- ---------------------------------------------------------------
- [*][02/12/2025 05:52] Domain: SmbHunt
- [*][02/12/2025 05:52] Start time: 02/12/2025 05:51:11
- [*][02/12/2025 05:52] End time: 02/12/2025 05:52:08
- [*][02/12/2025 05:52] Run time: 00:00:56.1979501
- [*][02/12/2025 05:52]
- [*][02/12/2025 05:52] COMPUTER SUMMARY
- [*][02/12/2025 05:52] - 7 domain computers found.
- [*][02/12/2025 05:52] - 0 (0.00%) domain computers responded to ping. (No Ping)
- [*][02/12/2025 05:52] - 7 (100.00%) domain computers had TCP port 445 accessible.
- [*][02/12/2025 05:52] - 2 (28.57%) domain computers had shares that were non-default.
- [*][02/12/2025 05:52] - 2 (28.57%) domain computers had shares with potentially excessive privileges.
- [*][02/12/2025 05:52] - 2 (28.57%) domain computers had shares that allowed READ access.
- [*][02/12/2025 05:52] - 1 (14.29%) domain computers had shares that allowed WRITE access.
- [*][02/12/2025 05:52] - 1 (14.29%) domain computers had shares that are HIGH RISK.
- [*][02/12/2025 05:52]
- [*][02/12/2025 05:52] SHARE SUMMARY
- [*][02/12/2025 05:52] - 19 shares were found.📌 We expect a minimum of 14 shares
- [*][02/12/2025 05:52]   because 7 systems had open ports and there are typically two default shares.
- [*][02/12/2025 05:52] - 3 (15.79%) shares across 2 systems were non-default.
- [*][02/12/2025 05:52] - 3 (15.79%) shares across 2 systems are configured with 6 potentially excessive ACLs.
- [*][02/12/2025 05:52] - 3 (15.79%) shares across 2 systems allowed READ access.
- [*][02/12/2025 05:52] - 1 (5.26%) shares across 1 systems allowed WRITE access.
- [*][02/12/2025 05:52] - 2 (10.53%) shares across 1 systems are considered HIGH RISK.
- [*][02/12/2025 05:52]
- [*][02/12/2025 05:52] SHARE ACL SUMMARY
- [*][02/12/2025 05:52] - 23 ACLs were found.📌
- [*][02/12/2025 05:52] - 23 (100.00%) ACLs were associated with non-default shares.
- [*][02/12/2025 05:52] - 6 (26.09%) ACLs were found to be potentially excessive.
- [*][02/12/2025 05:52] - 4 (17.39%) ACLs were found that allowed READ access.
- [*][02/12/2025 05:52] - 1 (4.35%) ACLs were found that allowed WRITE access.
- [*][02/12/2025 05:52] - 5 (21.74%) ACLs were found that are associated with HIGH RISK share names.
- [*][02/12/2025 05:52]
- [*][02/12/2025 05:52] - The most common share names are:
- [*][02/12/2025 05:52] - 3 of 3 (100.00%) discovered shares are associated with the top 200 share names.
- [*][02/12/2025 05:52]   - 1 studentshareadmin
- [*][02/12/2025 05:52]   - 1 ADMIN$
- [*][02/12/2025 05:52]   - 1 C$
+ [*][02/20/2025 06:31] Domain: SmbHunt
+ [*][02/20/2025 06:31] Start time: 02/20/2025 06:31:20
+ [*][02/20/2025 06:31] End time: 02/20/2025 06:31:45
+ [*][02/20/2025 06:31] Run time: 00:00:25.1958136
+ [*][02/20/2025 06:31]
+ [*][02/20/2025 06:31] COMPUTER SUMMARY
+ [*][02/20/2025 06:31] - 7 domain computers found.
+ [*][02/20/2025 06:31] - 0 (0.00%) domain computers responded to ping. (No Ping)
+ [*][02/20/2025 06:31] - 7 (100.00%) domain computers had TCP port 445 accessible.
+ [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares that were non-default.
+ [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares with potentially excessive privileges.
+ [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares that allowed READ access.
+ [*][02/20/2025 06:31] - 2 (28.57%) domain computers had shares that allowed WRITE access.
+ [*][02/20/2025 06:31] - 1 (14.29%) domain computers had shares that are HIGH RISK.
+ [*][02/20/2025 06:31]
+ [*][02/20/2025 06:31] SHARE SUMMARY
+ [*][02/20/2025 06:31] - 23 shares were found. We expect a minimum of 14 shares
+ [*][02/20/2025 06:31]   because 7 systems had open ports and there are typically two default shares.
+ [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems were non-default.
+ [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems are configured with 10 potentially excessive ACLs.
+ [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems allowed READ access.
+ [*][02/20/2025 06:31] - 2 (8.70%) shares across 2 systems allowed WRITE access.
+ [*][02/20/2025 06:31] - 2 (8.70%) shares across 1 systems are considered HIGH RISK.
+ [*][02/20/2025 06:31]
+ [*][02/20/2025 06:31] SHARE ACL SUMMARY
+ [*][02/20/2025 06:31] - 30 ACLs were found.
+ [*][02/20/2025 06:31] - 30 (100.00%) ACLs were associated with non-default shares.
+ [*][02/20/2025 06:31] - 10 (33.33%) ACLs were found to be potentially excessive.
+ [*][02/20/2025 06:31] - 6 (20.00%) ACLs were found that allowed READ access.
+ [*][02/20/2025 06:31] - 2 (6.67%) ACLs were found that allowed WRITE access.
+ [*][02/20/2025 06:31] - 5 (16.67%) ACLs were found that are associated with HIGH RISK share names.
+ [*][02/20/2025 06:31]
+ [*][02/20/2025 06:31] - The most common share names are:
+ [*][02/20/2025 06:31] - 4 of 4 (100.00%) discovered shares are associated with the top 200 share names.
+ [*][02/20/2025 06:31]   - 1 AI📁
+ [*][02/20/2025 06:31]   - 1 studentshareadmin
+ [*][02/20/2025 06:31]   - 1 C$
+ [*][02/20/2025 06:31]   - 1 ADMIN$
  [*] -----------------------------------------------
- [*][02/12/2025 05:52]   - Generating HTML Report
- [*][02/12/2025 05:52]   - Estimated generation time: 1 minute or less
- [*][02/12/2025 05:52]   - All files written to C:\AD\Tools\\SmbShareHunt-02122025055111📌
- [*][02/12/2025 05:52]   - Done.
+ [*][02/20/2025 06:31]   - Generating HTML Report
+ [*][02/20/2025 06:31]   - Estimated generation time: 1 minute or less
+ [*][02/20/2025 06:31]   - All files written to C:\AD\Tools\\SmbShareHunt-02202025063120📌
+ [*][02/20/2025 06:31]   - Done.
 ```
 
-`dir C:\AD\Tools\SmbShareHunt-02122025055111`:
+`dir C:\AD\Tools\SmbShareHunt-02202025063120`:
 ```
-    Directory: C:\AD\Tools\SmbShareHunt-02122025055111
+    Directory: C:\AD\Tools\SmbShareHunt-02202025063120
 
 
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-d-----         2/12/2025   5:52 AM                Results
--a----         2/12/2025   5:52 AM        1021314 Summary-Report-SmbHunt.html📌
+d-----         2/20/2025   6:31 AM                Results
+-a----         2/20/2025   6:31 AM        1069450 Summary-Report-SmbHunt.html📌
 ```
 
 You need to copy the summary report to your host machine because the report needs internet access, which is not available on the student VM.
 
 The 'Summary Report' page shows, well, the summary.
 
-![Firefox - Summary Report Page](./assets/screenshots/.png)
+![PowerHuntShares - Summary Report Page](./assets/screenshots/learning_objective_01_powerhuntshares_report_page.png)
 
-The Critical and High findings will be for `dcorp-adminsrv` as `student422` has admin privileges there.
-Another interesting observation is in the Medium findings that shows that there is a directory named `AI` on `dcorp-ci` where `BUILTIN\Users` has `WriteData/Addfile` permissions.
+The `Critical` and `High` findings will be for `dcorp-adminsrv` as `student422` has admin privileges there.
+Another interesting observation is in the `Low` findings that shows that there is a directory named `AI` on `dcorp-ci` where `BUILTIN\Users` has `WriteData/AddFile` permissions.
 
-![ShareGraph](./assets/screenshots/.png)
+![PowerHuntShares - Insecure ACEs (Low)](./assets/screenshots/learning_objective_01_powerhuntshares_report_insecureaces.png)
 
-Go to `ShareGraph` -> `Search: dcorp-ci` -> Right click on `dcorp-ci` node -> Click `Expand`.
+Go to `ShareGraph` -> `Search Nodes: dcorp-ci` -> right click on `dcorp-ci` node -> click `Expand`.
 It turns out that `Everyone` has privileges on the `AI` folder.
 
-![ShareGraph](./assets/screenshots/.png)
+![PowerHuntShares - ShareGraph](./assets/screenshots/learning_objective_01_powerhuntshares_report_sharegraph.png)
 
 ---
 ---
