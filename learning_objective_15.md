@@ -610,7 +610,7 @@ Supplemental Credentials:
 [SNIP]
 ```
 
-Awesome ! We escalated to Enterprise Admins too!
+Awesome! We escalated to Enterprise Admins too!
 🚩
 
 ---
