@@ -26,7 +26,7 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 	- [x] **Domain Administrators**
 	- [x] **Enterprise Administrators**
 - [x] **Use BloodHound to identify the shortest path to Domain Admins in the `dollarcorp` domain**
-- [ ] **Find a file share where `student422` has Write permissions**
+- [x] **Find a file share where `student422` has Write permissions**
 
 #### 02 [Learning Objective](./learning_objective_02.md)
 
