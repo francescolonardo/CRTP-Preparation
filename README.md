@@ -106,9 +106,9 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 #### 15 [Learning Objective](./learning_objective_15.md)
 
-- [ ] **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
-- [ ] **Compromise the server and escalate to Domain Admin privileges**
-- [ ] **Escalate to Enterprise Admins privileges by abusing Printer Bug**
+- [x] **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
+- [x] **Compromise the server and escalate to Domain Admin privileges**
+- [x] **Escalate to Enterprise Admins privileges by abusing Printer Bug**
 
 #### 16 [Learning Objective](./learning_objective_16.md)
 
