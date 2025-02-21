@@ -210,6 +210,7 @@ instancetype             : 4
 objectclass              : {top, container, groupPolicyContainer}
 objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
 ```
+🚩
 
 2. **Analyze the permissions for `student422` using BloodHound UI**
 
@@ -225,6 +226,7 @@ Due to the membership of the "RDPUsers" group, the `student841` user has the fol
 - Full Control/`GenericAll` over `supportx` and `controlx` users.
 - Full Control/`GenericAll` on the `Applocker` group policy.
 - `Enrollment` permissions on multiple certificate templates.
+🚩
 
 ---
 ---
