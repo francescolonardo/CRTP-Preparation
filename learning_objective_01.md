@@ -22,7 +22,7 @@
 
 We can use PowerView for enumerating the domain. Please note that all the enumeration can be done with Microsoft's ActiveDirectory module as well.
 
-**Using PowerView**
+**Using PowerView module**
 
 Start a PowerShell session using Invisi-Shell to avoid enhanced logging. Run the below command from a command prompt on the student VM.
 
@@ -54,23 +54,10 @@ PS C:\AD\Tools>
 
 Load PowerView in the PowerShell session.
 
-`Get-Module`:
-```
-ModuleType Version    Name                                ExportedCommands
----------- -------    ----                                ----------------
-Script     2.0.0      PSReadline                          {Get-PSReadLineKeyHandler, Get-PSReadLineOption, Remove-PSReadLineKeyHandler, Set-PSReadLineKeyHandler...}
-```
-
 `Import-Module C:\AD\Tools\PowerView.ps1`
 
-`Get-Module`:
-```
-ModuleType Version    Name                                ExportedCommands
----------- -------    ----                                ----------------
-Manifest   3.1.0.0    Microsoft.PowerShell.Utility        {Add-Member, Add-Type, Clear-Variable, Compare-Object...}📌
-Script     2.0.0      PSReadline                          {Get-PSReadLineKeyHandler, Get-PSReadLineOption, Remove-PSReadLineKeyHandler, Set-PSReadLineKeyHandler...}
-```
-
+ **Enumerate users in the current domain using PowerView**
+ 
 `Get-DomainUser`:
 ```
 pwdlastset                    : 11/11/2022 6:33:55 AM
@@ -80,7 +67,7 @@ description                   : Built-in account for administering the computer/
 distinguishedname             : CN=Administrator,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 objectclass                   : {top, person, organizationalPerson, user}
 lastlogontimestamp            : 2/4/2025 6:19:15 AM
-samaccountname                : Administrator📌
+samaccountname                : Administrator👤
 logonhours                    : @{Tuesday=System.Collections.Hashtable; Friday=System.Collections.Hashtable; Wednesday=System.Collections.Hashtable;
                                 Saturday=System.Collections.Hashtable; Thursday=System.Collections.Hashtable; Monday=System.Collections.Hashtable;
                                 Sunday=System.Collections.Hashtable}
@@ -111,6 +98,40 @@ iscriticalsystemobject        : True
 name                          : Administrator
 
 [SNIP]
+
+logoncount            : 72
+badpasswordtime       : 12/4/2024 9:10:02 PM
+distinguishedname     : CN=app admin,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+objectclass           : {top, person, organizationalPerson, user}
+displayname           : app admin
+lastlogontimestamp    : 2/19/2025 10:08:28 PM
+userprincipalname     : appadmin
+samaccountname        : appadmin👤
+codepage              : 0
+samaccounttype        : USER_OBJECT
+accountexpires        : NEVER
+countrycode           : 0
+whenchanged           : 2/20/2025 6:08:28 AM
+instancetype          : 4
+usncreated            : 38196
+objectguid            : 6115db58-7505-481e-ab17-4ce61a06b425
+sn                    : admin
+lastlogoff            : 12/31/1600 4:00:00 PM
+whencreated           : 11/14/2022 12:51:10 PM
+objectcategory        : CN=Person,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
+dscorepropagationdata : {12/5/2024 12:47:28 PM, 11/14/2022 12:51:10 PM, 1/1/1601 12:00:01 AM}
+givenname             : app
+usnchanged            : 648918
+lastlogon             : 2/20/2025 10:08:38 PM
+badpwdcount           : 0
+cn                    : app admin
+useraccountcontrol    : NORMAL_ACCOUNT, DONT_EXPIRE_PASSWORD
+objectsid             : S-1-5-21-719815819-3726368948-3917688648-1117
+primarygroupid        : 513
+pwdlastset            : 11/14/2022 4:51:10 AM
+name                  : app admin
+
+[SNIP]
 ```
 
 `whoami`:
@@ -127,7 +148,7 @@ objectclass           : {top, person, organizationalPerson, user}
 displayname           : student422
 lastlogontimestamp    : 2/8/2025 9:14:18 PM
 userprincipalname     : student422@dollarcorp.moneycorp.local
-samaccountname        : student422📌
+samaccountname        : student422👤
 codepage              : 0
 samaccounttype        : USER_OBJECT
 accountexpires        : NEVER
@@ -157,23 +178,28 @@ To list a specific property of all the users, we can use the `select-object` (or
 
 `Get-DomainUser | select -ExpandProperty samaccountname`:
 ```
-Administrator
+Administrator👤
 Guest
-krbtgt
-sqladmin
-websvc
-srvadmin
-appadmin
-svcadmin
+krbtgt👤
+sqladmin👤
+websvc👤
+srvadmin👤
+appadmin👤
+svcadmin👤
 testda
-mgmtadmin
-ciadmin
-sql1admin
+mgmtadmin👤
+ciadmin👤
+sql1admin👤
 studentadmin
-student422
+
+[SNIP]
+
+student422👤
 
 [SNIP]
 ```
+
+ **Enumerate computers in the current domain using PowerView**
 
 Now, to enumerate member computers in the domain we can use `Get-DomainComputer`.
 
@@ -184,13 +210,13 @@ dcorp-std422
 
 `Get-DomainComputer | select -ExpandProperty dnshostname`:
 ```
-dcorp-dc.dollarcorp.moneycorp.local
-dcorp-adminsrv.dollarcorp.moneycorp.local
-dcorp-appsrv.dollarcorp.moneycorp.local
-dcorp-ci.dollarcorp.moneycorp.local
-dcorp-mgmt.dollarcorp.moneycorp.local
-dcorp-mssql.dollarcorp.moneycorp.local
-dcorp-sql1.dollarcorp.moneycorp.local
+dcorp-dc.dollarcorp.moneycorp.local🖥️
+dcorp-adminsrv.dollarcorp.moneycorp.local🖥️
+dcorp-appsrv.dollarcorp.moneycorp.local🖥️
+dcorp-ci.dollarcorp.moneycorp.local🖥️
+dcorp-mgmt.dollarcorp.moneycorp.local🖥️
+dcorp-mssql.dollarcorp.moneycorp.local🖥️
+dcorp-sql1.dollarcorp.moneycorp.local🖥️
 dcorp-stdadmin.dollarcorp.moneycorp.local
 dcorp-std416.dollarcorp.moneycorp.local
 dcorp-std417.dollarcorp.moneycorp.local
@@ -198,7 +224,7 @@ dcorp-std418.dollarcorp.moneycorp.local
 
 [SNIP]
 
-dcorp-std422.dollarcorp.moneycorp.local
+dcorp-std422.dollarcorp.moneycorp.local🖥️
 
 [SNIP]
 ```
@@ -218,6 +244,8 @@ dcorp-std417.dollarcorp.moneycorp.local
 dcorp-std418.dollarcorp.moneycorp.local
 ```
 
+ **Enumerate domain administrators in the current domain using PowerView**
+ 
 To see details of the "Domain Admins" group.
 
 `Get-DomainGroup -Identity "Domain Admins"`:
@@ -226,7 +254,7 @@ grouptype              : GLOBAL_SCOPE, SECURITY
 admincount             : 1
 iscriticalsystemobject : True
 samaccounttype         : GROUP_OBJECT
-samaccountname         : Domain Admins📌
+samaccountname         : Domain Admins👥
 whenchanged            : 11/14/2022 5:06:37 PM
 objectsid              : S-1-5-21-719815819-3726368948-3917688648-512
 name                   : Domain Admins
@@ -238,7 +266,7 @@ objectguid             : 7d766421-bcf7-40b1-a970-17da0bedb489
 description            : Designated administrators of the domain
 memberof               : {CN=Denied RODC Password Replication Group,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local,
                          CN=Administrators,CN=Builtin,DC=dollarcorp,DC=moneycorp,DC=local}
-member                 : {CN=svc admin📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local, CN=Administrator📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local}
+member                 : {CN=svc admin👤,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local, CN=Administrator👤,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local}
 usncreated             : 12315
 whencreated            : 11/12/2022 5:59:41 AM
 distinguishedname      : CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
@@ -251,23 +279,25 @@ To enumerate members of the "Domain Admins" group.
 `Get-DomainGroupMember -Identity "Domain Admins"`:
 ```
 GroupDomain             : dollarcorp.moneycorp.local
-GroupName               : Domain Admins
+GroupName               : Domain Admins👥
 GroupDistinguishedName  : CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 MemberDomain            : dollarcorp.moneycorp.local
-MemberName              : svcadmin📌
+MemberName              : svcadmin👤
 MemberDistinguishedName : CN=svc admin,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 MemberObjectClass       : user
 MemberSID               : S-1-5-21-719815819-3726368948-3917688648-1118📌
 
 GroupDomain             : dollarcorp.moneycorp.local
-GroupName               : Domain Admins
+GroupName               : Domain Admins👥
 GroupDistinguishedName  : CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 MemberDomain            : dollarcorp.moneycorp.local
-MemberName              : Administrator📌
+MemberName              : Administrator👤
 MemberDistinguishedName : CN=Administrator,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 MemberObjectClass       : user
 MemberSID               : S-1-5-21-719815819-3726368948-3917688648-500📌
 ```
+
+ **Enumerate enterprise administrators in the current domain using PowerView**
 
 To enumerate members of the "Enterprise Admins" group.
 
@@ -280,7 +310,7 @@ Since, this is not a forest root domain, the above command will return nothing. 
 
 `Get-Domain`:
 ```
-Forest                  : moneycorp.local📌
+Forest                  : moneycorp.local🏰
 DomainControllers       : {dcorp-dc.dollarcorp.moneycorp.local}
 Children                : {us.dollarcorp.moneycorp.local}
 DomainMode              : Unknown
@@ -289,26 +319,26 @@ Parent                  : moneycorp.local
 PdcRoleOwner            : dcorp-dc.dollarcorp.moneycorp.local
 RidRoleOwner            : dcorp-dc.dollarcorp.moneycorp.local
 InfrastructureRoleOwner : dcorp-dc.dollarcorp.moneycorp.local
-Name                    : dollarcorp.moneycorp.local📌
+Name                    : dollarcorp.moneycorp.local🏛️
 ```
 
 `Get-DomainGroupMember -Identity "Enterprise Admins" -Domain moneycorp.local`:
 ```
 GroupDomain             : moneycorp.local
-GroupName               : Enterprise Admins
+GroupName               : Enterprise Admins👥
 GroupDistinguishedName  : CN=Enterprise Admins,CN=Users,DC=moneycorp,DC=local
 MemberDomain            : moneycorp.local
-MemberName              : Administrator📌
+MemberName              : Administrator👑
 MemberDistinguishedName : CN=Administrator,CN=Users,DC=moneycorp,DC=local
 MemberObjectClass       : user
 MemberSID               : S-1-5-21-335606122-960912869-3279953914-500📌
 ```
 
-**Using the Active Directory module (ADModule)**
+**Using Active Directory module (ADModule)**
 
 Let's import the ADModule.
 
-**Note:** Remember to use it from a different PowerShell session started by using Invisi-Shell. If you load PowerView and the ADModule in same PowerShell session, some functions may not work.
+**Note:** Remember to use it **from a different PowerShell session** started by using Invisi-Shell. If you load PowerView and the ADModule in same PowerShell session, some functions may not work.
 
 `exit`:
 ```
@@ -326,7 +356,7 @@ Let's import the ADModule.
 
 `Import-Module C:\AD\Tools\ADModule-master\ActiveDirectory\ActiveDirectory.psd1`
 
-Enumerate all the users in the current domain using the ADModule.
+ **Enumerate users in the current domain using ADModule**
 
 `Get-ADUser -Filter *`:
 ```
@@ -336,7 +366,7 @@ GivenName         :
 Name              : Administrator
 ObjectClass       : user
 ObjectGUID        : d954e824-f549-47c2-9809-646c218cef36
-SamAccountName    : Administrator📌
+SamAccountName    : Administrator👤
 SID               : S-1-5-21-719815819-3726368948-3917688648-500
 Surname           :
 UserPrincipalName :
@@ -347,7 +377,7 @@ GivenName         :
 Name              : Guest
 ObjectClass       : user
 ObjectGUID        : caa69143-af4c-4551-af91-e9edd1059080
-SamAccountName    : Guest📌
+SamAccountName    : Guest👤
 SID               : S-1-5-21-719815819-3726368948-3917688648-501
 Surname           :
 UserPrincipalName :
@@ -357,20 +387,23 @@ UserPrincipalName :
 
 `Get-ADUser -Filter * | select -ExpandProperty Samaccountname`:
 ```
-Administrator
+Administrator👤
 Guest
-krbtgt
+krbtgt👤
 mcorp$
 US$
 ecorp$
-sqladmin
-websvc
-srvadmin
-appadmin
-svcadmin
+sqladmin👤
+websvc👤
+srvadmin👤
+appadmin👤
+svcadmin👤
 testda
-mgmtadmin
-student422
+mgmtadmin👤
+
+[SNIP]
+
+student422👤
 
 [SNIP]
 ```
@@ -397,7 +430,7 @@ testda         Not what the name implies ;)
 [SNIP]
 ```
 
-For the next task, list all the computers using the ADModule.
+ **Enumerate computers in the current domain using ADModule**
 
 `Get-ADComputer -Filter *`:
 ```
@@ -407,7 +440,7 @@ Enabled           : True
 Name              : DCORP-DC
 ObjectClass       : computer
 ObjectGUID        : d698b7ab-f29e-461b-9bc9-24a4a131c92d
-SamAccountName    : DCORP-DC$
+SamAccountName    : DCORP-DC$🖥️
 SID               : S-1-5-21-719815819-3726368948-3917688648-1000
 UserPrincipalName :
 
@@ -417,7 +450,7 @@ Enabled           : True
 Name              : DCORP-ADMINSRV
 ObjectClass       : computer
 ObjectGUID        : 2e036483-7f45-4416-8a62-893618556370
-SamAccountName    : DCORP-ADMINSRV$
+SamAccountName    : DCORP-ADMINSRV$🖥️
 SID               : S-1-5-21-719815819-3726368948-3917688648-1105
 UserPrincipalName :
 
@@ -426,19 +459,23 @@ UserPrincipalName :
 
 `Get-ADComputer -Filter * | select -ExpandProperty NDNSHostNameame`:
 ```
-dcorp-dc.dollarcorp.moneycorp.local
-dcorp-adminsrv.dollarcorp.moneycorp.local
-dcorp-appsrv.dollarcorp.moneycorp.local
-dcorp-ci.dollarcorp.moneycorp.local
-dcorp-mgmt.dollarcorp.moneycorp.local
-dcorp-mssql.dollarcorp.moneycorp.local
-dcorp-sql1.dollarcorp.moneycorp.local
+dcorp-dc.dollarcorp.moneycorp.local🖥️
+dcorp-adminsrv.dollarcorp.moneycorp.local🖥️
+dcorp-appsrv.dollarcorp.moneycorp.local🖥️
+dcorp-ci.dollarcorp.moneycorp.local🖥️
+dcorp-mgmt.dollarcorp.moneycorp.local🖥️
+dcorp-mssql.dollarcorp.moneycorp.local🖥️
+dcorp-sql1.dollarcorp.moneycorp.local🖥️
 dcorp-stdadmin.dollarcorp.moneycorp.local
+
+[SNIP]
+
+dcorp-std422.dollarcorp.moneycorp.local🖥️
 
 [SNIP]
 ```
 
-Enumerate "Domain Admins" using the Active Directory Module.
+ **Enumerate domain administrators in the current domain using ADModule**
 
 `Get-ADGroupMember -Identity 'Domain Admins'`:
 ```
@@ -446,18 +483,18 @@ distinguishedName : CN=Administrator,CN=Users,DC=dollarcorp,DC=moneycorp,DC=loca
 name              : Administrator
 objectClass       : user
 objectGUID        : d954e824-f549-47c2-9809-646c218cef36
-SamAccountName    : Administrator📌
+SamAccountName    : Administrator👤
 SID               : S-1-5-21-719815819-3726368948-3917688648-500
 
 distinguishedName : CN=svc admin,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 name              : svc admin
 objectClass       : user
 objectGUID        : 244f9c84-7e33-4ed6-aca1-3328d0802db0
-SamAccountName    : svcadmin📌
+SamAccountName    : svcadmin👤
 SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 ```
 
-Enumerate the "Enterprise Admins" using the Active Directory Module.
+ **Enumerate enterprise administrators in the current domain using ADModule**
 
 `Get-ADGroupMember -Identity 'Enterprise Admins' -Server moneycorp.local`:
 ```
@@ -465,7 +502,7 @@ distinguishedName : CN=Administrator,CN=Users,DC=moneycorp,DC=local
 name              : Administrator
 objectClass       : user
 objectGUID        : bff03156-2c42-4e55-a21c-07eb868cd5f8
-SamAccountName    : Administrator📌
+SamAccountName    : Administrator👑
 SID               : S-1-5-21-335606122-960912869-3279953914-500
 ```
 
