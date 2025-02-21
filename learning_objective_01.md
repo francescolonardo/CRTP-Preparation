@@ -7,7 +7,7 @@
 	- **Computers**
 	- **Domain Administrators**
 	- **Enterprise Administrators**
-2. **Use BloodHound to identify the shortest path to Domain Admins in the `dollarcorp` domain**
+2. **Use BloodHound to identify the shortest path to "Domain Admins" in the `dollarcorp` domain**
 3. **Find a file share where `studentx` has Write permissions**
 
 ---
@@ -477,7 +477,7 @@ dcorp-std422.dollarcorp.moneycorp.local🖥️
 
  **Enumerate domain administrators in the current domain using ADModule**
 
-`Get-ADGroupMember -Identity 'Domain Admins'`:
+`Get-ADGroupMember -Identity "Domain Admins"`:
 ```
 distinguishedName : CN=Administrator,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 name              : Administrator
@@ -496,7 +496,7 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 
  **Enumerate enterprise administrators in the current domain using ADModule**
 
-`Get-ADGroupMember -Identity 'Enterprise Admins' -Server moneycorp.local`:
+`Get-ADGroupMember -Identity "Enterprise Admins" -Server moneycorp.local`:
 ```
 distinguishedName : CN=Administrator,CN=Users,DC=moneycorp,DC=local
 name              : Administrator
