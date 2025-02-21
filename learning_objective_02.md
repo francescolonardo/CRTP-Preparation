@@ -2,35 +2,44 @@
 
 ## Tasks
 
-1. **Enumerate following for the dollarcorp domain:**
-	- **ACL for the Domain Admins group**
-	- **ACLs where studentx has interesting permissions**
-2. **Analyze the permissions for studentx in BloodHound UI**
+1. **Enumerate following for the `dollarcorp` domain:**
+	- **ACLs for the "Domain Admins" group**
+	- **ACLs where `student422` has interesting permissions**
+2. **Analyze the permissions for `student422` in BloodHound UI**
 
 ---
 
 ## Solution
 
-1. **Enumerate following for the dollarcorp domain:**
-	- **ACL for the Domain Admins group**
-	- **ACLs where studentx has interesting permissions**
+1. **Enumerate following for the `dollarcorp` domain:**
+	- **ACLs for the "Domain Admins" group**
+	- **ACLs where `student422` has interesting permissions**
 
 To enumerate ACLs, we can use `Get-DomainObjectACL` from PowerView.
 
-**Note:** Remember to conitnue using the PowerShell session started using `Invisi-Shell`.
+**Note:** Remember to continue using the PowerShell session started using `Invisi-Shell`.
 
-Let's enumerate ACLs for the Domain Admins Group.
+**Enumerate ACLs for the "Domain Admins" group**
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`cd \AD\Tools`
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
 
 `Get-DomainObjectAcl -Identity "Domain Admins" -ResolveGUIDs -Verbose`:
 ```
 AceQualifier           : AccessAllowed
-ObjectDN               : CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
-ActiveDirectoryRights  : ReadProperty
+ObjectDN               : CN=Domain Admins📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+ActiveDirectoryRights  : ReadProperty📌
 ObjectAceType          : User-Account-Restrictions📌
 ObjectSID              : S-1-5-21-719815819-3726368948-3917688648-512
 InheritanceFlags       : None
 BinaryLength           : 60
-AceType                : AccessAllowedObject
+AceType                : AccessAllowedObject📌
 ObjectAceFlags         : ObjectAceTypePresent, InheritedObjectAceTypePresent
 IsCallback             : False
 PropagationFlags       : None
@@ -43,13 +52,13 @@ InheritedObjectAceType : inetOrgPerson
 OpaqueLength           : 0
 
 AceQualifier           : AccessAllowed
-ObjectDN               : CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
-ActiveDirectoryRights  : ReadProperty
+ObjectDN               : CN=Domain Admins📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+ActiveDirectoryRights  : ReadProperty📌
 ObjectAceType          : User-Account-Restrictions📌
 ObjectSID              : S-1-5-21-719815819-3726368948-3917688648-512
 InheritanceFlags       : None
 BinaryLength           : 60
-AceType                : AccessAllowedObject
+AceType                : AccessAllowedObject📌
 ObjectAceFlags         : ObjectAceTypePresent, InheritedObjectAceTypePresent
 IsCallback             : False
 PropagationFlags       : None
@@ -68,6 +77,8 @@ OpaqueLength           : 0
 ```
 dcorp\student422
 ```
+
+**Enumerate ACLs where `student422` has interesting permissions**
 
 Finally, to check for modify rights/permissions for the `student422`, we can use `Find-InterestingDomainACL` from PowerView.
 
@@ -102,7 +113,7 @@ objectcategory        : CN=Person,CN=Schema,CN=Configuration,DC=moneycorp,DC=loc
 dscorepropagationdata : {1/16/2025 3:59:30 PM, 1/1/1601 12:00:00 AM}
 givenname             : student422
 usnchanged            : 483797
-memberof              : CN=RDP Users,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local📌
+memberof              : CN=RDP Users📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 lastlogon             : 2/11/2025 3:25:38 AM
 badpwdcount           : 2748
 cn                    : student422
@@ -113,11 +124,11 @@ pwdlastset            : 1/16/2025 7:59:38 AM
 name                  : student422
 ```
 
-Since `student422` is a member of the RDPUsers group, let us check permissions for it too.
+Since `student422` is a member of the "RDPUsers" group, let us check permissions for it too.
 
 `Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match "RDPUsers"}`:
 ```
-ObjectDN                : CN=Control416User,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local📌
+ObjectDN                : CN=Control416User📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 AceQualifier            : AccessAllowed
 ActiveDirectoryRights   : GenericAll📌
 ObjectAceType           : None
@@ -145,7 +156,7 @@ IdentityReferenceClass  : group
 
 [SNIP]
 
-ObjectDN                : CN=Support416User,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local📌
+ObjectDN                : CN=Support416User📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 AceQualifier            : AccessAllowed
 ActiveDirectoryRights   : GenericAll📌
 ObjectAceType           : None
@@ -160,7 +171,7 @@ IdentityReferenceClass  : group
 
 [SNIP]
 
-ObjectDN                : CN={0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E},CN=Policies,CN=System,DC=dollarcorp,DC=moneycorp,DC=local📌
+ObjectDN                : CN={0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E}📌,CN=Policies,CN=System,DC=dollarcorp,DC=moneycorp,DC=local
 AceQualifier            : AccessAllowed
 ActiveDirectoryRights   : GenericAll📌
 ObjectAceType           : None
@@ -179,7 +190,7 @@ IdentityReferenceClass  : group
 `Get-DomainGPO -Identity '{0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E}'`:
 ```
 flags                    : 0
-displayname              : Applocker📌
+displayname              : Applocker📑
 gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{62C1845D-C4A6-4ACB-BBB0-C895FD090385}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4
                            EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]
 whenchanged              : 1/6/2025 8:33:19 AM
@@ -200,19 +211,19 @@ objectclass              : {top, container, groupPolicyContainer}
 objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
 ```
 
-2. **Analyze the permissions for studentx using BloodHound UI**
+2. **Analyze the permissions for `student422` using BloodHound UI**
 
 Note that **it is easier to analyze ACLs using BloodHound** as it shows interesting ACLs for the user and the groups it is a member of.
 
-Let’s look at the 'Outbound Object Control' for the `student841` in the BloodHound CE UI.
+Let's look at the 'Outbound Object Control' for the `student841` in the BloodHound CE UI.
 
 ![BloodHound CE - ACLs](./assets/screenshots/learning_objective_02_bloodhound_ce_acls.png)
 
 Multiple permissions stand out in the above diagram.
 
-Due to the membership of the RDPUsers group, the `student841` user has following interesting permissions:
-- Full Control/`Generic All` over `supportx` and `controlx` users.
-- Full Control/`Generic All` on the `Applocker` group policy.
+Due to the membership of the "RDPUsers" group, the `student841` user has the following interesting permissions:
+- Full Control/`GenericAll` over `supportx` and `controlx` users.
+- Full Control/`GenericAll` on the `Applocker` group policy.
 - `Enrollment` permissions on multiple certificate templates.
 
 ---
