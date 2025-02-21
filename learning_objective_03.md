@@ -7,7 +7,7 @@
 	- **List all the computers in the `DevOps` OU**
 	- **List the GPOs**
 	- **Enumerate GPOs applied on the `DevOps` OU**
-	- **Enumerate ACLs for the `Applocker` and `DevOps` GPOs**
+	- **Enumerate ACLs for the `Applocker` and `DevOps Policy` GPOs**
 
 ---
 
@@ -18,7 +18,7 @@
 	- **List all the computers in the `DevOps` OU**
 	- **List the GPOs**
 	- **Enumerate GPO applied on the DevOps OU**
-	- **Enumerate ACLs for the `Applocker` and `DevOps` GPOs**
+	- **Enumerate ACLs for the `Applocker` and `DevOps Policy` GPOs**
 
 We can continue using PowerView for enumeration.
 
@@ -131,7 +131,7 @@ DCORP-CI🖥️
 [SNIP]
 
 flags                    : 0
-displayname              : Applocker📌
+displayname              : Applocker📑
 gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{62C1845D-C4A6-4ACB-BBB0-C895FD090385}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E1
                            4A0-B4FB-11D0-A0D0-00A0C90F574B}]
 whenchanged              : 1/6/2025 8:33:19 AM
@@ -154,7 +154,7 @@ objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,
 [SNIP]
 
 flags                    : 0
-displayname              : DevOps Policy📌
+displayname              : DevOps Policy📑
 gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0
                            D0-00A0C90F574B}]
 whenchanged              : 12/24/2024 7:09:01 AM
@@ -181,10 +181,10 @@ objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,
 ```
 Default Domain Policy
 Default Domain Controllers Policy
-Applocker📌
+Applocker📑
 Servers
 Students
-DevOps Policy📌
+DevOps Policy📑
 ```
 🚩
 
@@ -200,7 +200,7 @@ To enumerate GPO applied on the `DevOps` OU, we need the name of the policy from
 `Get-DomainGPO -Identity '{0BF8D01C-1F62-4BDC-958C-57140B67D147}'`:
 ```
 flags                    : 0
-displayname              : DevOps Policy📌
+displayname              : DevOps Policy📑
 gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0
                            D0-00A0C90F574B}]
 whenchanged              : 12/24/2024 7:09:01 AM
@@ -226,7 +226,7 @@ It is possible to hack both the commands together in a single command (profiting
 `Get-DomainGPO -Identity (Get-DomainOU -Identity 'DevOps').gplink.substring(11,(Get-DomainOU -Identity DevOps).gplink.length-72)`:
 ```
 flags                    : 0
-displayname              : DevOps Policy📌
+displayname              : DevOps Policy📑
 gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0
                            D0-00A0C90F574B}]
 whenchanged              : 12/24/2024 7:09:01 AM
@@ -248,9 +248,9 @@ objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,
 ```
 🚩
 
-**Enumerate ACLs for the `Applocker` and `DevOps` GPOs**
+**Enumerate ACLs for the `Applocker` and `DevOps Policy` GPOs**
 
-To enumerate the ACLs for the `Applocker` and `DevOps` GPO, let's use the BloodHound CE UI.
+To enumerate the ACLs for the `Applocker` and `DevOps Policy` GPO, let's use the BloodHound CE UI.
 
 Search for "Applocker" in the UI -> click on the node -> click on `Inboud Object Control`.
 
