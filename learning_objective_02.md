@@ -98,7 +98,7 @@ objectclass           : {top, person, organizationalPerson, user}
 displayname           : student422
 lastlogontimestamp    : 2/8/2025 9:14:18 PM
 userprincipalname     : student422@dollarcorp.moneycorp.local
-samaccountname        : student422📌
+samaccountname        : student422👤
 codepage              : 0
 samaccounttype        : USER_OBJECT
 accountexpires        : NEVER
@@ -113,7 +113,7 @@ objectcategory        : CN=Person,CN=Schema,CN=Configuration,DC=moneycorp,DC=loc
 dscorepropagationdata : {1/16/2025 3:59:30 PM, 1/1/1601 12:00:00 AM}
 givenname             : student422
 usnchanged            : 483797
-memberof              : CN=RDP Users📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+memberof              : CN=RDP Users👥,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 lastlogon             : 2/11/2025 3:25:38 AM
 badpwdcount           : 2748
 cn                    : student422
@@ -136,20 +136,20 @@ AceFlags                : None
 AceType                 : AccessAllowed
 InheritanceFlags        : None
 SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1123
-IdentityReferenceName   : RDPUsers📌
+IdentityReferenceName   : RDPUsers👥
 IdentityReferenceDomain : dollarcorp.moneycorp.local
 IdentityReferenceDN     : CN=RDP Users,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 IdentityReferenceClass  : group
 
-ObjectDN                : CN=Control417User,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+ObjectDN                : CN=Control417User📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 AceQualifier            : AccessAllowed
-ActiveDirectoryRights   : GenericAll
+ActiveDirectoryRights   : GenericAll📌
 ObjectAceType           : None
 AceFlags                : None
 AceType                 : AccessAllowed
 InheritanceFlags        : None
 SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1123
-IdentityReferenceName   : RDPUsers
+IdentityReferenceName   : RDPUsers👥
 IdentityReferenceDomain : dollarcorp.moneycorp.local
 IdentityReferenceDN     : CN=RDP Users,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 IdentityReferenceClass  : group
@@ -164,7 +164,7 @@ AceFlags                : None
 AceType                 : AccessAllowed
 InheritanceFlags        : None
 SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1123
-IdentityReferenceName   : RDPUsers📌
+IdentityReferenceName   : RDPUsers👥
 IdentityReferenceDomain : dollarcorp.moneycorp.local
 IdentityReferenceDN     : CN=RDP Users,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 IdentityReferenceClass  : group
@@ -179,7 +179,7 @@ AceFlags                : None
 AceType                 : AccessAllowed
 InheritanceFlags        : None
 SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1123
-IdentityReferenceName   : RDPUsers📌
+IdentityReferenceName   : RDPUsers👥
 IdentityReferenceDomain : dollarcorp.moneycorp.local
 IdentityReferenceDN     : CN=RDP Users,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
 IdentityReferenceClass  : group
@@ -201,7 +201,7 @@ usnchanged               : 303528
 dscorepropagationdata    : {1/6/2025 8:33:19 AM, 12/18/2024 8:31:49 AM, 12/18/2024 8:31:01 AM, 12/18/2024 8:30:36 AM...}
 objectguid               : bcf4770b-b560-468b-88cb-6beaeb6793f9
 gpcfilesyspath           : \\dollarcorp.moneycorp.local\SysVol\dollarcorp.moneycorp.local\Policies\{0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E}📌
-distinguishedname        : CN={0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E},CN=Policies,CN=System,DC=dollarcorp,DC=moneycorp,DC=local
+distinguishedname        : CN={0D1CC23D-1F20-4EEE-AF64-D99597AE2A6E}📌,CN=Policies,CN=System,DC=dollarcorp,DC=moneycorp,DC=local
 whencreated              : 11/15/2022 4:21:20 AM
 showinadvancedviewonly   : True
 usncreated               : 45231
