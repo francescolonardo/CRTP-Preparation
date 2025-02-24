@@ -19,12 +19,11 @@
 
 `. C:\AD\Tools\PowerView.ps1`
 
-`Get-DomainGPO -Identity 'DevOps Policy'`:
+`Get-DomainGPO -Identity "DevOps Policy"`:
 ```
 flags                    : 0
 displayname              : DevOps Policy📑
-gpcmachineextensionnames : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EA
-                           C-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]
+gpcmachineextensionnames📌 : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]
 whenchanged              : 12/24/2024 7:09:01 AM
 versionnumber            : 3
 name                     : {0BF8D01C-1F62-4BDC-958C-57140B67D147}📌
@@ -306,7 +305,7 @@ Verify if the `gPCfileSysPath` has been modified for the `DevOps Policy` GPO. Ru
 
 `. C:\AD\Tools\PowerView.ps1`
 
-`Get-DomainGPO -Identity 'DevOps Policy'`:
+`Get-DomainGPO -Identity "DevOps Policy"`:
 ```
 flags                    : 0
 displayname              : DevOps Policy📑
