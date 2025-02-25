@@ -1,4 +1,4 @@
-# Learning Objective 02
+# Learning Objective 02 (ACLs Enumeration)
 
 ## Tasks
 
@@ -224,7 +224,7 @@ Multiple permissions stand out in the above diagram.
 
 Due to the membership of the "RDPUsers" group, the `student841` user has the following interesting permissions:
 - Full Control/`GenericAll` over `supportx` and `controlx` users.
-- Full Control/`GenericAll` on the `Applocker` group policy.
+- Full Control/`GenericAll` on the `Applocker` GPO.
 - `Enrollment` permissions on multiple certificate templates.
 🚩
 
