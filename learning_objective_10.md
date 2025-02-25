@@ -1,4 +1,4 @@
-# Learning Objective 10 (Diamond Ticket Attack for Persistence)
+# Learning Objective 10 (Persistence - Diamond Ticket)
 
 ## Tasks
 
