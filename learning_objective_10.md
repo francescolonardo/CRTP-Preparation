@@ -1,4 +1,4 @@
-# Learning Objective 10
+# Learning Objective 10 (Diamond Ticket Attack)
 
 ## Tasks
 
