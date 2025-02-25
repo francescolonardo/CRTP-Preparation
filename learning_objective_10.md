@@ -1,4 +1,4 @@
-# Learning Objective 10 (Persistence - Diamond Ticket)
+# Learning Objective 10 (Persistence | Diamond Ticket)
 
 ## Tasks
 
