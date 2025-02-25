@@ -1,4 +1,4 @@
-# Learning Objective 01
+# Learning Objective 01 (Users/Computers/Shares Enumeration and Attack Paths Discovery)
 
 ## Tasks
 
@@ -8,7 +8,7 @@
 	- **Domain Administrators**
 	- **Enterprise Administrators**
 2. **Use BloodHound to identify the shortest path to "Domain Admins" in the `dollarcorp` domain**
-3. **Find a file share where `studentx` has Write permissions**
+3. **Find a file share where `studentx` has write permissions**
 
 ---
 
