@@ -1,4 +1,4 @@
-# Learning Objective 04 (Trusts Enumeration)
+# Learning Objective 04 (Domain Enumeration - Trusts)
 
 ## Tasks
 
