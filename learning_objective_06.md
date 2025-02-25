@@ -1,4 +1,4 @@
-# Learning Objective 06 (GPO Abuse for Privilege Escalation)
+# Learning Objective 06 (Privilege Escalation - GPO Abuse)
 
 ## Tasks
 
