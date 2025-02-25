@@ -1,4 +1,4 @@
-# Learning Objective 04
+# Learning Objective 04 (Trusts Enumeration)
 
 ## Tasks
 
