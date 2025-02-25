@@ -34,7 +34,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ==================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only❌
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Group used for deny only❌
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -198,7 +198,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ===============================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
