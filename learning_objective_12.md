@@ -1,4 +1,4 @@
-# Learning Objective 12 (Replication Rights Abuse for DCSync Attack)
+# Learning Objective 12 (Persistence using ACLs - Rights Abuse)
 
 ## Tasks
 
