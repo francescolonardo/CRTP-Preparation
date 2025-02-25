@@ -1,4 +1,4 @@
-# Learning Objective 09 (Silver Ticket Attack)
+# Learning Objective 09 (Silver Ticket Attack for Persistence)
 
 ## Tasks
 
@@ -18,7 +18,7 @@ From the information gathered in the previous steps (see *Learning Objective 07*
 
 Using the below command, we can create a silver ticket that provides us access to the HTTP service (WinRM) on DC.
 
-Please note that the hash of `dcorp-dc$` (RC4 in the below command) may be different in your lab instance. You can also use aes256 keys in place of NTLM hash.
+Please note that the hash of `dcorp-dc$` (RC4 in the below command) may be different in your lab instance. **You can also use aes256 keys in place of NTLM hash.**
 
 **HTTP Service**
 
