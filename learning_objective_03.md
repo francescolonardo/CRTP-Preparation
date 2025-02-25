@@ -1,11 +1,11 @@
-# Learning Objective 03
+# Learning Objective 03 (OUs/GPOs/ACLs Enumeration)
 
 ## Tasks
 
 1. **Enumerate following for the `dollarcorp` domain:**
 	- **List all the OUs**
 	- **List all the computers in the `DevOps` OU**
-	- **List the GPOs**
+	- **List all the GPOs**
 	- **Enumerate GPOs applied on the `DevOps` OU**
 	- **Enumerate ACLs for the `Applocker` and `DevOps Policy` GPOs**
 
@@ -16,7 +16,7 @@
 1. **Enumerate following for the `dollarcorp` domain:**
 	- **List all the OUs**
 	- **List all the computers in the `DevOps` OU**
-	- **List the GPOs**
+	- **List all the GPOs**
 	- **Enumerate GPO applied on the DevOps OU**
 	- **Enumerate ACLs for the `Applocker` and `DevOps Policy` GPOs**
 
@@ -124,7 +124,7 @@ DCORP-CI🖥️
 ```
 🚩
 
-**List the GPOs**
+**List all the GPOs**
 
 `Get-DomainGPO`:
 ```
@@ -256,13 +256,13 @@ Search for "Applocker" in the UI -> click on the node -> click on `Inboud Object
 
 ![BloodHound CE - Applocker Inbound Object Control](./assets/screenshots/learning_objective_03_bloodhound_ce_applocker.png)
 
-It turns out that the "RDPUsers" group has `GenericAll` over the `Applocker` policy.
+It turns out that the "RDPUsers" group has `GenericAll` over the `Applocker` GPO.
 
 Similarly, search for "DevOps" and look at its `Inbound Object Control`.
 
 ![BloodHound CE - DevOps Policy Inbound Object Control](./assets/screenshots/learning_objective_03_bloodhound_ce_devops.png)
 
-A user named `devopsadmin` has `WriteDACL` on `DevOps Policy`.
+A user named `devopsadmin` has `WriteDACL` on `DevOps Policy` GPO.
 🚩
 
 ---
