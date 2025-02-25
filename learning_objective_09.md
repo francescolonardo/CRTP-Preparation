@@ -1,4 +1,4 @@
-# Learning Objective 09 (Silver Ticket Attack for Persistence)
+# Learning Objective 09 (Persistence - Silver Ticket)
 
 ## Tasks
 
