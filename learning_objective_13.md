@@ -1,4 +1,4 @@
-# Learning Objective 13 (Persistence using ACLs | Security Descriptors)
+# Learning Objective 13
 
 ## Tasks
 
