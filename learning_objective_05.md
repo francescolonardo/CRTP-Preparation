@@ -1,4 +1,4 @@
-# Learning Objective 05
+# Learning Objective 05 (Abuse Service Misconfigurations for Privilege Escalation)
 
 ## Tasks
 
