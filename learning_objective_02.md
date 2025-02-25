@@ -1,4 +1,4 @@
-# Learning Objective 02 (ACLs Enumeration)
+# Learning Objective 02 (Domain Enumeration | ACL)
 
 ## Tasks
 
