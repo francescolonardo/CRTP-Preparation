@@ -1,4 +1,4 @@
-# Learning Objective 04 (Domain Enumeration - Trusts)
+# Learning Objective 04 (Domain Enumeration | Forest + Trusts)
 
 ## Tasks
 
