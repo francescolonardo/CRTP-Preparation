@@ -1,4 +1,4 @@
-# Learning Objective 05 (Privilege Escalation - Feature Abuse)
+# Learning Objective 05 (Privilege Escalation | Feature Abuse)
 
 ## Tasks
 
