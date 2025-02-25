@@ -1,4 +1,4 @@
-# Learning Objective 03 (Domain Enumeration - GPO + OU)
+# Learning Objective 03 (Domain Enumeration | GPOs + OUs)
 
 ## Tasks
 
