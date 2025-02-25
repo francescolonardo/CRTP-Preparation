@@ -1,4 +1,4 @@
-# Learning Objective 11 (DSRM Credential Abuse for Persistence)
+# Learning Objective 11 (Persistence - DSRM)
 
 ## Tasks
 
