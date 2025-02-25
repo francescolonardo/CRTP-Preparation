@@ -1,4 +1,4 @@
-# Learning Objective 08
+# Learning Objective 08 (Golden Ticket Attack)
 
 ## Tasks
 
