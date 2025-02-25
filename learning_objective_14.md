@@ -1,4 +1,4 @@
-# Learning Objective 14 (Privilege Escalation - Kerberoasting)
+# Learning Objective 14 (Privilege Escalation | Kerberoasting)
 
 ## Tasks
 
