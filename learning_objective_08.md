@@ -1,4 +1,4 @@
-# Learning Objective 08 (Golden Ticket Attack for Persistence)
+# Learning Objective 08 (Persistence - Golden Ticket)
 
 ## Tasks
 
