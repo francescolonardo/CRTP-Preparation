@@ -1,4 +1,4 @@
-# Learning Objective 09 (Persistence - Silver Ticket)
+# Learning Objective 09 (Persistence | Silver Ticket)
 
 ## Tasks
 
