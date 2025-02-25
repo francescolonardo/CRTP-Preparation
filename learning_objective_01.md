@@ -1,4 +1,4 @@
-# Learning Objective 01 (Users/Computers/Shares Enumeration and Attack Paths Discovery)
+# Learning Objective 01 (Domain Enumeration | Users + Computers + Shares + BloodHound)
 
 ## Tasks
 
