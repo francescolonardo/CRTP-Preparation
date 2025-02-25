@@ -188,7 +188,7 @@ NTLM : af0686cc0ca8f04df42210c9ac980760
 RID  : 000001f6 (502)
 User : krbtgt👤
 LM   :
-NTLM : 4e9815869d2090ccfca61c1fe0d23986🧩
+NTLM : 4e9815869d2090ccfca61c1fe0d23986🔑
 
 [SNIP]
 
@@ -262,7 +262,7 @@ Object Security ID   : S-1-5-21-719815819-3726368948-3917688648-502📌
 Object Relative ID   : 502
 
 Credentials:
-  Hash NTLM: 4e9815869d2090ccfca61c1fe0d23986🧩
+  Hash NTLM: 4e9815869d2090ccfca61c1fe0d23986🔑
     ntlm- 0: 4e9815869d2090ccfca61c1fe0d23986
     lm  - 0: ea03581a1268674a828bde6ab09db837
 
