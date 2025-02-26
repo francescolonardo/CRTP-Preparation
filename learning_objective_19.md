@@ -4,15 +4,12 @@
 
 1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA by forging a golden ticket using `dollarcorp`'s `krbtgt` TGT encryption key**
 
-
-**Using DA privileges on `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate to EA by forging a silver ticket**
-
 ---
 
 ## Attack Path Steps
 
-- **Forge a Golden Ticket with EA SID History using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
-- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
+- **Forge a Golden Ticket (with EA SID History) using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
+- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
 
 ---
 
@@ -20,7 +17,7 @@
 
 1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA by forging a golden ticket using `dollarcorp`'s `krbtgt` TGT encryption key**
 
-- **Forge a Golden Ticket with EA SID History using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
+- **Forge a Golden Ticket (with EA SID History) using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
 
 We already have the `krbtgt` hash from `dcorp-dc` (see *Learning Objective 08*).
 
@@ -85,7 +82,7 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
-- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
+- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
 
 We can now access `mcorp-dc`!
 
