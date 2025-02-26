@@ -10,7 +10,7 @@
 
 - **Access to the Child DC with DA Privileges**
 - **Extract the Trust Key for the Parent Domain from the Child DC**
-- **Forge a Silver Ticket with EA SID History for Privilege Escalation**
+- **Forge a Silver Ticket with EA SID History using the Trust Key from the Child DC for Privilege Escalation**
 - **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
 
 ---
@@ -138,7 +138,7 @@ Domain: MONEYCORP.LOCAL (mcorp / S-1-5-21-335606122-960912869-3279953914)
 [SNIP]
 ```
 
-- **Forge a Silver Ticket with EA SID History for Privilege Escalation**
+- **Forge a Silver Ticket with EA SID History using the Trust Key from the Child DC for Privilege Escalation**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
