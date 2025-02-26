@@ -2,17 +2,29 @@
 
 ## Tasks
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to "Enterprise Admins" using `dollarcorp`'s `krbtgt` TGT encryption key**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA by forging a golden ticket using `dollarcorp`'s `krbtgt` TGT encryption key**
+
+
+**Using DA privileges on `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate to EA by forging a silver ticket**
+
+---
+
+## Attack Path Steps
+
+- **Forge a Golden Ticket with EA SID History using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
+- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
 
 ---
 
 ## Solution
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to "Enterprise Admins" using `dollarcorp`'s `krbtgt` TGT encryption key**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA by forging a golden ticket using `dollarcorp`'s `krbtgt` TGT encryption key**
+
+- **Forge a Golden Ticket with EA SID History using the `krbtgt` TGT Encryption Key from the Child DC for Privilege Escalation**
 
 We already have the `krbtgt` hash from `dcorp-dc` (see *Learning Objective 08*).
 
-Let's create a **golden ticket** (not an inter-realm TGT) and inject it. Run the below command.
+Let's create a **golden ticket** (not an inter-realm TGT) and inject it. Due to the trust, the parent domain will trust the TGT.
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -72,6 +84,8 @@ Cached Tickets: (1)
         Cache Flags: 0x1 -> PRIMARY
         Kdc Called:
 ```
+
+- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
 
 We can now access `mcorp-dc`!
 
