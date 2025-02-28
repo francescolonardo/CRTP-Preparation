@@ -1,4 +1,4 @@
-# Learning Objective 15 (Privilege Escalation | Unconstrained Delegation + Coercion + DCSync)
+# Learning Objective 15 (Domain Privilege Escalation | Unconstrained Delegation + Coercion + DCSync)
 
 ## Tasks
 
