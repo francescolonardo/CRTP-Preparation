@@ -1,4 +1,4 @@
-# Learning Objective 16 (Privilege Escalation | Constrained Delegation + DCSync)
+# Learning Objective 16 (Domain Privilege Escalation | Constrained Delegation + DCSync)
 
 ## Tasks
 
