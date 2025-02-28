@@ -1,4 +1,4 @@
-# Learning Objective 05 (Privilege Escalation | Feature Abuse)
+# Learning Objective 05 (Local Privilege Escalation | Feature Abuse)
 
 ## Tasks
 
@@ -73,7 +73,7 @@ Kerberos support for Dynamic Access Control on this device has been disabled.
 
 We can use Powerup from PowerSploit module to check for any privilege escalation path.
 
-**Note:** Remember to run PowerUp from a PowerShell session started using Invisi-Shell.
+**Note: Remember to run PowerUp from a PowerShell session started using Invisi-Shell.**
 
 `cd \AD\Tools`
 
@@ -427,7 +427,7 @@ dcorp-adminsrv
 
 3. **Using privileges of a user on Jenkins on `172.16.3.11:8080`, get admin privileges on `172.16.3.11`, the `dcorp-ci` server**
 
-**Abuse Jenkins Instance**
+**Get Local Admin Privileges by Abusing Jenkins Instance**
 
 Next, let's try our hands on the Jenkins instance.
 
@@ -438,7 +438,7 @@ We have a misconfigured Jenkins instance on `dcorp-ci` (`http://172.16.3.11:8080
 
 Since Jenkins does not have a password policy many users use username as passwords even on the publicly available instances. By manually trying the usernames as passwords we can identify that the user "builduser" has password "builduser". The user "builduser" can configure builds and add build steps which will help us in executing commands.
 
-Use the encodedcomand parameter of PowerShell to use an encoded reverse shell or use `download execute` cradle in Jenkins build step.
+Use the `encodedcomand` parameter of PowerShell to use an encoded reverse shell or use `download-execute` cradle in Jenkins build step.
 
 You can use any reverse shell, below we are using a slightly modified version of `Invoke-PowerShellTcp` from [Nishang](https://github.com/samratashok/nishang). We renamed the function `Invoke-PowerShellTcp` to `Power` in the script **to bypass Windows Defender**.
 
@@ -491,7 +491,9 @@ listening on [any] 443 ...
 [...]
 ```
 
-On Jenkins web console, launch the Build by clicking on `Build Now` and on the listener, you will see:
+On Jenkins web console, launch the build by clicking on `Build Now`.
+
+On the listener, you will see:
 
 ```
 [...]
