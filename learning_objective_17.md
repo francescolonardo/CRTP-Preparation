@@ -1,4 +1,4 @@
-# Learning Objective 17 (Privilege Escalation | Resource-based Constrained Delegation)
+# Learning Objective 17 (Domain Privilege Escalation | Resource-based Constrained Delegation)
 
 ## Tasks
 
