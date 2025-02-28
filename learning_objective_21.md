@@ -1,4 +1,4 @@
-# Learning Objective 21 (Domain Privilege Escalation | Abuse AD CS - ESC1 + ESC3)
+# Learning Objective 21 (Domain Privilege Escalation | AD CS Abuse - ESC1 + ESC3)
 
 ## Tasks
 
