@@ -2,7 +2,7 @@
 
 ## Tasks
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate privileges to EA by forging a silver ticket**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate to EA privileges by forging a silver ticket using the trust key for `moneycorp.local`**
 
 ---
 
@@ -17,7 +17,7 @@
 
 ## Solution
 
-1. **Using DA access to `dollarcorp.moneycorp.local`, extract the trust key for `moneycorp.local` and escalate privileges to EA by forging a silver ticket**
+1. **Using DA access to `dollarcorp.moneycorp.local`, escalate to EA privileges by forging a silver ticket using the trust key for `moneycorp.local`**
 
 - **Access to the Child DC with DA Privileges**
 
