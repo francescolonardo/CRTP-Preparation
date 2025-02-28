@@ -1,4 +1,4 @@
-# Learning Objective 22 (Privilege Escalation | MSSQL Servers - Database Links)
+# Learning Objective 22 (Privilege Escalation | MSSQL Servers - Abuse Database Links)
 
 ## Tasks
 
