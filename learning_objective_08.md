@@ -1,4 +1,4 @@
-# Learning Objective 08 (Persistence | Golden Ticket)
+# Learning Objective 08 (Domain Persistence | Golden Ticket + DCSync)
 
 ## Tasks
 
