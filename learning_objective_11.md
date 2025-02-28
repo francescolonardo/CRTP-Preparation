@@ -1,4 +1,4 @@
-# Learning Objective 11 (Persistence | DSRM)
+# Learning Objective 11 (Domain Persistence | DSRM)
 
 ## Tasks
 
