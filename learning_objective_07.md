@@ -1,4 +1,4 @@
-# Learning Objective 07 (Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash)
+# Learning Objective 07 (Domain Privilege Escalation, Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash)
 
 ## Tasks
 
