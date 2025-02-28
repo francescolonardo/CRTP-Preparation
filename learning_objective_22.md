@@ -1,4 +1,4 @@
-# Learning Objective 22 (Domain Privilege Escalation | Abuse MSSQL Database Links)
+# Learning Objective 22 (Domain Privilege Escalation | MSSQL Database Links Abuse)
 
 ## Tasks
 
