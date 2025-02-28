@@ -1,4 +1,4 @@
-# Learning Objective 06 (Privilege Escalation | Relaying + GPO Abuse)
+# Learning Objective 06 (Local Privilege Escalation | Relaying + GPO Abuse)
 
 ## Tasks
 
