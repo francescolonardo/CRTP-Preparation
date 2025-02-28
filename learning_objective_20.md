@@ -1,4 +1,4 @@
-# Learning Objective 20 (Privilege Escalation | Across Forest Trusts - Trust Key Abuse)
+# Learning Objective 20 (Domain Privilege Escalation | Across Forest Trusts - Trust Key Abuse)
 
 ## Tasks
 
