@@ -1,4 +1,4 @@
-# Learning Objective 19 (Privilege Escalation | Abuse Across Domain Trusts - `krbtgt` Key)
+# Learning Objective 19 (Privilege Escalation | Across Domain Trusts - `krbtgt` Key Abuse)
 
 ## Tasks
 
