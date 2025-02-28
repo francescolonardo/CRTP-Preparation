@@ -1,4 +1,4 @@
-# Learning Objective 21 (Privilege Escalation | Across Domain Trusts - AD CS + ESC1 + ESC3)
+# Learning Objective 21 (Privilege Escalation | AD CS - ESC1 + ESC3)
 
 ## Tasks
 
