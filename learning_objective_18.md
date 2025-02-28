@@ -1,4 +1,4 @@
-# Learning Objective 18 (Domain Privilege Escalation | Abuse Across Domain Trusts - Trust Key)
+# Learning Objective 18 (Domain Privilege Escalation | Across Domain Trusts - Trust Key Abuse)
 
 ## Tasks
 
