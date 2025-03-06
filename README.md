@@ -1,10 +1,8 @@
 # Certified Red Team Professional (CRTP) - Study Material
 
-<!--
 <div>
-	<img src="https://assets.ine.com/certifications/badges/eWPT.png" alt="eWPT Logo" width="150" height="auto">
+	<img src="https://media.eu.badgr.com/uploads/badges/assertion-P8JsviIlSMaUERQwRzXfBQ.png?versionId=rBEkGC30RhkHLLXK_Y9j8kPj7VZLTOAy" alt="I pwned Active Directory Attacks Lab" width="150" height="auto">
 </div>
--->
 
 ## Introduction
 
