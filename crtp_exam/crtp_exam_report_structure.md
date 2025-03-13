@@ -1,6 +1,36 @@
-# Certified Red Team Professional (CRTP)
+# Certified Red Team Professional (CRTP) Exam Report
 
-## Certification Exam Report Structure
+## Introduction
+
+This report for the **Certified Red Team Professional (CRTP)** exam documents an entirely hands-on challenge designed to assess the ability to compromise a realistic Windows Active Directory environment by focusing on misconfigurations and advanced techniques, rather than trivial or "one-click" exploits. During the 24-hour exam window, I investigated multiple domains, enumerated configurations, and executed various techniques for privilege escalation and lateral movement. This document provides a detailed account of the steps, methodologies, and observations I made while compromising each target server in the lab environment.
+
+### Exam Scope
+
+- **Targets**: The exam lab contains five target servers, each with unique roles, domains, and configurations.
+- **Entry Point VM**: A dedicated virtual machine was provided as a launch point to launch attacks within the environment, but it does not count as a target server.
+- **Goal**: Achieve OS command execution on each target server. Full administrative privileges are helpful, but not explicitly required for passing.
+- **Methodology**: Avoid destructive attacks, brute-forcing, or exploit kits that rely on patchable CVEs. Instead, leverage legitimate Windows features, AD misconfigurations, and known post-exploitation tools (appropriately documented in this report).
+
+### Exam Objective
+
+The primary aim was to **demonstrate a practical red team engagement** approach in an Active Directory environment, specifically by:
+
+1. **Enumeration**: Identifying systems, domains, trust relationships, and potential misconfigurations.
+2. **Initial foothold**: Gaining a stable entry point on each target server through techniques consistent with real-world post-exploitation (e.g., abusing permissions or roles rather than relying on patchable CVEs).
+3. **Privilege Escalation and Lateral Movement**: Elevating privileges or moving across the environment through legitimate AD functionalities, to consolidate access and gather critical information (domain credentials, sensitive data, etc.).
+4. **Documentation and Mitigation**: Documenting all findings, methods, and mitigation ideas in a clear, detailed manner to reflect a genuine attacker mindset while offering practical defensive measures.
+
+By the conclusion of this report, the reader should understand both the **tactical steps** used (commands, scripts, screenshots) and the **rationale** behind them, why each approach was chosen, the potential threats posed to real environments, and how these threats might be prevented in a production setting.
+
+---
+
+## Summary
+
+???
+
+---
+
+## ???
 
 ### Domain Enumeration
 
