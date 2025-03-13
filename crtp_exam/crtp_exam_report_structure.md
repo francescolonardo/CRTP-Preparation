@@ -960,7 +960,7 @@ Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a
   ASREP (key)              :  7F6825F607E9474BCD6B9C684DC70F7C1CA977ADE7BFD2AD152FD54968349DEB
 ```
 
-![Spawned `cmd` process](./assets/screenshots/spawned_cmd.svg)
+![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
