@@ -444,6 +444,9 @@ d-----        3/11/2025   1:42 PM                Results
 -a----        3/11/2025   1:42 PM         971698 Summary-Report-SmbHunt.html📌
 ```
 
+[SCREENSHOT]
+❌
+
 **Domain Enumeration | Local Admin Access**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
@@ -490,11 +493,11 @@ mgmtsrv🖥️    TECH\techservice👤    False
 
 ---
 
-### Local Privilege Escalation | Feature Abuse (with PowerUp)
+### Local Privilege Escalation | Service Abuse (with PowerUp)
 
-2) **Service Abuse for Local Privilege Escalation** (successful ✅)
+2) **Service Abuse for Local Privilege Escalation on `studvm.tech.finance.corp`** (successful ✅)
 
-Description: Identified and exploited a misconfigured Windows service (`vds`) to escalate privileges by modifying its binary path and adding the current user to the Administrators group.
+Description: Discovered a misconfigured Windows service (`vds`) that was running as `LocalSystem` and allowed modifications to its binary path. By leveraging `PowerUp`, the service's path was temporarily replaced with a command to add `tech\studentuser` to the local Administrators group. This successfully elevated the user's privileges on `studvm.tech.finance.corp`.
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -567,11 +570,11 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 ---
 
-### Domain Privilege Escalation | Kerberoasting (with PowerView, Rubeus, John)
+### Kerberoasting (with PowerView, Rubeus, John)
 
-3) **Kerberoasting Attack for Domain Privilege Escalation** (unsuccessful ❌)
+3) **Kerberoasting Attack for Domain Lateral Movement on `dbserver31.tech.finance.corp`** (unsuccessful ❌)
 
-Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `sqlserversync`. Successfully extracted a Kerberos TGS ticket but failed to crack the password using multiple wordlists, indicating a strong password policy.
+Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `tech\sqlserversync` in an attempt to gain the service account password and pivot onto `dbserver31.tech.finance.corp`. Although the Kerberos TGS was successfully extracted, the password could not be cracked with multiple wordlists, implying a strong password policy.
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -607,7 +610,7 @@ lastlogoff            : 12/31/1600 4:00:00 PM
 whencreated           : 2/4/2022 1:16:06 PM
 objectcategory        : CN=Person,CN=Schema,CN=Configuration,DC=finance,DC=corp
 dscorepropagationdata : {2/4/2022 1:16:34 PM, 2/4/2022 1:16:06 PM, 1/1/1601 12:00:01 AM}
-serviceprincipalname📌: MSSQLSvc📌/dbserver31.tech.finance.corp📌
+serviceprincipalname📌: MSSQLSvc📌/dbserver31.tech.finance.corp🖥️
 givenname             : sqlserver
 usnchanged            : 37100
 lastlogon             : 2/5/2022 11:48:16 PM
@@ -679,11 +682,11 @@ Session completed.
 
 ---
 
-### Domain Privilege Escalation | Constrained Delegation (with PowerView, Rubeus, SafetyKatz)
+### Constrained Delegation + Domain Lateral Movement (with PowerView, Rubeus, SafetyKatz)
 
-4) **Constrained Delegation Abuse for Domain Privilege Escalation** (successful ✅)
+4) **Constrained Delegation Abuse on `studvm.tech.finance.corp` for Domain Lateral Movement to `mgmtsrv.tech.finance.corp`** (successful ✅)
 
-Description: Performed Active Directory enumeration to identify users or machines with **Constrained Delegation** enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of **computer accounts** revealed that `STUDVM$` has Constrained Delegation enabled and is allowed to delegate authentication to the **CIFS service on `mgmtsrv.tech.finance.corp`**. This finding is leveraged to impersonate a privileged user and escalate privileges.
+Description: Performed Active Directory enumeration to identify users or machines with Constrained Delegation enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of computer accounts revealed that `tech\STUDVM$` has Constrained Delegation enabled and is allowed to delegate authentication to the CIFS service on `mgmtsrv.tech.finance.corp`. This finding was leveraged to impersonate a privileged user and enabling lateral movement onto `mgmtsrv.tech.finance.corp`.
 
 - **Find a Delegator User where Constrained Delegation is Enabled**
 
@@ -870,11 +873,11 @@ COMPUTERNAME=MGMTSRV🖥️
 
 ---
 
-### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+### Credential Extraction (with SafetyKatz)
 
-5) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+5) **Credential Extraction on `mgmtsrv.tech.finance.corp`** (successful ✅)
 
-Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **cleartext credentials** and **Kerberos keys** of `techservice` and `MGMTSRV$` from **LSASS memory** on `mgmtsrv.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted cleartext credentials and Kerberos keys of `tech\techservice` and `tech\MGMTSRV$` from LSASS memory on `mgmtsrv.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
 ![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -980,9 +983,9 @@ SID               : S-1-5-18
 
 ### Domain Persistence | Silver Ticket (with Rubeus)
 
-6) **Silver Ticket Attack for Domain Persistence** (successful ✅)
+6) **Silver Ticket Attack for Domain Persistence on `mgmtsrv.tech.finance.corp`** (successful ✅)
 
-Description: Leveraged the **RC4 Kerberos key** extracted from `mgmtsrv` to forge a **Silver Ticket** for the `http/mgmtsrv.tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting **administrator-level access** to `mgmtsrv` **without requiring authentication from the Domain Controller**. This technique enables **persistence and stealthy access** to the target machine, bypassing standard Kerberos authentication mechanisms.
+Description: Leveraged the RC4 Kerberos key extracted from `mgmtsrv.tech.finance.corp` to forge a Silver Ticket for the `http/mgmtsrv.tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to `mgmtsrv.tech.finance.corp` without requiring authentication from the Domain Controller. This technique enables persistence and stealthy access to the target machine, bypassing standard Kerberos authentication mechanisms.
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1068,9 +1071,9 @@ COMPUTERNAME=MGMTSRV🖥️
 
 ### Domain Lateral Movement | OverPass-The-Hash (with Rubeus)
 
-7) **OverPass-The-Hash for Domain Lateral Movement** (successful ✅)
+7) **OverPass-The-Hash for Domain Lateral Movement on `techsrv30.tech.finance.corp`** (successful ✅)
 
-Description: Used the **AES-256 Kerberos Key** of `techservice`, extracted in a previous step, to request a **TGT (Ticket Granting Ticket)** without needing the user's password. This was achieved using `Rubeus` to perform an **OverPass-The-Hash attack**. The obtained ticket was injected into a **new logon session**, allowing authenticated access as `techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
+Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a previous step, to request a TGT (Ticket Granting Ticket) without needing the user's password. This was achieved using `Rubeus` to perform an OverPass-The-Hash attack. The obtained ticket was injected into a new logon session, allowing authenticated access as `tech\techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1161,11 +1164,11 @@ COMPUTERNAME=TECHSRV30🖥️
 
 ---
 
-### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
+### Credential Extraction (with SafetyKatz)
 
-8) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+8) **Credential Extraction on `techsrv30.tech.finance.corp`** (successful ✅)
 
-Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **cleartext credentials** of `databaseagent` from the Windows Credential Vault and **Kerberos keys** of `TECHSRV30$` from **LSASS memory** on `techsrv30.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted cleartext credentials of `tech\databaseagent` from the Windows Credential Vault and Kerberos keys of `tech\TECHSRV30$` from LSASS memory on `techsrv30.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
 - **Bypassing PowerShell Logging and AMSI for Evasion**
 
@@ -1256,11 +1259,11 @@ SID               : S-1-5-18
 
 ---
 
-### Domain Lateral Movement | OverPass-The-Hash (with RunAs)
+### Domain Privilege Escalation | `RunAs` (with RunAs)
 
-9) **OverPass-The-Hash for Domain Lateral Movement** (successful ✅)
+9) **RunAs for Domain Privilege Escalation as `tech\databaseagent`** (successful ✅)
 
-Description: Used the **cleartext credentials** of `databaseagent`, extracted in a previous step, to initiate a **net-only authentication session** with `runas`. This allowed running commands as `databaseagent` while maintaining the original user's context in the local environment. Privilege enumeration revealed that **SeDebugPrivilege** and **SeImpersonatePrivilege** were enabled, which could be leveraged for **potential privilege escalation** and further lateral movement within the domain.
+Description: Used the cleartext credential of `tech\databaseagent`, extracted in a previous step, to initiate a net-only authentication session with `RunAs`. This allowed running commands as `tech\databaseagent` while maintaining the original user's context in the local environment. Privilege enumeration revealed that `SeDebugPrivilege` and `SeImpersonatePrivilege` were enabled, which could be leveraged for potential privilege escalation and further lateral movement within the domain.
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1314,11 +1317,11 @@ SeCreateGlobalPrivilege                   Create global objects                 
 
 ---
 
-### Cross Trust Attacks | SQL Server Links Abuse (with PowerUpSQL, Invoke-PowerShellTcpEx)
+### SQL Server `xp_cmdshell` Abuse + Domain Lateral Movement (with PowerUpSQL, Invoke-PowerShellTcpEx)
 
-10) **SQL Server Links Abuse for Domain Lateral Movement** (successful ✅)
+10) **SQL Server `xp_cmdshell` Abuse Abuse for Domain Lateral Movement to `dbserver31.tech.finance.corp`** as `tech\sqlserversync` (successful ✅)
 
-Description: Abused **SQL Server Linked Server functionality** to perform **lateral movement** within the domain. First, identified a target SQL Server (`dbserver31.tech.finance.corp`) where the user `databaseagent` had **authentication rights** and was a **sysadmin**. Then, validated the ability to execute commands on a linked SQL Server using `xp_cmdshell`. Finally, a reverse shell was obtained by executing a **PowerShell script** on the target server, successfully establishing a foothold on `dbserver31.tech.finance.corp` as `sqlserversync`. This allows further **privilege escalation** and post-exploitation actions within the domain.
+Description: Exploited a `sysadmin`-level SQL Server instance on `dbserver31.tech.finance.corp` via `xp_cmdshell` to achieve lateral movement in the domain. Using the `tech\databaseagent` account, which held `sysadmin` privileges, we confirmed command execution capabilities and ultimately launched a PowerShell reverse shell, gaining a foothold on `dbserver31.tech.finance.corp` as `tech\sqlserversync`. This new session enables further escalation and post-exploitation actions within the environment.
 
 - **Identify a Target SQL Server where we have Authentication Rights**
 
@@ -1396,7 +1399,7 @@ VERBOSE: --------------------------------
 VERBOSE:  - Link Path to server: DBSERVER31🔗
 VERBOSE:  - Link Login: TECH\databaseagent👤
 VERBOSE:  - Link IsSysAdmin: 1📌
-VERBOSE:  - Link Count: 0
+VERBOSE:  - Link Count: 0📌
 VERBOSE:  - Links on this server:
 
 
@@ -1408,8 +1411,9 @@ Path        : {DBSERVER31}
 User        : TECH\databaseagent👤
 Links       :
 ```
+❌
 
-- **Validate Command Execution on a Linked SQL Server**
+- **Validate Command Execution on the Target SQL Server**
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query "exec master..xp_cmdshell 'set username'"`:
 ```
@@ -1519,6 +1523,8 @@ Description: Attempted to extract **credentials** from `dbserver31.tech.finance.
 12) **Token Impersonation for ocal Privilege Escalation** (successful ✅)
 
 Description: Leveraged `GodPotato`, a privilege escalation exploit that abuses **Named Pipe Token Impersonation**, to obtain **SYSTEM privileges** on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
+
+![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
