@@ -24,13 +24,13 @@ By the conclusion of this report, the reader should understand both the **tactic
 
 ---
 
-## Summary
+## Executive Summary
 
 ???
 
 ---
 
-## ???
+## Attack Methodology
 
 ### Domain Enumeration
 
