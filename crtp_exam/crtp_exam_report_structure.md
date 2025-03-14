@@ -5,17 +5,29 @@ date: "2025-03-14"
 subject: "Certified Red Team Professional (CRTP)"
 lang: "en"
 titlepage: true
-titlepage-color: "F2F3F5"
+titlepage-color: "dc3e3e"
 titlepage-text-color: "000000"
 titlepage-rule-color: "000000"
 titlepage-rule-height: 2
 book: true
 classoption: oneside
-code-block-font-size: \scriptsize
+code-block-font-size: \small
 colorlinks: true
 linkcolor: orange
 urlcolor: orange
 toccolor: black
+mainfont: "Source Sans Pro"
+sansfont: "Source Sans Pro"
+monofont: "Source Code Pro"
+mainfontfallback:
+  - "NotoColorEmoji:mode=harf"
+sansfontfallback:
+  - "NotoColorEmoji:mode=harf"
+monofontfallback:
+  - "NotoColorEmoji:mode=harf"
+header-includes:
+  - |
+    \usepackage{fontspec}
 ---
 
 # Introduction
@@ -36,7 +48,7 @@ The primary aim was to **demonstrate a practical red team engagement** approach 
 1. **Enumeration**: Identifying systems, domains, trust relationships, and potential misconfigurations.
 2. **Initial foothold**: Gaining a stable entry point on each target server through techniques consistent with real-world post-exploitation (e.g., abusing permissions or roles rather than relying on patchable CVEs).
 3. **Privilege Escalation and Lateral Movement**: Elevating privileges or moving across the environment through legitimate AD functionalities, to consolidate access and gather critical information (domain credentials, sensitive data, etc.).
-4. **Documentation and Mitigation**: Documenting all findings, methods, and mitigation ideas in a clear, detailed manner to reflect a genuine attacker mindset while offering practical defensive measures.
+4. **Documentation**: Documenting all findings, methods, in a clear, detailed manner to reflect a genuine attacker mindset.
 
 By the conclusion of this report, the reader should understand both the **tactical steps** used (commands, scripts, screenshots) and the **rationale** behind them, why each approach was chosen, the potential threats posed to real environments, and how these threats might be prevented in a production setting.
 
