@@ -27,8 +27,29 @@ monofontfallback:
   - "NotoColorEmoji:mode=harf"
 header-includes:
   - |
-    \usepackage{fontspec}
+    \usepackage{graphicx}
+    \makeatletter
+    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth \linewidth \else \Gin@nat@width\fi}
+    \def\maxheight{\ifdim\Gin@nat@height>\textheight \textheight \else \Gin@nat@height\fi}
+    \makeatother
+    \let\Oldincludegraphics\includegraphics
+    \renewcommand{\includegraphics}[2][]{%
+      \Oldincludegraphics[width=\maxwidth,height=\maxheight,keepaspectratio,#1]{#2}%
+    }
 ---
+<!--
+pandoc ./report.md -o ./report.pdf \
+--pdf-engine lualatex \
+--template eisvogel \
+--listing \
+--table-of-contents \
+--toc-depth 6 \
+--number-sections \
+--top-level-division=chapter \
+--highlight-style zenburn \
+--resource-path=.:src \
+--resource-path=.:/usr/share/osert/src
+-->
 
 # Introduction
 
@@ -1492,7 +1513,7 @@ SID               : S-1-5-18
 
 ---
 
-### OverPass-The-Hash for Domain Privilege Escalation as `tech\sqlserversync` (successful ✅)
+## OverPass-The-Hash for Domain Privilege Escalation as `tech\sqlserversync` (successful ✅)
 
 Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserversync` by requesting a TGT with the account's AES-256 Kerberos key. Since `sqlserversync` possessed domain replication privileges, we then executed a DCSync attack on `tech\administrator` and `tech\krbtgt` to extract their AES-256 Kerberos keys and NTLM hashes. The successful retrieval of these credentials enables lateral movement and privilege escalation. Notably, the `tech\krbtgt` credentials are useful for Golden Ticket attacks, while the `tech\administrator` credentials provide administrative access to the domain, facilitating further exploitation.
 
