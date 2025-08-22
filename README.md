@@ -16,7 +16,7 @@ Whether you're preparing for the CRTP certification or looking to enhance your k
 
 ## Learning Path Topics
 
-### 01 [Learning Objective](./learning_objective_01.md)
+#### 01 [Learning Objective](./learning_objective_01.md)
 
 - [x] **Enumerate following for the `dollarcorp` domain:**
 	- [x]  **Users**
