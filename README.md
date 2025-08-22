@@ -14,6 +14,8 @@ Each section covers essential red teaming techniques, including Active Directory
 
 Whether you're preparing for the CRTP certification or looking to enhance your knowledge of Active Directory security, this repository serves as both a study guide and a technical resource for anyone interested in offensive security and red teaming.
 
+---
+
 ## Learning Path Topics
 
 #### 01 [Learning Objective](./learning_objective_01.md)
